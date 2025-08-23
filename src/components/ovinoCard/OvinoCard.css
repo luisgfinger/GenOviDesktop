@@ -1,0 +1,38 @@
+.ovinoCard-container {
+  background-color: var(--primary-color);
+  height: 310px;
+  width: 230px;
+  border-radius: 10px;
+}
+
+.ovinoCard-container li {
+  border-radius: 10px;
+  padding-top: 13px;
+}
+
+.ovinoCard-container li:first-child {
+  justify-content: center;
+  align-items: center;
+}
+
+.ovinoCard-container li h3 {
+  color: var(--full-black-color);
+  padding-left: 9px;
+}
+
+.ovinoCard-container li p {
+  padding-left: 9px;
+}
+
+.ovinoCard-container li span{
+  align-items: center;
+}
+
+.ovinoCard-container li span h3,p{
+  font-size: 17px;
+}
+
+.ovinoCard-buttons{
+    align-items: center;
+    gap: 10px;
+}

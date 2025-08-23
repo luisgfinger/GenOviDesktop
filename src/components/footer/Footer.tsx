@@ -22,7 +22,7 @@ const Footer: React.FC = () => {
         </li>
         <li>
           <span>
-            <a className="link-effect" href="">Baixe nosso aplicativo para Android ou IOS</a>
+            <p>Baixe nosso aplicativo para Android ou IOS</p>
           </span>
         </li>
         <li className="stores-buttons flex">

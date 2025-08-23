@@ -6,22 +6,30 @@
   --secondary-color: #F8EAC0;
   --white-color: #FAFAFA;
   --green-color: #4A7023;
+  --light-green-color: #B1CB96;
+  --text-primary-color: #4F4F4F;
+  --full-black-color: #000000;
+
   --small-text-size: 16px;
   --h3-size: 20px;
   --h3-weight: 300;
   --h3-bold-weight: 600;
   --h2-size: 34px;
-  --h2-weight: 300;
+  --h2-weight: 400;
+  --h1-size: 30px;
   --button-text-size: 25px;
+
   --label-size: 21px;
   --label-weight: 300;
-  --text-primary-color: #4F4F4F;
+
+  
 }
 
-/*Desativar scroll horizontal*/
+/*Desativar scroll horizontal
 html, body {
   overflow-x: hidden;
 }
+*/
 
 /* Zerar css padrão dos navegadores */
 ul {
@@ -99,9 +107,22 @@ body h2{
   font-weight: var(--h2-weight);
 }
 
+body h1{
+  font-size: var(--h1-size);
+}
+
 body label{
   font-size: var(--label-size);
   font-weight: var(--label-weight);
+}
+
+a {
+  transition: transform 0.3s ease;
+}
+
+a:hover {
+  transform: scale(1.08);
+  cursor: pointer;
 }
 
 

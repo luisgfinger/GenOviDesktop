@@ -1,25 +1,41 @@
 /* Estilos padrão para botões */
 
-@import url('https://fonts.googleapis.com/css2?family=Jockey+One&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Jockey+One&display=swap");
 
-.primary-button{
-    height: 42px;
-    width: 169px;
-    border: none;
-    border-radius: 17px;
-    margin-top: 59px;
-    background-color: var(--green-color);
-    color: var(--white-color);
-    font-size: var(--button-text-size);
-    display: flex;
-    font-family: 'Jockey One', sans-serif;
-    justify-content: center;
-    align-items: center;
-    font-weight: 300;
+.login-button {
+  height: 42px;
+  width: 169px;
+  border: none;
+  border-radius: 17px;
+  margin-top: 59px;
+  background-color: var(--green-color);
+  color: var(--white-color);
+  font-size: var(--button-text-size);
+  display: flex;
+  font-family: "Jockey One", sans-serif;
+  justify-content: center;
+  align-items: center;
+  font-weight: 300;
 }
 
-.primary-button:hover{
-    background-color: var(--primary-color);
-    cursor: pointer;
+.login-button:hover {
+  background-color: var(--primary-color);
+  cursor: pointer;
 }
 
+.ovinoCard-button {
+  width: 177px;
+  height: 27px;
+  border-radius: 10px;
+}
+
+.ovinoCard-primaryButton {
+  background-color: var(--secondary-color);
+  border: none;
+}
+
+.ovinoCard-secondaryButton {
+  background: transparent;
+  border: 3px solid var(--secondary-color);
+  border-width: 3px;
+}

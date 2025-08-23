@@ -1,0 +1,16 @@
+.ovinoMenu-content{
+    gap: 30px;
+    padding-left: 100px;
+    padding-top: 30px;
+   
+}
+
+.ovinoMenu-content li h3{
+    font-size: 30px;
+    color: var(--full-black-color);
+}
+
+.ovinoMenu-content-optionsLine{
+    gap: 30px;
+    padding-bottom: 50px;
+}

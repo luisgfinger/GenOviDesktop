@@ -1,9 +1,9 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import Navbar from "../../components/navbar/NavBar";
-import "./Home.css"
+import "./Home.css";
 import LoginForm from '../login/LoginForm';
 import Footer from "../../components/footer/Footer";
-import Plant from "../../components/plant/Plant"
 
 const navItems = [
   { label: "Sobre nós", href: "#home" },
@@ -13,17 +13,17 @@ const navItems = [
 ];
 
 const Home: React.FC = () => {
-   const handleLogin = (email: string, password: string) => {
-    console.log("E-mail:", email);
-    console.log("Senha:", password);
-  };
+  const navigate = useNavigate(); 
 
+  const handleLogin = (username: string) => {
+    console.log("Usuário logado:", localStorage.getItem("username"));
+    navigate("/dashboard");
+  };
 
   return (
     <>
-      <Navbar items={navItems} />
       <div className="container flex-column">
-        <LoginForm onLogin={handleLogin}/>
+        <LoginForm onLoginSuccess={handleLogin}/>
         <Footer/>
       </div>
     </>

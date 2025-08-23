@@ -1,0 +1,30 @@
+.optionCard-container{
+    width: 150px;
+    height: 180px;
+    background-color: var(--primary-color);
+    border-radius: 20px;
+    justify-content: center;
+    align-items: center;
+}
+
+.optionCard-container a{
+    gap: 20px;
+    justify-content: center;
+    align-items: center;
+}
+
+.optionCard-container a img{
+    width: 60px;
+    height: 60px;
+}
+
+.optionCardText{
+    text-align: center;
+    height: 69px;
+    color: var(--full-black-color);
+    align-items: center;
+}
+
+.optionCardText h3{
+    font-size: 20px !important;
+}
