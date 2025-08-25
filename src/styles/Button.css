@@ -29,9 +29,19 @@
   border-radius: 10px;
 }
 
+.ovinoCard-button:hover{
+  cursor: pointer;
+}
+
 .ovinoCard-primaryButton {
   background-color: var(--secondary-color);
   border: none;
+}
+
+.ovinoCard-primaryButton:hover {
+  background: transparent;
+  border: 3px solid var(--secondary-color);
+  border-width: 3px;
 }
 
 .ovinoCard-secondaryButton {
@@ -39,3 +49,23 @@
   border: 3px solid var(--secondary-color);
   border-width: 3px;
 }
+
+.ovinoCard-secondaryButton:hover {
+  background-color: var(--secondary-color);
+  border: none;
+}
+
+.paginationMenu-button {
+  width: 200px;
+  height: 40px;
+  border: none;
+  background-color: #b1cb96;
+  border-radius: 15px;
+  transition: transform 0.3s ease;
+}
+
+.paginationMenu-button:hover{
+    transform: scale(1.08);
+    cursor: pointer;
+}
+

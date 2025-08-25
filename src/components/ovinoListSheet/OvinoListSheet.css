@@ -1,0 +1,32 @@
+.ovinoSheet-container {
+    width: 848px;
+    max-height: 442px;
+    font-size: 13.58px;
+    background-color: #D9D9D9;
+    overflow-y: auto;
+}
+
+.ovinoSheet-titles-row {
+    background-color: #CAC3AF;
+    height: 34px;
+    position: sticky;
+    top: 0;
+    z-index: 1;
+}
+
+.ovinoSheet-titles-row span,
+.ovinoSheet-row span {
+    width: 12.5%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 34px;
+}
+
+.par {
+    background-color: #BBBBBB;
+}
+
+.impar {
+    background-color: #D9D9D9;
+}

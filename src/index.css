@@ -25,11 +25,11 @@
   
 }
 
-/*Desativar scroll horizontal
+/*Desativar scroll horizontal*/
 html, body {
   overflow-x: hidden;
 }
-*/
+
 
 /* Zerar css padrão dos navegadores */
 ul {
