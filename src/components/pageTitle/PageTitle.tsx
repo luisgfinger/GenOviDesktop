@@ -11,14 +11,18 @@ interface PageTitleProps {
 
 const PageTitle: React.FC<PageTitleProps> = ({ onSearch }) => {
   const location = useLocation();
-  const isDashboard = location.pathname === "/dashboard/ovinos";
+  const searchEnabled = location.pathname === "/dashboard/ovinos/gerenciar" || location.pathname === "/dashboard/criadores/gerenciar";
 
   const typeName = useMemo(() => {
     switch (location.pathname) {
+      case "/dashboard/ovinos":
+        return "Gerenciar Rebanho";
       case "/dashboard/ovinos/gerenciar":
-        return "ovino";
+        return "Gerenciar Rebanho"
+      case "/dashboard/ovinos/cadastrar":
+        return "Cadastrar Ovino"
       default:
-        return "invalido";
+        return "Gerenciar Criadores";
     }
   }, [location.pathname]);
 
@@ -29,18 +33,18 @@ const PageTitle: React.FC<PageTitleProps> = ({ onSearch }) => {
   ];
 
   return (
-    <div className={isDashboard ? "pageTitle-dashboard flex" : "pageTitle-container flex-column"}>
-      <ul>
+    <div className={!searchEnabled ? "pageTitle-dashboard flex" : "pageTitle-container flex"}>
+      <ul className="flex">
         <li className="pageTitle-line flex">
           <img src={Ovelha} alt="ovelha" />
-          <h2>GERENCIAR REBANHO</h2>
+          <h2>{typeName}</h2>
         </li>
 
-        {!isDashboard && (
+        {searchEnabled && (
           <li>
             <SearchBar
               placeholder={
-                typeName === "ovino"
+                location.pathname === "/dashboard/ovinos/gerenciar"
                   ? "Pesquisar animal por nome, fbb ou id"
                   : "Pesquisar..."
               }
