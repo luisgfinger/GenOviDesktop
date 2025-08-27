@@ -1,27 +1,21 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import OvinoCard from "../ovinoCard/OvinoCard";
 import "./GerenciarOvinos.css";
 import OvinoService, { type Ovino } from "../../services/ovinoService";
 import PaginationMenu from "../paginationMenu/PaginationMenu";
-import OvinosViewAll from "../ovinosViewAll/OvinosViewAll";
+import OvinoListSheet from "../ovinoListSheet/OvinoListSheet";
 
-const GerenciarOvinos: React.FC = () => {
+interface GerenciarOvinosProps {
+  searchQuery: string;
+}
+
+const GerenciarOvinos: React.FC<GerenciarOvinosProps> = ({ searchQuery }) => {
   const [ovinos, setOvinos] = useState<Ovino[]>([]);
   const [loading, setLoading] = useState(true);
   const [viewAll, setViewAll] = useState(false);
 
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 8;
-  const totalPages = Math.ceil(ovinos.length / itemsPerPage);
-
-  const currentOvinos = ovinos.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
-  );
-
-  const handleViewAll = () => {
-    setViewAll(!viewAll);
-  };
 
   useEffect(() => {
     const fetchOvinos = async () => {
@@ -38,12 +32,27 @@ const GerenciarOvinos: React.FC = () => {
     fetchOvinos();
   }, []);
 
+  const filteredOvinos = useMemo(() => {
+    if (!searchQuery) return ovinos;
+    return ovinos.filter((o) =>
+      [o.id?.toString(), o.fbb, o.nome, o.raca, o.sexo]
+        .filter(Boolean)
+        .some((field) => field!.toLowerCase().includes(searchQuery.toLowerCase()))
+    );
+  }, [ovinos, searchQuery]);
+
+  const totalPages = Math.ceil(filteredOvinos.length / itemsPerPage);
+  const currentOvinos = filteredOvinos.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
+
   if (loading) return <p>Carregando...</p>;
 
   return (
     <div className="gerenciarOvinos-container flex-column">
       {viewAll ? (
-        <OvinosViewAll ovinos={ovinos} />
+        <OvinoListSheet ovinos={filteredOvinos} />
       ) : (
         <div className="gerenciarOvinos-container-inside">
           {currentOvinos.map((ovino, index) => (
@@ -61,23 +70,19 @@ const GerenciarOvinos: React.FC = () => {
           ))}
         </div>
       )}
-      {viewAll ? (
-        <button
-          className="paginationMenu-button"
-          onClick={() => setViewAll(false)}
-        >
+      {!viewAll && filteredOvinos.length > itemsPerPage && (
+        <PaginationMenu
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={setCurrentPage}
+          showViewAll
+          onViewAll={() => setViewAll(!viewAll)}
+        />
+      )}
+      {viewAll && (
+        <button className="paginationMenu-button" onClick={() => setViewAll(false)}>
           Ver menos
         </button>
-      ) : (
-        ovinos.length > itemsPerPage && (
-          <PaginationMenu
-            currentPage={currentPage}
-            totalPages={totalPages}
-            onPageChange={setCurrentPage}
-            showViewAll
-            onViewAll={handleViewAll}
-          />
-        )
       )}
     </div>
   );

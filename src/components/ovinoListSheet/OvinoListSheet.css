@@ -1,32 +1,52 @@
-.ovinoSheet-container {
-    width: 848px;
-    max-height: 442px;
-    font-size: 13.58px;
-    background-color: #D9D9D9;
-    overflow-y: auto;
+.ovinoSheet-container{
+    gap: 85px;
+    align-items: center;
+}
+
+.ovinoSheet-container-inside {
+  width: 848px;
+  max-height: 442px;
+  font-size: 13.58px;
+  background-color: #d9d9d9;
+  overflow-y: auto;
+  overflow-x: hidden;
+  border-radius: 10px;
 }
 
 .ovinoSheet-titles-row {
-    background-color: #CAC3AF;
-    height: 34px;
-    position: sticky;
-    top: 0;
-    z-index: 1;
+  background-color: #cac3af;
+  height: 34px;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  padding-left: 10px;
+  padding-right: 10px;
 }
 
 .ovinoSheet-titles-row span,
 .ovinoSheet-row span {
-    width: 12.5%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 34px;
+  width: 12.5%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 34px;
+}
+
+.ovinoSheet-row {
+  transition: transform 0.3s ease;
+  padding-left: 10px;
+  padding-right: 10px;
+}
+
+.ovinoSheet-row:hover {
+  cursor: pointer;
+  transform: scale(1.02);
 }
 
 .par {
-    background-color: #BBBBBB;
+  background-color: #bbbbbb;
 }
 
 .impar {
-    background-color: #D9D9D9;
+  background-color: #d9d9d9;
 }
