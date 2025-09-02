@@ -1,8 +1,9 @@
 import React, { useState } from "react";
 import "./LoginForm.css";
 import "../../styles/Button.css";
-import Plant from "../../components/plant/Plant";
-import { login } from "../../services/loginService";
+import Plant from "../plant/Plant";
+import { login as loginService } from "../../services/loginService";
+import { useAuth } from "../../context/AuthContext";
 
 interface LoginFormProps {
   onLoginSuccess: (username: string) => void;
@@ -12,6 +13,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
   const [username, setUsername] = useState("");
   const [senha, setSenha] = useState("");
   const [error, setError] = useState("");
+  const { login } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -24,17 +26,12 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
     setError("");
 
     try {
-      const data = await login(username, senha);
-      localStorage.setItem("token", data.token);
-      localStorage.setItem("username", username);
-      
-      if (onLoginSuccess) {
-        onLoginSuccess(username)
-      }
-    } catch (err: any) {
+      const data = await loginService(username, senha);
+      login(username, data.token);
+      onLoginSuccess(username);
+    } catch (err) {
       console.error(err);
       setError("Usuário ou senha incorretos.");
-      
     }
   };
 

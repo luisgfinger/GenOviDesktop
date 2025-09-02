@@ -23,34 +23,34 @@
   cursor: pointer;
 }
 
-.ovinoCard-button {
+.card-button {
   width: 177px;
   height: 27px;
   border-radius: 10px;
 }
 
-.ovinoCard-button:hover{
+.card-button:hover{
   cursor: pointer;
 }
 
-.ovinoCard-primaryButton {
+.card-primaryButton {
   background-color: var(--secondary-color);
   border: none;
 }
 
-.ovinoCard-primaryButton:hover {
+.card-primaryButton:hover {
   background: transparent;
   border: 3px solid var(--secondary-color);
   border-width: 3px;
 }
 
-.ovinoCard-secondaryButton {
+.card-secondaryButton {
   background: transparent;
   border: 3px solid var(--secondary-color);
   border-width: 3px;
 }
 
-.ovinoCard-secondaryButton:hover {
+.card-secondaryButton:hover {
   background-color: var(--secondary-color);
   border: none;
 }

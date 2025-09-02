@@ -1,11 +1,11 @@
-.gerenciarOvinos-container {
+.gerenciar-container {
   padding-top: 25px;
   justify-content: center;
   align-items: center;
   gap: 26px;
 }
 
-.gerenciarOvinos-container-inside {
+.gerenciar-container-inside {
   display: grid;
   grid-template-columns: repeat(4, max-content);
   gap: 26px;

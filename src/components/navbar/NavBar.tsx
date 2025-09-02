@@ -2,30 +2,36 @@ import React from "react";
 import "./NavBar.css";
 import LogoType from "../logo/Logo";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext";
 
-interface NavItem {
-  label: string;
-  href: string;
-}
-
-interface NavbarProps {
-  items: NavItem[];
-}
-
-const Navbar: React.FC<NavbarProps> = ({ items }) => {
+const Navbar: React.FC = () => {
   const navigate = useNavigate();
+  const { isLoggedIn, logout } = useAuth();
+
+  const items = isLoggedIn
+    ? [
+        { label: "Dashboard", href: "/dashboard/ovinos" },
+        { label: "Perfil", href: "/profile" },
+      ]
+      
+    : [
+        { label: "Sobre nós", href: "#home" },
+        { label: "Suporte", href: "#about" },
+        { label: "Preços", href: "#contact" },
+        { label: "Serviços", href: "#blog" },
+      ];
 
   const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("username");
-
+    logout();
     navigate("/");
   };
 
   return (
     <nav className="flex">
       <span>
-        <a href="/"><LogoType /></a>
+        <a href="/">
+          <LogoType />
+        </a>
       </span>
       <ul className="flex">
         {items.map((item, index) => (
@@ -36,7 +42,7 @@ const Navbar: React.FC<NavbarProps> = ({ items }) => {
           </li>
         ))}
       </ul>
-      <button onClick={handleLogout}>Logout</button>
+      {isLoggedIn && <button onClick={handleLogout}>Logout</button>}
     </nav>
   );
 };

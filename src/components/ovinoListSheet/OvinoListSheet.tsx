@@ -1,8 +1,8 @@
 import React, { useState } from "react";
-import type { Ovino } from "../../services/ovinoService";
-import "./ovinoListSheet.css";
-import OvinoCard from "../ovinoCard/OvinoCard";
+import type { Ovino } from "../../services/ovino/ovinoService";
+import "./OvinoListSheet.css";
 import { motion, AnimatePresence } from "framer-motion";
+import OvinoCard from "../ovinoCard/OvinoCard";
 
 interface OvinoListSheetProps {
   ovinos: Ovino[];

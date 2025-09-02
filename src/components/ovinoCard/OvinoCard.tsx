@@ -57,10 +57,10 @@ const OvinoCard: React.FC<OvinoCardProps> = ({
         </span>
       </li>
       <li className="ovinoCard-buttons flex-column">
-        <button className="ovinoCard-button ovinoCard-primaryButton">
+        <button className="card-button card-primaryButton">
           Ver mais
         </button>
-        <button className="ovinoCard-button ovinoCard-secondaryButton">
+        <button className="card-button card-secondaryButton">
           Abrir registros
         </button>
       </li>
