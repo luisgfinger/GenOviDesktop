@@ -1,0 +1,108 @@
+.cadastrarOvino-container{
+    background-color: var(--silver-color);
+    width: 1020px;
+    height: 725px;
+    align-self: center;
+    justify-self: center;
+    margin-top: 60px;
+    border-radius: 10px;
+    margin-bottom: 60px;
+}
+
+.cadastrarOvino-imageUpdate{
+    background-color: var(--gray-color);
+    width: 180px;
+    height: 180px;
+    border-radius: 180px;
+    align-items: center;
+    justify-content: center;
+}
+
+.cadastrarOvino-container h3,label{
+    color: var(--full-black-color);
+}
+
+.cadastrarOvino-container input, .cadastrarOvino-container select{
+    height: 40px;
+    border-radius: 10px;
+    border: none;
+    background-color: var(--gray-color);
+    padding-left: 8px;
+}
+
+.cadastrarOvino-line1{
+    gap: 30px;
+    width: 100%;
+    justify-content: center;
+    padding: 40px;
+    align-items: center;
+}
+
+.cadastrarOvino-line1-column1, .cadastrarOvino-line1-column2{
+    gap: 30px;
+}
+
+.cadastrarOvino-line1-column1 li input{
+    width: 400px;
+}
+
+.cadastrarOvino-line1-column2 li input, .cadastrarOvino-line1-column2 li select{
+    width: 289px;
+}
+
+.cadastrarOvino-line2{
+    width: 100%;
+    gap: 60px;
+    justify-content: center;
+}
+
+.cadastrarOvino-line2-column1{
+    gap: 30px;
+}
+
+.cadastrarOvino-line2-column1 li{
+    gap: 36px;
+}
+
+.cadastrarOvino-line2-column1 input{
+    width: 200px;
+}
+
+.cadastrarOvino-line2-column1 li:last-of-type{
+    gap: 0px;
+}
+
+.cadastrarOvino-line2-column1 input:last-of-type{
+    width: 100%;
+}
+
+.cadastrarOvinoline2-column2{
+    gap: 30px;
+    align-self: flex-end;
+}
+
+.cadastrarOvinoline2-column2 input, .cadastrarOvinoline2-column2 select{
+    width: 459px;
+}
+
+.cadastrarOvino-line3{
+    width: 100%;
+    padding-top: 30px;
+    align-items: center;
+}
+
+.cadastrarOvino-line3 input{
+   width: 925px;
+   height: 70px;
+}
+
+.cadastrarOvino-line3 label{
+    width: 925px;
+    align-self: center;
+    justify-self: center;
+}
+
+.cadastrarOvino-container button{
+    margin-top: 24px;
+    align-self: center;
+}

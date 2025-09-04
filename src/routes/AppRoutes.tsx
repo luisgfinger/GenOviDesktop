@@ -2,7 +2,7 @@ import React from "react";
 import { Routes, Route } from "react-router-dom";
 import Home from "../pages/home/Home";
 import Dashboard from "../pages/dashboard/Dashboard";
-import Navbar from "../components/navbar/NavBar";
+import Navbar from "../components/layout/navbar/NavBar";
 import ProtectedRoute from "./ProtectedRoute";
 
 const AppRoutes: React.FC = () => {
@@ -20,6 +20,7 @@ const AppRoutes: React.FC = () => {
             </ProtectedRoute>
           }
         />
+        
       </Routes>
     </>
   );

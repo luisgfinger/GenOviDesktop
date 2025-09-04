@@ -1,11 +1,11 @@
 import { Routes, Route } from "react-router-dom";
-import SideMenu from "../../components/side-menu/SideMenu";
-import PageTitle from "../../components/pageTitle/PageTitle";
+import SideMenu from "../../components/layout/side-menu/SideMenu";
+import PageTitle from "../../components/dashboard/pageTitle/PageTitle";
 import "./Dashboard.css"
-import Gerenciar from "../../components/gerenciar/Gerenciar";
+import Gerenciar from "../../components/dashboard/gerenciar/Gerenciar";
 import { useState } from "react";
-import DashboardMenu from "../../components/dashboardMenu/DashboardMenu";
-import CadastrarOvino from "../../components/cadastrarOvino/CadastrarOvino";
+import DashboardMenu from "../../components/dashboard/dashboardMenu/DashboardMenu";
+import CadastrarOvino from "../../components/form/cadastrarOvino/CadastrarOvino";
 
 const Dashboard: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState("");

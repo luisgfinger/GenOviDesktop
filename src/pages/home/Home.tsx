@@ -1,8 +1,8 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import "./Home.css";
-import LoginForm from "../../components/login/LoginForm";
-import Footer from "../../components/footer/Footer";
+import LoginForm from "../../components/form/loginForm/LoginForm";
+import Footer from "../../components/layout/footer/Footer";
 
 const Home: React.FC = () => {
   const navigate = useNavigate();

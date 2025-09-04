@@ -1,4 +1,4 @@
-import api from "../api/services/api";
+import api from "./api";
 
 interface LoginResponse {
   token: string;
