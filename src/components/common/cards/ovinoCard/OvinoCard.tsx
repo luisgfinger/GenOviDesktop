@@ -1,8 +1,7 @@
 import React from "react";
 import "./OvinoCard.css";
-import "../../../../styles/Button.css";
-
 import Ovino from "../../../../assets/images/ovinoImagem.png";
+import Button from "../../buttons/Button";
 
 interface OvinoCardProps {
   imagem?: string;
@@ -57,12 +56,12 @@ const OvinoCard: React.FC<OvinoCardProps> = ({
         </span>
       </li>
       <li className="ovinoCard-buttons flex-column">
-        <button className="card-button card-primaryButton">
+        <Button variant="cardPrimary">
           Ver mais
-        </button>
-        <button className="card-button card-secondaryButton">
+        </Button>
+        <Button variant="cardSecondary">
           Abrir registros
-        </button>
+        </Button>
       </li>
     </ul>
   );

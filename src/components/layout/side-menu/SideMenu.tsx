@@ -4,6 +4,7 @@ import Ovinos from "../../../assets/icons/ovinos.png";
 import Funcionarios from "../../../assets/icons/funcionarios.png";
 import Notificacoes from "../../../assets/icons/notificacoes.png";
 import Ia from "../../../assets/icons/ia.png";
+import Arrow from "../../../assets/icons/backArrow.png";
 import "./SideMenu.css";
 
 const SideMenu: React.FC = () => {
@@ -18,6 +19,17 @@ const SideMenu: React.FC = () => {
   ];
 
   console.log(location.pathname);
+
+  const handleBack = () => {
+    const currentPath = location.pathname;
+    navigate(-1);
+
+    setTimeout(() => {
+      if (location.pathname === currentPath) {
+        navigate("/dashboard/ovinos", { replace: true });
+      }
+    }, 50);
+  };
 
   return (
     <div className="sideMenu-container flex">
@@ -45,7 +57,11 @@ const SideMenu: React.FC = () => {
             </React.Fragment>
           );
         })}
-        <span className="separator"></span>
+        <span className="separator" onClick={handleBack}></span>
+        <span className="backArrow flex">
+          <img src={Arrow} alt="voltar" />
+          <p>VOLTAR</p>
+        </span>
       </ul>
     </div>
   );

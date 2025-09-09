@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import "./LoginForm.css";
-import "../../../styles/Button.css";
 import Plant from "../../common/plant/Plant";
 import { login as loginService } from "../../../api/services/loginService";
 import { useAuth } from "../../../context/AuthContext";
+import Button from "../../common/buttons/Button";
 
 interface LoginFormProps {
   onLoginSuccess: (username: string) => void;
@@ -55,9 +55,10 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
             value={senha}
             onChange={(e) => setSenha(e.target.value)}
           />
-          <button className="login-button" type="submit">
-            ENTRAR
-          </button>
+          <Button variant="login" type="submit">
+            Entrar
+          </Button>
+
           <span className="link-effect">
             <a href="">Esqueceu sua senha?</a>
           </span>

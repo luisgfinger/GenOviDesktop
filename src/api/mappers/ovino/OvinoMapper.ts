@@ -5,7 +5,7 @@ import type { OvinoRequestDTO } from "../../dto/ovino/OvinoRequestDTO";
 function formatarSexo(sexo?: string): string {
   switch (sexo?.toUpperCase()) {
     case "MACHO": return "Macho";
-    case "FEMEA": return "Fêmea";
+    case "FEMEA": return "Femea";
     default: return "Não informado";
   }
 }

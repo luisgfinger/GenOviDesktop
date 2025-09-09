@@ -1,23 +1,25 @@
-.sideMenu-container{
-    width: 221px;
-    height: auto;
-    background-color: var(--light-green-color);
-    box-shadow: 0px 16px 32px rgba(0, 0, 0, 0.1);
-    justify-content: center;
- 
+.sideMenu-container {
+  position: fixed; /* fica fixo na tela */
+  top: 60px; /* começa logo abaixo do navbar */
+  left: 0;
+  width: 221px;
+  height: calc(100vh - 60px); /* ocupa o resto da tela */
+  background-color: var(--light-green-color);
+  box-shadow: 0px 16px 32px rgba(0, 0, 0, 0.1);
+  overflow-y: auto; /* rolagem independente */
 }
 
-.sideMenu-container ul{
-    width: 100%;
+.sideMenu-container ul {
+  width: 100%;
 }
 
-.sideMenu-container li{
-    align-items: center;
-    padding-left: 25px;
-    gap: 16px;
-    width: 100%;
-    height: 70px;
-    transition: transform 0.3s ease;
+.sideMenu-container li {
+  align-items: center;
+  padding-left: 25px;
+  gap: 16px;
+  width: 100%;
+  height: 70px;
+  transition: transform 0.3s ease;
 }
 
 .sideMenu-container li:not(.active):hover {
@@ -25,17 +27,30 @@
   cursor: pointer;
 }
 
-.separator{
-    width: 100%;
-    height: 0.5px;
-    background-color: var(--green-color);
+.separator {
+  width: 100%;
+  height: 0.5px;
+  background-color: var(--green-color);
 }
 
-.sideMenu-container p{
-    color: var(--green-color);
-    font-size: 12px;
+.sideMenu-container p {
+  color: var(--green-color);
+  font-size: 12px;
 }
 
 .active {
-  background-color: #f0f0f0; 
+  background-color: #f0f0f0;
+}
+
+.backArrow {
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding-top: 50px;
+  transition: transform 0.3s ease;
+}
+
+.backArrow:hover {
+  cursor: pointer;
+  transform: scale(1.08);
 }

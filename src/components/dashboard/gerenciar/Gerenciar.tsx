@@ -1,15 +1,14 @@
 import React, { useEffect, useMemo, useState } from "react";
 import "./Gerenciar.css";
 import OvinoService from "../../../api/services/ovino/OvinoService";
-import type {Ovino} from "../../../api/models/ovino/Ovino"
-import criadorService, {
-  type Criador,
-} from "../../../services/criador/criadorService";
+import type {Ovino} from "../../../api/models/ovino/Ovino";
+import type { Criador } from "../../../api/models/criador/CriadorModel";
 import PaginationMenu from "../../common/paginationMenu/PaginationMenu";
 import OvinoCard from "../../common/cards/ovinoCard/OvinoCard";
 import CriadorCard from "../../common/cards/criadorCard/CriadorCard";
 import OvinoListSheet from "./ovinoListSheet/OvinoListSheet";
 import CriadorListSheet from "./criadorListSheet/CriadorListSheet";
+import CriadorService from "../../../api/services/criador/CriadorService";
 
 interface GerenciarProps {
   searchQuery: string;
@@ -32,7 +31,7 @@ const Gerenciar: React.FC<GerenciarProps> = ({ searchQuery, type }) => {
           const data = await OvinoService.getAll();
           setOvinos(data);
         } else if (type === "criador") {
-          const data = await criadorService.getAll();
+          const data = await CriadorService.getAll();
           setCriadores(data);
         }
       } catch (error) {

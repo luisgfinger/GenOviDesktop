@@ -3,6 +3,7 @@ import "./NavBar.css";
 import LogoType from "../../common/logo/Logo";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../../context/AuthContext";
+import Button from "../../common/buttons/Button";
 
 const Navbar: React.FC = () => {
   const navigate = useNavigate();
@@ -42,7 +43,7 @@ const Navbar: React.FC = () => {
           </li>
         ))}
       </ul>
-      {isLoggedIn && <button onClick={handleLogout}>Logout</button>}
+      {isLoggedIn && <a><Button onClick={handleLogout}>Logout</Button></a>}
     </nav>
   );
 };

@@ -2,6 +2,7 @@ import React from "react";
 import "./paginationMenu.css";
 import LeftArrow from "../../../assets/icons/leftArrow.png";
 import RightArrow from "../../../assets/icons/rightArrow.png";
+import Button from "../buttons/Button";
 
 interface PaginationMenuProps {
   currentPage: number;
@@ -42,9 +43,9 @@ const PaginationMenu: React.FC<PaginationMenuProps> = ({
 
       {showViewAll && (
         <li className="flex">
-          <button className="paginationMenu-button" onClick={onViewAll}>
+          <Button variant="pagination" onClick={onViewAll}>
             Ver todos
-          </button>
+          </Button>
         </li>
       )}
 

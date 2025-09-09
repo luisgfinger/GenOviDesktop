@@ -1,5 +1,4 @@
 import { Routes, Route } from "react-router-dom";
-import SideMenu from "../../components/layout/side-menu/SideMenu";
 import PageTitle from "../../components/dashboard/pageTitle/PageTitle";
 import "./Dashboard.css"
 import Gerenciar from "../../components/dashboard/gerenciar/Gerenciar";
@@ -12,7 +11,6 @@ const Dashboard: React.FC = () => {
 
   return (
     <div className="dashboard-container flex">
-      <SideMenu />
       <div className="dashboard-inside flex-column">
         <PageTitle onSearch={setSearchQuery} />
         <Routes>

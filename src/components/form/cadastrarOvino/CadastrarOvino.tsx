@@ -1,10 +1,10 @@
 import React, { useState } from "react";
 import "./CadastrarOvino.css";
-import "../../../styles/Button.css";
 import CriadorAutocomplete from "../criadorAutoComplete/CriadorAutoComplete";
 import OvinoAutocomplete from "../ovinoAutoComplete/OvinoAutoComplete";
 
 import OvinoService from "../../../api/services/ovino/OvinoService";
+import Button from "../../common/buttons/Button";
 
 const CadastrarOvino: React.FC = () => {
   const [nome, setNome] = useState("");
@@ -80,7 +80,7 @@ const CadastrarOvino: React.FC = () => {
               id="nome"
               name="nome"
               placeholder="Insira seu nome completo"
-              maxLength={100}
+              maxLength={25}
               value={nome}
               onChange={(e) => setNome(e.target.value)}
               required
@@ -227,9 +227,9 @@ const CadastrarOvino: React.FC = () => {
         />
       </span>
 
-      <button type="submit" className="paginationMenu-button">
+      <Button variant="pagination" type="submit">
         Criar ovino
-      </button>
+      </Button>
     </form>
   );
 };

@@ -2,6 +2,7 @@
     height: auto;
     min-height: 100vh;
     background-color: var(--white-color);
+    width: 100%;
 }
 
 .dashboard-inside{

@@ -12,7 +12,7 @@ const Home: React.FC = () => {
   };
 
   return (
-    <div className="container flex-column">
+    <div className="home-container flex-column">
       <LoginForm onLoginSuccess={handleLogin} />
       <Footer />
     </div>

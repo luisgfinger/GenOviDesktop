@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect, type ChangeEvent, type FocusEvent } from "react";
-import CriadorService, { type Criador } from "../../../services/criador/criadorService";
+import CriadorService from "../../../api/services/criador/CriadorService";
+import type { Criador } from "../../../api/models/criador/CriadorModel";
 
 interface CriadorAutocompleteProps {
   onSelect: (id: string) => void;
