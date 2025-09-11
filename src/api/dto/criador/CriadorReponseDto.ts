@@ -1,5 +1,5 @@
 export interface CriadorResponseDTO {
-  id?: string;
+  id: string;
   cpfCnpj?: string;
   endereco?: string;
   nome?: string;

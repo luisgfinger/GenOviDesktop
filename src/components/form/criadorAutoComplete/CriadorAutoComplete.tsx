@@ -3,7 +3,7 @@ import CriadorService from "../../../api/services/criador/CriadorService";
 import type { Criador } from "../../../api/models/criador/CriadorModel";
 
 interface CriadorAutocompleteProps {
-  onSelect: (id: string) => void;
+  onSelect: (id: number) => void;
   required?: boolean;
 }
 
@@ -11,7 +11,7 @@ export default function CriadorAutocomplete({ onSelect, required = false }: Cria
   const [criadores, setCriadores] = useState<Criador[]>([]);
   const [inputValue, setInputValue] = useState<string>("");
   const [isOpen, setIsOpen] = useState<boolean>(false);
-  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [selectedId, setSelectedId] = useState(0);
   const [filteredCriadores, setFilteredCriadores] = useState<Criador[]>([]);
 
   const inputRef = useRef<HTMLInputElement>(null);

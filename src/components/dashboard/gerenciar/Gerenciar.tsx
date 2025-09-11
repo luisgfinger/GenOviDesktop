@@ -36,6 +36,7 @@ const Gerenciar: React.FC<GerenciarProps> = ({ searchQuery, type }) => {
         }
       } catch (error) {
         console.error(`Erro ao carregar ${type}`, error);
+        console.log(localStorage.getItem("token"))
       } finally {
         setLoading(false);
       }
@@ -101,7 +102,8 @@ const Gerenciar: React.FC<GerenciarProps> = ({ searchQuery, type }) => {
               ))
             : (currentData as Criador[]).map((criador, index) => (
                 <CriadorCard
-                  key={criador.id || `${index}-${criador.nome}`}
+                  key={criador.id}
+                  id={criador.id}
                   cpfCnpj={criador.cpfCnpj}
                   endereco={criador.endereco}
                   nome={criador.nome}

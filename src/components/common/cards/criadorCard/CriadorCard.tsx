@@ -4,6 +4,7 @@ import Ovino from "../../../../assets/images/ovinoImagem.png";
 import Button from "../../buttons/Button";
 
 interface CriadorCardProps {
+  id: string;
   imagem?: string;
   cpfCnpj: string;
   endereco: string;
@@ -12,6 +13,7 @@ interface CriadorCardProps {
 }
 
 const CriadorCard: React.FC<CriadorCardProps> = ({
+  id,
   imagem = Ovino,
   cpfCnpj,
   endereco,
@@ -24,6 +26,7 @@ const CriadorCard: React.FC<CriadorCardProps> = ({
         <img src={imagem} alt={nome} />
         <div className="flex-column">
           <h3>{nome}</h3>
+          <p>{id??"Não encontrado"}</p>
         </div>
       </li>
       <li className="flex-column">
