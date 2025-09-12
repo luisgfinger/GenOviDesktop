@@ -3,9 +3,10 @@ export interface Ovino {
   nome: string;
   raca: string;
   fbb: string;
+  rfid: string;
   sexo: string;
-  dataNascimento?: string;
-  peso?: number;
+  dataNascimento: string;
+  peso: number;
   pureza: string;
   pai: string;
   mae: string;

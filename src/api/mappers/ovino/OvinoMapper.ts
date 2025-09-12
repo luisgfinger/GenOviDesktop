@@ -23,25 +23,24 @@ function formatarPureza(pureza?: string): string {
 export const ovinoMapper = {
   toModel(dto: OvinoResponseDTO): Ovino {
     return {
-      id: dto.rfid,
-      nome: dto.nome ?? "Não informado",
-      raca: dto.raca ?? "Não informado",
-      fbb: dto.fbb ?? "Não informado",
+      id: dto.id,
+      nome: dto.nome,
+      raca: dto.raca,
+      fbb: dto.fbb,
+      rfid: dto.rfid ?? "Não informado",
       sexo: formatarSexo(dto.sexo),
-      dataNascimento: dto.dataNascimento,
-      peso: dto.peso,
+      dataNascimento: dto.dataNascimento?? "Não informado",
+      peso: dto.peso?? 0,
       pureza: formatarPureza(dto.typeGrauPureza),
       pai: dto.ascendencia?.ovinoPai?.nome ?? "Não informado",
       mae: dto.ascendencia?.ovinoMae?.nome ?? "Não informado",
-      status: dto.status ?? "Não informado",
+      status: dto.status,
       comportamento: dto.comportamento ?? "Não informado",
     };
   },
 
-  toRequest(data: Omit<OvinoRequestDTO, "rfid">): OvinoRequestDTO {
-    return {
-      rfid: Math.floor(Math.random() * 1_000_000_000),
-      ...data,
-    };
-  }
+toRequest(data: OvinoRequestDTO): OvinoRequestDTO {
+  return data;
+}
+
 };

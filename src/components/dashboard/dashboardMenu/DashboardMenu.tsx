@@ -72,7 +72,7 @@ const DashboardMenu: React.FC<DashboardMenuProps> = ({ location }) => {
     {
       images: [{ src: Add, alt: "add" }],
       text: "Cadastrar Criador",
-      href: "/",
+      href: "/dashboard/criadores/cadastrar",
     },
     {
       images: [{ src: Manage, alt: "add" }],

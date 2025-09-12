@@ -14,16 +14,16 @@ class OvinoService {
     return response.data.map(ovinoMapper.toModel);
   }
 
-  async create(data: Omit<OvinoRequestDTO, "rfid">): Promise<Ovino> {
-    const token = localStorage.getItem("token");
-    const dto = ovinoMapper.toRequest(data);
+  async create(data: OvinoRequestDTO): Promise<Ovino> {
+  const token = localStorage.getItem("token");
+  const dto = ovinoMapper.toRequest(data);
 
-    const response = await api.post<OvinoResponseDTO>("/user/ovinos", dto, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
+  const response = await api.post<OvinoResponseDTO>("/user/ovinos", dto, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
 
-    return ovinoMapper.toModel(response.data);
-  }
+  return ovinoMapper.toModel(response.data);
+}
 }
 
 export default new OvinoService();

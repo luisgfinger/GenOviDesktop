@@ -5,6 +5,7 @@ import Gerenciar from "../../components/dashboard/gerenciar/Gerenciar";
 import { useState } from "react";
 import DashboardMenu from "../../components/dashboard/dashboardMenu/DashboardMenu";
 import CadastrarOvino from "../../components/form/cadastrarOvino/CadastrarOvino";
+import CadastrarCriador from "../../components/form/cadastrarCriador/CadastrarCriador";
 
 const Dashboard: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -30,6 +31,10 @@ const Dashboard: React.FC = () => {
           <Route
             path="criadores/gerenciar"
             element={<Gerenciar searchQuery={searchQuery} type="criador"/>}
+          />
+           <Route
+            path="criadores/cadastrar"
+            element={<CadastrarCriador/>}
           />
         </Routes>
       </div>

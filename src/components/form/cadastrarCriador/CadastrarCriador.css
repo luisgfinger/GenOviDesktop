@@ -1,0 +1,33 @@
+.cadastrarCriador-container {
+  background-color: var(--silver-color);
+  width: 500px;
+  height: 550px;
+  align-self: center;
+  justify-self: center;
+  margin-top: 40px;
+  border-radius: 10px;
+  margin-bottom: 60px;
+}
+
+.cadastrarCriador-container h3,label{
+    color: var(--full-black-color);
+}
+
+.cadastrarCriador-container ul{
+    gap: 34px;
+    align-items: center;
+    margin-top: 42px;
+}
+
+.cadastrarCriador-container input{
+    height: 40px;
+    border-radius: 10px;
+    border: none;
+    background-color: var(--gray-color);
+    padding-left: 8px;
+    width: 350px;
+}
+
+.cadastrarCriador-container button{
+    margin-top: 36px;
+}

@@ -1,5 +1,5 @@
 export class Criador {
-  id: number;
+  id: string;
   cpfCnpj: string;
   endereco: string;
   nome: string;
@@ -7,7 +7,7 @@ export class Criador {
   imagem?: string;
 
   constructor(
-    id: number,
+    id: string,
     cpfCnpj: string,
     endereco: string,
     nome: string,

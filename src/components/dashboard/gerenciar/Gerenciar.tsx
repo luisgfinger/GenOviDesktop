@@ -100,7 +100,7 @@ const Gerenciar: React.FC<GerenciarProps> = ({ searchQuery, type }) => {
                   pureza={ovino.pureza}
                 />
               ))
-            : (currentData as Criador[]).map((criador, index) => (
+            : (currentData as Criador[]).map((criador) => (
                 <CriadorCard
                   key={criador.id}
                   id={criador.id}

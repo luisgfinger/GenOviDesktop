@@ -1,13 +1,14 @@
 export interface OvinoResponseDTO {
-  rfid: string;
+  id: string;
   nome: string;
   raca: string;
   fbb: string;
   dataNascimento?: string;
   typeGrauPureza?: string;
-  sexo?: string;
+  rfid?: string;
+  sexo: string;
   peso?: number;
-  status?: string;
+  status: string;
   comportamento?: string;
   ascendencia?: {
     ovinoPai?: { nome: string };
