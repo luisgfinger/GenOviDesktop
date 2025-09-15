@@ -1,4 +1,4 @@
-export interface CriadorResponseDTO {
+export interface FuncionarioResponseDTO {
   id: string;
   cpfCnpj: string;
   endereco: string;

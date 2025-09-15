@@ -1,4 +1,4 @@
-export class Criador {
+export class Funcionario {
   id: string;
   cpfCnpj: string;
   endereco: string;

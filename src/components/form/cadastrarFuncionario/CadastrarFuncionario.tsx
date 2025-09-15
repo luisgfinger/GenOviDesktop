@@ -1,9 +1,9 @@
 import React, { use, useState } from "react";
-import "./CadastrarCriador.css";
-import CriadorService from "../../../api/services/criador/CriadorService";
+import "./CadastrarFuncionario.css";
+import FuncionarioService from "../../../api/services/funcionario/FuncionarioService";
 import Button from "../../common/buttons/Button";
 
-const CadastrarCriador: React.FC = () => {
+const CadastrarFuncionario: React.FC = () => {
   const [cpfCnpj, setCpfCnpj] = useState<string>("");
   const [endereco, setEndereco] = useState<string>("");
   const [nome, setNome] = useState("");
@@ -12,33 +12,33 @@ const CadastrarCriador: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const criadorData = {
+      const funcionarioData = {
         cpfCnpj: cpfCnpj.replace(/\D/g, ""),
         endereco,
         nome,
         telefone,
       };
 
-      console.log("Enviando para API:", criadorData);
+      console.log("Enviando para API:", funcionarioData);
 
-      const novoCriador = await CriadorService.create(criadorData);
+      const novoFuncionario = await FuncionarioService.create(funcionarioData);
 
-      alert(`✅ Criador cadastrado com sucesso! ID: ${novoCriador.id}`);
+      alert(`✅ Funcionario cadastrado com sucesso! ID: ${novoFuncionario.id}`);
 
       setCpfCnpj("");
       setEndereco("");
       setNome("");
       setTelefone("");
     } catch (error) {
-      console.error("Erro ao cadastrar criador:", error);
+      console.error("Erro ao cadastrar funcionario:", error);
       alert(
-        "❌ Erro ao cadastrar criador. Verifique os dados e tente novamente."
+        "❌ Erro ao cadastrar funcionario. Verifique os dados e tente novamente."
       );
     }
   };
   return (
     <form
-      className="cadastrarCriador-container flex-column"
+      className="cadastrarFuncionario-container flex-column"
       onSubmit={handleSubmit}
     >
       <ul className="flex-column">
@@ -95,11 +95,11 @@ const CadastrarCriador: React.FC = () => {
           />
         </li>
         <Button variant="pagination" type="submit">
-          Cadastrar criador
+          Cadastrar funcionario
         </Button>
       </ul>
     </form>
   );
 };
 
-export default CadastrarCriador;
+export default CadastrarFuncionario;

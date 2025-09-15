@@ -1,43 +1,43 @@
 import { useState, useRef, useEffect, type ChangeEvent, type FocusEvent } from "react";
-import CriadorService from "../../../api/services/criador/CriadorService";
-import type { Criador } from "../../../api/models/criador/CriadorModel";
+import FuncionarioService from "../../../api/services/funcionario/FuncionarioService";
+import type { Funcionario } from "../../../api/models/funcionario/FuncionarioModel";
 
-interface CriadorAutocompleteProps {
+interface FuncionarioAutocompleteProps {
   onSelect: (id: string) => void;
   required?: boolean;
 }
 
-export default function CriadorAutocomplete({ onSelect, required = false }: CriadorAutocompleteProps) {
-  const [criadores, setCriadores] = useState<Criador[]>([]);
+export default function FuncionarioAutocomplete({ onSelect, required = false }: FuncionarioAutocompleteProps) {
+  const [funcionarios, setFuncionarios] = useState<Funcionario[]>([]);
   const [inputValue, setInputValue] = useState<string>("");
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [selectedId, setSelectedId] = useState<string>("");
-  const [filteredCriadores, setFilteredCriadores] = useState<Criador[]>([]);
+  const [filteredFuncionarios, setFilteredFuncionarios] = useState<Funcionario[]>([]);
 
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    async function fetchCriadores() {
+    async function fetchFuncionarios() {
       try {
-        const data = await CriadorService.getAll();
-        setCriadores(data);
-        setFilteredCriadores(data);
+        const data = await FuncionarioService.getAll();
+        setFuncionarios(data);
+        setFilteredFuncionarios(data);
       } catch (error) {
-        console.error("Erro ao buscar criadores:", error);
+        console.error("Erro ao buscar funcionarios:", error);
       }
     }
-    fetchCriadores();
+    fetchFuncionarios();
   }, []);
 
   useEffect(() => {
-    if (!inputValue) setFilteredCriadores(criadores);
+    if (!inputValue) setFilteredFuncionarios(funcionarios);
     else
-      setFilteredCriadores(
-        criadores.filter(c =>
+      setFilteredFuncionarios(
+        funcionarios.filter(c =>
           c.nome.toLowerCase().includes(inputValue.toLowerCase())
         )
       );
-  }, [inputValue, criadores]);
+  }, [inputValue, funcionarios]);
 
   const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     setInputValue(e.target.value);
@@ -45,12 +45,12 @@ export default function CriadorAutocomplete({ onSelect, required = false }: Cria
     setIsOpen(true);
   };
 
-  const handleSelectCriador = (criador: Criador) => {
-    setInputValue(criador.nome);
-    setSelectedId(criador.id);
+  const handleSelectFuncionario = (funcionario: Funcionario) => {
+    setInputValue(funcionario.nome);
+    setSelectedId(funcionario.id);
     setIsOpen(false);
     inputRef.current?.focus();
-    onSelect(criador.id);
+    onSelect(funcionario.id);
   };
 
   const handleBlur = (e: FocusEvent<HTMLInputElement>) => {
@@ -66,20 +66,20 @@ export default function CriadorAutocomplete({ onSelect, required = false }: Cria
         onChange={handleInputChange}
         onBlur={handleBlur}
         onFocus={() => setIsOpen(true)}
-        placeholder="Digite ou selecione um criador"
+        placeholder="Digite ou selecione um funcionario"
         autoComplete="off"
         style={{ width: "100%", padding: "8px 12px" }}
         required={required}
       />
       {isOpen && (
         <ul style={{ position: "absolute", top: "100%", left: 0, right: 0, maxHeight: 200, overflowY: "auto", background: "white", border: "1px solid #d1d5db", zIndex: 1000, margin: 0, padding: 0, listStyle: "none" }}>
-          {filteredCriadores.length === 0 ? (
-            <li style={{ padding: 12, fontStyle: "italic", color: "#6b7280" }}>Nenhum criador encontrado</li>
+          {filteredFuncionarios.length === 0 ? (
+            <li style={{ padding: 12, fontStyle: "italic", color: "#6b7280" }}>Nenhum funcionario encontrado</li>
           ) : (
-            filteredCriadores.map(c => (
+            filteredFuncionarios.map(c => (
               <li
                 key={c.id}
-                onClick={() => handleSelectCriador(c)}
+                onClick={() => handleSelectFuncionario(c)}
                 style={{ padding: 12, cursor: "pointer", backgroundColor: selectedId === c.id ? "#f3f4f6" : "white" }}
               >
                 {c.nome}
@@ -88,7 +88,7 @@ export default function CriadorAutocomplete({ onSelect, required = false }: Cria
           )}
         </ul>
       )}
-      <input type="hidden" name="criadorId" value={selectedId || ""} required={required} />
+      <input type="hidden" name="funcionarioId" value={selectedId || ""} required={required} />
     </li>
   );
 }

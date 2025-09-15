@@ -1,4 +1,4 @@
-.criadorCard-container {
+.funcionarioCard-container {
   background-color: var(--primary-color);
   height: 310px;
   width: 250px;
@@ -6,39 +6,39 @@
   transition: transform 0.3s ease;
 }
 
-.criadorCard-container:hover{
+.funcionarioCard-container:hover{
   cursor: pointer;
   transform: scale(1.08);
 }
 
-.criadorCard-container li {
+.funcionarioCard-container li {
   border-radius: 10px;
   padding-top: 13px;
 }
 
-.criadorCard-container li:first-child {
+.funcionarioCard-container li:first-child {
   justify-content: center;
   align-items: center;
 }
 
-.criadorCard-container li h3 {
+.funcionarioCard-container li h3 {
   color: var(--full-black-color);
   padding-left: 9px;
 }
 
-.criadorCard-container li p {
+.funcionarioCard-container li p {
   padding-left: 9px;
 }
 
-.criadorCard-container li span{
+.funcionarioCard-container li span{
   align-items: center;
 }
 
-.criadorCard-container li span h3,p{
+.funcionarioCard-container li span h3,p{
   font-size: 17px;
 }
 
-.criadorCard-buttons{
+.funcionarioCard-buttons{
     align-items: center;
     gap: 10px;
 }

@@ -1,4 +1,4 @@
-.cadastrarCriador-container {
+.cadastrarFuncionario-container {
   background-color: var(--silver-color);
   width: 500px;
   height: 550px;
@@ -9,17 +9,17 @@
   margin-bottom: 60px;
 }
 
-.cadastrarCriador-container h3,label{
+.cadastrarFuncionario-container h3,label{
     color: var(--full-black-color);
 }
 
-.cadastrarCriador-container ul{
+.cadastrarFuncionario-container ul{
     gap: 34px;
     align-items: center;
     margin-top: 42px;
 }
 
-.cadastrarCriador-container input{
+.cadastrarFuncionario-container input{
     height: 40px;
     border-radius: 10px;
     border: none;
@@ -28,6 +28,6 @@
     width: 350px;
 }
 
-.cadastrarCriador-container button{
+.cadastrarFuncionario-container button{
     margin-top: 36px;
 }

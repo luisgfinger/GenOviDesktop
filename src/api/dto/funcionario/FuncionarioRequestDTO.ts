@@ -1,4 +1,4 @@
-export interface CriadorRequestDTO {
+export interface FuncionarioRequestDTO {
   cpfCnpj: string;
   endereco: string;
   nome: string;

@@ -1,9 +1,9 @@
 import React from "react";
-import "./CriadorCard.css";
+import "./FuncionarioCard.css";
 import Ovino from "../../../../assets/images/ovinoImagem.png";
 import Button from "../../buttons/Button";
 
-interface CriadorCardProps {
+interface FuncionarioCardProps {
   id: string;
   imagem?: string;
   cpfCnpj: string;
@@ -12,7 +12,7 @@ interface CriadorCardProps {
   telefone: string;
 }
 
-const CriadorCard: React.FC<CriadorCardProps> = ({
+const FuncionarioCard: React.FC<FuncionarioCardProps> = ({
   id,
   imagem = Ovino,
   cpfCnpj,
@@ -21,7 +21,7 @@ const CriadorCard: React.FC<CriadorCardProps> = ({
   telefone,
 }) => {
   return (
-    <ul className="criadorCard-container flex-column">
+    <ul className="funcionarioCard-container flex-column">
       <li className="flex">
         <img src={imagem} alt={nome} />
         <div className="flex-column">
@@ -43,7 +43,7 @@ const CriadorCard: React.FC<CriadorCardProps> = ({
           <p>{telefone}</p>
         </span>
       </li>
-      <li className="criadorCard-buttons flex-column">
+      <li className="funcionarioCard-buttons flex-column">
         <Button variant="cardPrimary">Ver mais</Button>
         <Button variant="cardSecondary">Abrir registros</Button>
       </li>
@@ -51,4 +51,4 @@ const CriadorCard: React.FC<CriadorCardProps> = ({
   );
 };
 
-export default CriadorCard;
+export default FuncionarioCard;

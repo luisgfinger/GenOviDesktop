@@ -11,7 +11,7 @@ interface PageTitleProps {
 
 const PageTitle: React.FC<PageTitleProps> = ({ onSearch }) => {
   const location = useLocation();
-  const searchEnabled = location.pathname === "/dashboard/ovinos/gerenciar" || location.pathname === "/dashboard/criadores/gerenciar";
+  const searchEnabled = location.pathname === "/dashboard/ovinos/gerenciar" || location.pathname === "/dashboard/funcionarios/gerenciar";
 
   const typeName = useMemo(() => {
     switch (location.pathname) {
@@ -22,7 +22,7 @@ const PageTitle: React.FC<PageTitleProps> = ({ onSearch }) => {
       case "/dashboard/ovinos/cadastrar":
         return "Cadastrar Ovino"
       default:
-        return "Gerenciar Criadores";
+        return "Gerenciar Funcionarios";
     }
   }, [location.pathname]);
 

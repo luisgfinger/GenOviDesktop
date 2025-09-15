@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import "./CadastrarOvino.css";
-import CriadorAutocomplete from "../criadorAutoComplete/CriadorAutoComplete";
+import FuncionarioAutocomplete from "../funcionarioAutoComplete/FuncionarioAutoComplete";
 import OvinoAutocomplete from "../ovinoAutoComplete/OvinoAutoComplete";
 
 import OvinoService from "../../../api/services/ovino/OvinoService";
@@ -97,8 +97,8 @@ const CadastrarOvino: React.FC = () => {
             />
           </li>
           <li>
-            <label htmlFor="criador">Criador</label>
-            <CriadorAutocomplete onSelect={(id) => setCriadorId(id)} />
+            <label htmlFor="funcionario">Funcionario</label>
+            <FuncionarioAutocomplete onSelect={(id) => setCriadorId(id)} />
           </li>
         </ul>
 

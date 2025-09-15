@@ -68,23 +68,23 @@ const DashboardMenu: React.FC<DashboardMenuProps> = ({ location }) => {
     },
   ];
 
-  const criadoresCardOptions = [
+  const funcionariosCardOptions = [
     {
       images: [{ src: Add, alt: "add" }],
-      text: "Cadastrar Criador",
-      href: "/dashboard/criadores/cadastrar",
+      text: "Cadastrar Funcionario",
+      href: "/dashboard/funcionarios/cadastrar",
     },
     {
       images: [{ src: Manage, alt: "add" }],
-      text: "Gerenciar Criador",
-      href: "/dashboard/criadores/gerenciar",
+      text: "Gerenciar Funcionario",
+      href: "/dashboard/funcionarios/gerenciar",
     },
   ];
 
   return (
     <ul className="dashboardMenu-content flex-column">
       <li>
-        <h3>{location == "ovino"? "Ovinos" : "Criadores"}</h3>
+        <h3>{location == "ovino"? "Ovinos" : "Funcionarios"}</h3>
       </li>
       <li className="dashboardMenu-content-optionsLine flex">
         {location === "ovino"
@@ -96,7 +96,7 @@ const DashboardMenu: React.FC<DashboardMenuProps> = ({ location }) => {
                 href={option.href}
               />
             ))
-          : criadoresCardOptions.map((option, index) => (
+          : funcionariosCardOptions.map((option, index) => (
               <OptionCard
                 key={index}
                 images={option.images}

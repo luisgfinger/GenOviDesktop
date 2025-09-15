@@ -1,23 +1,23 @@
 import React, { useEffect, useMemo, useState } from "react";
 import "./Gerenciar.css";
 import OvinoService from "../../../api/services/ovino/OvinoService";
-import type {Ovino} from "../../../api/models/ovino/Ovino";
-import type { Criador } from "../../../api/models/criador/CriadorModel";
+import type { Ovino } from "../../../api/models/ovino/Ovino";
+import type { Funcionario } from "../../../api/models/funcionario/FuncionarioModel";
 import PaginationMenu from "../../common/paginationMenu/PaginationMenu";
 import OvinoCard from "../../common/cards/ovinoCard/OvinoCard";
-import CriadorCard from "../../common/cards/criadorCard/CriadorCard";
+import FuncionarioCard from "../../common/cards/funcionarioCard/FuncionarioCard";
 import OvinoListSheet from "./ovinoListSheet/OvinoListSheet";
-import CriadorListSheet from "./criadorListSheet/CriadorListSheet";
-import CriadorService from "../../../api/services/criador/CriadorService";
+import FuncionarioListSheet from "./FuncionarioListSheet/FuncionarioListSheet";
+import FuncionarioService from "../../../api/services/funcionario/FuncionarioService";
 
 interface GerenciarProps {
   searchQuery: string;
-  type: "ovino" | "criador";
+  type: "ovino" | "funcionario";
 }
 
 const Gerenciar: React.FC<GerenciarProps> = ({ searchQuery, type }) => {
   const [ovinos, setOvinos] = useState<Ovino[]>([]);
-  const [criadores, setCriadores] = useState<Criador[]>([]);
+  const [funcionarios, setFuncionarios] = useState<Funcionario[]>([]);
   const [loading, setLoading] = useState(true);
   const [viewAll, setViewAll] = useState(false);
 
@@ -30,13 +30,13 @@ const Gerenciar: React.FC<GerenciarProps> = ({ searchQuery, type }) => {
         if (type === "ovino") {
           const data = await OvinoService.getAll();
           setOvinos(data);
-        } else if (type === "criador") {
-          const data = await CriadorService.getAll();
-          setCriadores(data);
+        } else if (type === "funcionario") {
+          const data = await FuncionarioService.getAll();
+          setFuncionarios(data);
         }
       } catch (error) {
         console.error(`Erro ao carregar ${type}`, error);
-        console.log(localStorage.getItem("token"))
+        console.log(localStorage.getItem("token"));
       } finally {
         setLoading(false);
       }
@@ -56,18 +56,18 @@ const Gerenciar: React.FC<GerenciarProps> = ({ searchQuery, type }) => {
     );
   }, [ovinos, searchQuery]);
 
-  const filteredCriadores = useMemo(() => {
-    if (!searchQuery) return criadores;
-    return criadores.filter((c) =>
+  const filteredFuncionarios = useMemo(() => {
+    if (!searchQuery) return funcionarios;
+    return funcionarios.filter((c) =>
       [c.id?.toString(), c.cpfCnpj, c.endereco, c.nome, c.telefone]
         .filter(Boolean)
         .some((field) =>
           field!.toLowerCase().includes(searchQuery.toLowerCase())
         )
     );
-  }, [criadores, searchQuery]);
+  }, [funcionarios, searchQuery]);
 
-  const data = type === "ovino" ? filteredOvinos : filteredCriadores;
+  const data = type === "ovino" ? filteredOvinos : filteredFuncionarios;
   const totalPages = Math.ceil(data.length / itemsPerPage);
   const currentData = data.slice(
     (currentPage - 1) * itemsPerPage,
@@ -82,7 +82,7 @@ const Gerenciar: React.FC<GerenciarProps> = ({ searchQuery, type }) => {
         type === "ovino" ? (
           <OvinoListSheet ovinos={filteredOvinos} />
         ) : (
-          <CriadorListSheet criadores={filteredCriadores}/>
+          <FuncionarioListSheet funcionarios={filteredFuncionarios} />
         )
       ) : (
         <div className="gerenciar-container-inside">
@@ -100,14 +100,14 @@ const Gerenciar: React.FC<GerenciarProps> = ({ searchQuery, type }) => {
                   pureza={ovino.pureza}
                 />
               ))
-            : (currentData as Criador[]).map((criador) => (
-                <CriadorCard
-                  key={criador.id}
-                  id={criador.id}
-                  cpfCnpj={criador.cpfCnpj}
-                  endereco={criador.endereco}
-                  nome={criador.nome}
-                  telefone={criador.telefone}
+            : (currentData as Funcionario[]).map((funcionario) => (
+                <FuncionarioCard
+                  key={funcionario.id}
+                  id={funcionario.id}
+                  cpfCnpj={funcionario.cpfCnpj}
+                  endereco={funcionario.endereco}
+                  nome={funcionario.nome}
+                  telefone={funcionario.telefone}
                 />
               ))}
         </div>
