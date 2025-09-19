@@ -1,6 +1,5 @@
 import React, { use, useState } from "react";
 import "./CadastrarFuncionario.css";
-import FuncionarioService from "../../../api/services/funcionario/FuncionarioService";
 import Button from "../../common/buttons/Button";
 
 const CadastrarFuncionario: React.FC = () => {
@@ -10,33 +9,12 @@ const CadastrarFuncionario: React.FC = () => {
   const [telefone, setTelefone] = useState<string>("");
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    try {
-      const funcionarioData = {
-        cpfCnpj: cpfCnpj.replace(/\D/g, ""),
-        endereco,
-        nome,
-        telefone,
-      };
-
-      console.log("Enviando para API:", funcionarioData);
-
-      const novoFuncionario = await FuncionarioService.create(funcionarioData);
-
-      alert(`✅ Funcionario cadastrado com sucesso! ID: ${novoFuncionario.id}`);
-
-      setCpfCnpj("");
-      setEndereco("");
-      setNome("");
-      setTelefone("");
-    } catch (error) {
-      console.error("Erro ao cadastrar funcionario:", error);
-      alert(
-        "❌ Erro ao cadastrar funcionario. Verifique os dados e tente novamente."
-      );
-    }
+    
   };
+
+
   return (
+    <div className="cadastrar-funcionario-bg">
     <form
       className="cadastrarFuncionario-container flex-column"
       onSubmit={handleSubmit}
@@ -94,11 +72,12 @@ const CadastrarFuncionario: React.FC = () => {
             required
           />
         </li>
-        <Button variant="pagination" type="submit">
+        <Button variant="cadastrar" type="submit">
           Cadastrar funcionario
         </Button>
       </ul>
     </form>
+    </div>
   );
 };
 

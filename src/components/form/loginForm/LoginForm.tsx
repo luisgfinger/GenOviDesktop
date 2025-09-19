@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import "./LoginForm.css";
 import Plant from "../../common/plant/Plant";
-import { login as loginService } from "../../../api/services/loginService";
+//import { login as loginService } from "../../../api/services/loginService";
 import { useAuth } from "../../../context/AuthContext";
 import Button from "../../common/buttons/Button";
 
@@ -26,8 +26,8 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
     setError("");
 
     try {
-      const data = await loginService(username, senha);
-      login(username, data.token);
+      //const data = await loginService(username, senha);
+     // login(username, data.token);
       onLoginSuccess(username);
     } catch (err) {
       console.error(err);

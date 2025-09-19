@@ -67,3 +67,17 @@
     cursor: pointer;
 }
 
+.cadastrar-button {
+  width: 200px;
+  height: 40px;
+  border: none;
+  background-color: var(--secondary-color);
+  border-radius: 15px;
+  transition: transform 0.3s ease;
+}
+
+.cadastrar-button:hover{
+    transform: scale(1.08);
+    cursor: pointer;
+}
+

@@ -9,22 +9,15 @@ import SideMenu from "../components/layout/side-menu/SideMenu";
 import "../styles/AppLayout.css";
 
 const AppRoutes: React.FC = () => {
-  const { isLoggedIn } = useAuth();
-
+  //const { isLoggedIn } = useAuth();
+  const isLoggedIn = true;
   return (
     <>
       <Navbar />
-      <div className={isLoggedIn?"app-layout flex":"flex"}>
+      <div className={isLoggedIn ? "app-layout flex" : "flex"}>
         {isLoggedIn && <SideMenu />}
         <Routes>
-          <Route
-            path="/dashboard/*"
-            element={
-              <ProtectedRoute>
-                <Dashboard />
-              </ProtectedRoute>
-            }
-          />
+          <Route path="/dashboard/*" element={<Dashboard />} />
           <Route
             path="/"
             element={

@@ -57,6 +57,17 @@ a:focus, a:hover {
   font-family: 'Josefin Sans', sans-serif;
 }
 
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type=number] {
+  -moz-appearance: textfield;
+}
+
+
 /* Classes padrão para utilizar nos elementos */
 
 .flex{

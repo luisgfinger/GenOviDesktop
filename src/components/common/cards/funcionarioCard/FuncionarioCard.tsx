@@ -1,46 +1,46 @@
 import React from "react";
 import "./FuncionarioCard.css";
-import Ovino from "../../../../assets/images/ovinoImagem.png";
 import Button from "../../buttons/Button";
 
 interface FuncionarioCardProps {
-  id: string;
-  imagem?: string;
-  cpfCnpj: string;
-  endereco: string;
   nome: string;
+  endereco: string;
   telefone: string;
+  dataAdmissao: string;
+  cpfCnpj: string;
 }
 
 const FuncionarioCard: React.FC<FuncionarioCardProps> = ({
-  id,
-  imagem = Ovino,
-  cpfCnpj,
-  endereco,
   nome,
+  endereco,
   telefone,
+  dataAdmissao,
+  cpfCnpj,
 }) => {
+
   return (
     <ul className="funcionarioCard-container flex-column">
       <li className="flex">
-        <img src={imagem} alt={nome} />
         <div className="flex-column">
           <h3>{nome}</h3>
-          <p>{id??"Não encontrado"}</p>
         </div>
       </li>
       <li className="flex-column">
+         <span className="flex">
+          <h3>Endereço:</h3>
+          <p>{endereco}</p>
+        </span>
+         <span className="flex">
+          <h3>Telefone:</h3>
+          <p>{telefone}</p>
+        </span>
         <span className="flex">
           <h3>CPF/CNPJ:</h3>
           <p>{cpfCnpj}</p>
         </span>
         <span className="flex">
-          <h3>Endereço:</h3>
-          <p>{endereco}</p>
-        </span>
-        <span className="flex">
-          <h3>Telefone:</h3>
-          <p>{telefone}</p>
+          <h3>Data de admissão:</h3>
+          <p>{dataAdmissao}</p>
         </span>
       </li>
       <li className="funcionarioCard-buttons flex-column">

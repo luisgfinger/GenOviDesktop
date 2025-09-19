@@ -5,7 +5,11 @@
   border-radius: 20px;
   justify-content: center;
   align-items: center;
-  transition: transform 0.3s ease;
+  transition: all 0.3s ease;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: all 0.5s ease;
 }
 
 .optionCard-container:hover {
@@ -13,19 +17,42 @@
   cursor: pointer;
 }
 
-.optionCard-container a {
+.optionCard-container .option-Card-container-inside {
   gap: 20px;
   justify-content: center;
   align-items: center;
+  text-decoration: none;
+  color: inherit;
+  display: flex;
+  flex-direction: column;
+  transition: none;
 }
 
-.optionCard-container a:hover{
-    transform: scale(1);
+.optionCard-container.expanded .option-Card-container-inside {
+  gap: 0;
 }
 
-.optionCard-container a img {
+.optionCard-container .option-Card-container-inside:hover {
+  transform: none;
+  cursor: inherit;
+}
+
+.optionCard-container .option-Card-container-inside img{
   width: 60px;
   height: 60px;
+}
+
+.optionCardImage {
+  transition:
+    max-height 0.5s ease,
+    opacity 0.5s ease,
+    margin 0.5s ease;
+}
+
+.optionCardImage.hidden {
+  opacity: 0;
+  max-height: 0;
+  margin-bottom: 0; 
 }
 
 .optionCardText {
@@ -33,8 +60,57 @@
   height: 69px;
   color: var(--full-black-color);
   align-items: center;
+  display: flex;
+  justify-content: center;
+}
+
+.optionCard-container.expanded .optionCardText{
+  height: 50px;
 }
 
 .optionCardText h3 {
   font-size: 20px !important;
+}
+
+.optionCard-children {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  opacity: 0;
+  transform: translateY(10px);
+  transition:
+    opacity 0.3s ease,
+    transform 0.3s ease;
+}
+
+.optionCard-container.expanded {
+  width: 220px;
+  height: 250px;
+}
+
+.optionCard-container.expanded:hover {
+  cursor: default;
+}
+
+.optionCard-container.expanded .optionCard-children {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.child-link {
+  font-size: 16px;
+  background-color: var(--secondary-color);
+  transition: background-color 0.2s ease;
+  padding: 10px;
+  border-radius: 10px;
+  max-width: 184px;
+  max-height: 40px;
+  text-align: center;
+  align-items: center;
+  justify-content: center;
+}
+
+.child-link:hover {
+  background-color: var(--white-color);
+  cursor: pointer !important;
 }

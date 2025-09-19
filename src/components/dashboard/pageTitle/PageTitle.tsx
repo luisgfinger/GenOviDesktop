@@ -11,18 +11,26 @@ interface PageTitleProps {
 
 const PageTitle: React.FC<PageTitleProps> = ({ onSearch }) => {
   const location = useLocation();
-  const searchEnabled = location.pathname === "/dashboard/ovinos/gerenciar" || location.pathname === "/dashboard/funcionarios/gerenciar";
+  const searchEnabled =
+    location.pathname === "/dashboard/ovinos/gerenciar" ||
+    location.pathname === "/dashboard/funcionarios/gerenciar";
 
   const typeName = useMemo(() => {
     switch (location.pathname) {
       case "/dashboard/ovinos":
         return "Gerenciar Rebanho";
       case "/dashboard/ovinos/gerenciar":
-        return "Gerenciar Rebanho"
+        return "Gerenciar Rebanho";
       case "/dashboard/ovinos/cadastrar":
-        return "Cadastrar Ovino"
+        return "Cadastrar Ovino";
+      case "/dashboard/funcionarios/cadastrar":
+        return "Cadastrar funcionário";
+      case "/dashboard/funcionarios":
+        return "Gerenciar Funcionário";
+      case "/dashboard/funcionarios/gerenciar":
+        return "Gerenciar Funcionários";
       default:
-        return "Gerenciar Funcionarios";
+        return "Dashboard";
     }
   }, [location.pathname]);
 
@@ -33,7 +41,11 @@ const PageTitle: React.FC<PageTitleProps> = ({ onSearch }) => {
   ];
 
   return (
-    <div className={!searchEnabled ? "pageTitle-dashboard flex" : "pageTitle-container flex"}>
+    <div
+      className={
+        !searchEnabled ? "pageTitle-dashboard flex" : "pageTitle-container flex"
+      }
+    >
       <ul className="flex">
         <li className="pageTitle-line flex">
           <img src={Ovelha} alt="ovelha" />
@@ -58,6 +70,5 @@ const PageTitle: React.FC<PageTitleProps> = ({ onSearch }) => {
     </div>
   );
 };
-
 
 export default PageTitle;

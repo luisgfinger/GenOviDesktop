@@ -2,8 +2,6 @@ import React from "react";
 import OptionCard from "../../common/cards/optionCard/OptionCard";
 import Add from "../../../assets/icons/add.png";
 import Manage from "../../../assets/icons/manage.png";
-import Lote from "../../../assets/icons/lote.png";
-import Criar from "../../../assets/icons/criarLote.png";
 import Amamentacao from "../../../assets/icons/amamentacao.png";
 import Vacina from "../../../assets/icons/vacinas.png";
 import Medicamento from "../../../assets/icons/medicamentos.png";
@@ -11,6 +9,8 @@ import Doenca from "../../../assets/icons/doencas.png";
 import Gestacao from "../../../assets/icons/gestacao.png";
 
 import "./DashboardMenu.css";
+import { href } from "react-router-dom";
+import { hr } from "framer-motion/client";
 
 interface DashboardMenuProps {
   location: string;
@@ -28,24 +28,9 @@ const DashboardMenu: React.FC<DashboardMenuProps> = ({ location }) => {
       text: "Gerenciar Ovinos",
       href: "/dashboard/ovinos/gerenciar",
     },
-    {
-      images: [{ src: Criar, alt: "add" }],
-      text: "Criar lotes",
-      href: "/",
-    },
-    {
-      images: [{ src: Lote, alt: "add" }],
-      text: "Gerenciar lotes",
-      href: "/",
-    },
   ];
 
   const ovinosCardOptions2 = [
-    {
-      images: [{ src: Amamentacao, alt: "amamentacao" }],
-      text: "Amamentação",
-      href: "/",
-    },
     {
       images: [{ src: Vacina, alt: "vacina" }],
       text: "Vacinas",
@@ -66,6 +51,35 @@ const DashboardMenu: React.FC<DashboardMenuProps> = ({ location }) => {
       text: "Gestações",
       href: "/",
     },
+    {
+      images: [{ src: Amamentacao, alt: "amamentacao" }],
+      text: "Partos",
+      href: "/",
+    },
+  ];
+
+  const ovinoChildrenOptions = [
+    { text: "Registrar vacinação", href: "#" },
+    { text: "Cadastrar vacina", href: "#" },
+    {text: "Mais opções", href: "#"},
+
+    { text: "Registrar medicação", href: "#" },
+    { text: "Cadastrar medicamento", href: "#" },
+    {text: "Mais opções", href: "#"},
+
+    {text: "Registrar adoecimento", href: "#"},
+    {text: "Cadastrar doença", href: "#"},
+    {text: "Mais opções", href: "#"},
+
+    {text: "Registrar gestação", href: "#"},
+    {text: "Gerenciar gestações", href: "#"},
+    {text: "Mais opções", href: "#"},
+
+    {text: "Registrar parto", href: "#"},
+    {text: "Gerenciar partos", href: "#"},
+    {text: "Mais opções", href: "#"},
+
+
   ];
 
   const funcionariosCardOptions = [
@@ -84,9 +98,9 @@ const DashboardMenu: React.FC<DashboardMenuProps> = ({ location }) => {
   return (
     <ul className="dashboardMenu-content flex-column">
       <li>
-        <h3>{location == "ovino"? "Ovinos" : "Funcionarios"}</h3>
+        <h3>{location == "ovino" ? "Ovinos" : "Funcionarios"}</h3>
       </li>
-      <li className="dashboardMenu-content-optionsLine flex">
+      <li className="dashboardMenu-content-optionsLine dashboardMenu-content-optionsLine-line1 flex">
         {location === "ovino"
           ? ovinosCardOptions.map((option, index) => (
               <OptionCard
@@ -112,14 +126,22 @@ const DashboardMenu: React.FC<DashboardMenuProps> = ({ location }) => {
             <h3>Saúde</h3>
           </li>
           <li className="dashboardMenu-content-optionsLine flex">
-            {ovinosCardOptions2.map((option, index) => (
-              <OptionCard
-                key={index}
-                images={option.images}
-                text={option.text}
-                href={option.href}
-              />
-            ))}
+            {ovinosCardOptions2.map((option, index) => {
+              const childrenForCard = ovinoChildrenOptions.slice(
+                index * 3,
+                index * 3 + 3
+              );
+
+              return (
+                <OptionCard
+                  key={index}
+                  images={option.images}
+                  text={option.text}
+                  href={option.href}
+                  childrenOptions={childrenForCard}
+                />
+              );
+            })}
           </li>
         </>
       )}

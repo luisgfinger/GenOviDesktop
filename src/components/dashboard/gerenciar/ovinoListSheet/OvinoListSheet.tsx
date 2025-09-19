@@ -1,8 +1,8 @@
 import React, { useState } from "react";
-import type { Ovino } from "../../../../api/models/ovino/Ovino";
 import "./OvinoListSheet.css";
 import { motion, AnimatePresence } from "framer-motion";
 import OvinoCard from "../../../common/cards/ovinoCard/OvinoCard";
+import type { Ovino } from "../../../../api/models/ovino/OvinoModel";
 
 interface OvinoListSheetProps {
   ovinos: Ovino[];
@@ -21,7 +21,7 @@ const OvinoListSheet: React.FC<OvinoListSheetProps> = ({ ovinos }) => {
       <AnimatePresence mode="wait">
         {selectedOvino && (
           <motion.div
-            key={selectedOvino.id}
+            key={selectedOvino.rfid}
             initial={{ opacity: 0, scale: 0.8 }} 
             animate={{ opacity: 1, scale: 1 }}    
             exit={{ opacity: 0, scale: 0.8 }}   
@@ -29,14 +29,13 @@ const OvinoListSheet: React.FC<OvinoListSheetProps> = ({ ovinos }) => {
             style={{ transformOrigin: "center" }} 
           >
             <OvinoCard
-              imagem={selectedOvino.imagem}
               nome={selectedOvino.nome}
               sexo={selectedOvino.sexo}
-              fbb={selectedOvino.fbb}
+              fbb={selectedOvino.fbb ?? "Não informado"}
               raca={selectedOvino.raca}
-              pai={selectedOvino.pai}
-              mae={selectedOvino.mae}
-              pureza={selectedOvino.pureza}
+              pai={selectedOvino.rfidPai ?? "Não informado"}
+              mae={selectedOvino.rfidMae ?? "Não informado"}
+              pureza={selectedOvino.grauPureza}
             />
           </motion.div>
         )}
@@ -62,14 +61,14 @@ const OvinoListSheet: React.FC<OvinoListSheetProps> = ({ ovinos }) => {
             } ${selectedOvino?.id === ovino.id ? "selecionado" : ""}`}
             onClick={() => handleOvinoSelect(ovino)}
           >
-            <span className="flex">{ovino.id}</span>
+            <span className="flex">{ovino.rfid}</span>
             <span className="flex">{ovino.fbb}</span>
             <span className="flex">{ovino.nome}</span>
             <span className="flex">{ovino.raca}</span>
             <span className="flex">{ovino.sexo}</span>
-            <span className="flex">{ovino.mae}</span>
-            <span className="flex">{ovino.pai}</span>
-            <span className="flex">{ovino.pureza}</span>
+            <span className="flex">{ovino.rfidMae}</span>
+            <span className="flex">{ovino.rfidPai}</span>
+            <span className="flex">{ovino.grauPureza}</span>
           </li>
         ))}
       </ul>

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import type { Funcionario } from "../../../../api/models/funcionario/FuncionarioModel";
+import type { Funcionario } from "../../../../api/models/funcionario/FuncinarioModel";
 import "./FuncionarioListSheet.css";
 import { motion, AnimatePresence } from "framer-motion";
 import FuncionarioCard from "../../../common/cards/funcionarioCard/FuncionarioCard";
@@ -29,11 +29,11 @@ const FuncionarioListSheet: React.FC<FuncionarioListSheetProps> = ({ funcionario
             style={{ transformOrigin: "center" }} 
           >
             <FuncionarioCard
-              imagem={selectedFuncionario.imagem}
               cpfCnpj={selectedFuncionario.cpfCnpj}
               endereco={selectedFuncionario.endereco}
               nome={selectedFuncionario.nome}
-              telefone={selectedFuncionario.telefone} id={""}            />
+              telefone={selectedFuncionario.telefone}
+              dataAdmissao={selectedFuncionario.dataAdmissao}/>
           </motion.div>
         )}
       </AnimatePresence>

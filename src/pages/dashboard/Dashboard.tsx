@@ -4,8 +4,8 @@ import "./Dashboard.css"
 import Gerenciar from "../../components/dashboard/gerenciar/Gerenciar";
 import { useState } from "react";
 import DashboardMenu from "../../components/dashboard/dashboardMenu/DashboardMenu";
-import CadastrarOvino from "../../components/form/cadastrarOvino/CadastrarOvino";
 import CadastrarFuncionario from "../../components/form/cadastrarFuncionario/CadastrarFuncionario";
+import CadastrarOvino from "../../components/form/cadastrarOvino/CadastrarOvino";
 
 const Dashboard: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState("");
