@@ -1,18 +1,18 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useMemo, useState } from "react";
 import "./Gerenciar.css";
 import PaginationMenu from "../../common/paginationMenu/PaginationMenu";
 import OvinoCard from "../../common/cards/ovinoCard/OvinoCard";
 import FuncionarioCard from "../../common/cards/funcionarioCard/FuncionarioCard";
 import OvinoListSheet from "./ovinoListSheet/OvinoListSheet";
 import FuncionarioListSheet from "./FuncionarioListSheet/FuncionarioListSheet";
+import OptionCard from "../../common/cards/optionCard/OptionCard";
+import Add from "../../../assets/icons/add.png";
+
+import { useOvinos } from "../../../api/hooks/ovino/UseOvinos";
+import { useFuncionarios } from "../../../api/hooks/funcionario/UseFuncionarios";
 
 import type { Ovino } from "../../../api/models/ovino/OvinoModel";
 import type { Funcionario } from "../../../api/models/funcionario/FuncinarioModel";
-import { mockOvinos } from "../../../mockData/MockOvinos";
-import { mockFuncionarios } from "../../../mockData/mockFuncionarios";
-import OptionCard from "../../common/cards/optionCard/OptionCard";
-
-import Add from "../../../assets/icons/add.png";
 
 interface GerenciarProps {
   searchQuery: string;
@@ -20,47 +20,14 @@ interface GerenciarProps {
 }
 
 const Gerenciar: React.FC<GerenciarProps> = ({ searchQuery, type }) => {
-  const [ovinos, setOvinos] = useState<Ovino[]>([]);
-  const [funcionarios, setFuncionarios] = useState<Funcionario[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [viewAll, setViewAll] = useState(false);
+  const { ovinos, loading: loadingOvinos } = useOvinos();
+  const { funcionarios, loading: loadingFuncionarios } = useFuncionarios();
 
+  const [viewAll, setViewAll] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 8;
 
-  /*
-  useEffect(() => {
-   
-    const fetchData = async () => {
-      try {
-        if (type === "ovino") {
-          const data = await OvinoService.getAll();
-          setOvinos(data);
-        } else if (type === "funcionario") {
-          const data = await FuncionarioService.getAll();
-          setFuncionarios(data);
-        }
-      } catch (error) {
-        console.error(`Erro ao carregar ${type}`, error);
-        console.log(localStorage.getItem("token"));
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchData();
-  }, [type]);
-
-  */
-
-  useEffect(() => {
-    if (type === "ovino") {
-      setOvinos(mockOvinos);
-    } else {
-      setFuncionarios(mockFuncionarios);
-    }
-    setLoading(false);
-  }, [type]);
+  const loading = type === "ovino" ? loadingOvinos : loadingFuncionarios;
 
   const filteredOvinos = useMemo(() => {
     if (!searchQuery) return ovinos;
@@ -75,8 +42,8 @@ const Gerenciar: React.FC<GerenciarProps> = ({ searchQuery, type }) => {
 
   const filteredFuncionarios = useMemo(() => {
     if (!searchQuery) return funcionarios;
-    return funcionarios.filter((c) =>
-      [c.id.toString(), c.cpfCnpj, c.endereco, c.nome, c.telefone]
+    return funcionarios.filter((f) =>
+      [f.id.toString(), f.cpfCnpj, f.endereco, f.nome, f.telefone]
         .filter(Boolean)
         .some((field) =>
           field!.toLowerCase().includes(searchQuery.toLowerCase())
@@ -103,60 +70,52 @@ const Gerenciar: React.FC<GerenciarProps> = ({ searchQuery, type }) => {
         )
       ) : (
         <div className="gerenciar-container-inside">
-  {type === "ovino"
-    ? (currentData as Ovino[]).map((ovino, index) => {
-  
-        if (index === currentData.length - 1) {
-          return (
-            <OptionCard
-              key="add-card"
-              images={[{ src: Add, alt: "add" }]}
-              text="Cadastrar"
-              href="#"
-              style={{ width: "250px", height: "310px" }} 
-            />
-          );
-        }
+          {type === "ovino" ? (
+            <>
+              {(currentData as Ovino[]).map((ovino) => (
+                <OvinoCard
+                  key={ovino.id}
+                  nome={ovino.nome}
+                  sexo={ovino.sexo}
+                  fbb={ovino.fbb ?? "Não informado"}
+                  raca={ovino.raca}
+                  pai={ovino.ovinoPai}
+                  mae={ovino.ovinoMae}
+                  pureza={ovino.typeGrauPureza}
+                />
+              ))}
 
-        return (
-          <OvinoCard
-            key={ovino.id}
-            nome={ovino.nome}
-            sexo={ovino.sexo}
-            fbb={ovino.fbb ?? "Não informado"}
-            raca={ovino.raca}
-            pai={ovino.rfidPai ?? "Não informado"}
-            mae={ovino.rfidMae ?? "Não informado"}
-            pureza={ovino.grauPureza}
-          />
-        );
-      })
-    : (currentData as Funcionario[]).map((funcionario, index) => {
-        if (index === currentData.length - 1) {
-          return (
-            <OptionCard
-              key="add-card"
-              images={[{ src: Add, alt: "add" }]}
-              text="Cadastrar"
-              href="/dashboard/funcionarios/cadastrar"
-             style={{ width: "250px", height: "310px" }}
-            />
-          );
-        }
+              <OptionCard
+                key="add-ovino"
+                images={[{ src: Add, alt: "add" }]}
+                text="Cadastrar"
+                href="/dashboard/ovinos/cadastrar"
+                style={{ width: "250px", height: "310px" }}
+              />
+            </>
+          ) : (
+            <>
+              {(currentData as Funcionario[]).map((funcionario) => (
+                <FuncionarioCard
+                  key={funcionario.id}
+                  nome={funcionario.nome}
+                  endereco={funcionario.endereco}
+                  telefone={funcionario.telefone}
+                  cpfCnpj={funcionario.cpfCnpj}
+                  dataAdmissao={funcionario.dataAdmissao}
+                />
+              ))}
 
-        return (
-          <FuncionarioCard
-            key={funcionario.id}
-            nome={funcionario.nome}
-            endereco={funcionario.endereco}
-            telefone={funcionario.telefone}
-            cpfCnpj={funcionario.cpfCnpj}
-            dataAdmissao={funcionario.dataAdmissao}
-          />
-        );
-      })}
-</div>
-
+              <OptionCard
+                key="add-funcionario"
+                images={[{ src: Add, alt: "add" }]}
+                text="Cadastrar"
+                href="/dashboard/funcionarios/cadastrar"
+                style={{ width: "250px", height: "310px" }}
+              />
+            </>
+          )}
+        </div>
       )}
 
       {!viewAll && data.length > itemsPerPage && (

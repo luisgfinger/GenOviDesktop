@@ -1,70 +1,115 @@
 import React, { useState } from "react";
 import "./CadastrarOvino.css";
 import Button from "../../common/buttons/Button";
+import { toast } from "react-toastify";
 
-const TypeGrauPureza = {
-  PURO_ORIGEM: "Puro de origem",
-  PURO_POR_CRUZA: "Puro por cruza",
-  CRUZADO_CONTROLADO: "Cruzado controlado",
-  CRUZADO_INDETERMINADO: "Cruzado indeterminado",
-};
+import { TypeRaca } from "../../../api/enums/typeRaca/TypeRaca";
+import { TypeSexo } from "../../../api/enums/typeSexo/TypeSexo";
+import { TypeGrauPureza } from "../../../api/enums/typeGrauPureza/TypeGrauPureza";
+import { TypeStatus } from "../../../api/enums/typeStatus/TypeStatus";
+import { OvinoService } from "../../../api/services/ovino/OvinoService";
+import { formatEnum } from "../../../utils/formatEnum";
 
-const TypeStatus = {
-  ATIVO: "Ativo",
-  VENDIDO: "Vendido",
-  DESATIVADO: "Desativado",
-  MORTO: "Morto",
-};
+import { useCompras } from "../../../api/hooks/compra/UseCompras";
+import { useOvinos } from "../../../api/hooks/ovino/UseOvinos";
+import type { OvinoRequestDTO } from "../../../api/dtos/ovino/OvinoRequestDTO";
 
 const CadastrarOvino: React.FC = () => {
   const [step, setStep] = useState(1);
   const [rfid, setRfid] = useState("");
   const [nome, setNome] = useState("");
-  const [raca, setRaca] = useState("");
+  const [raca, setRaca] = useState<TypeRaca | "">("");
   const [fbb, setFbb] = useState("");
   const [dataNascimento, setDataNascimento] = useState("");
-  const [grauPureza, setGrauPureza] = useState("");
-  const [sexo, setSexo] = useState("");
+  const [grauPureza, setGrauPureza] = useState<TypeGrauPureza | "">("");
+  const [sexo, setSexo] = useState<TypeSexo | "">("");
   const [idOvelhaMae, setIdOvelhaMae] = useState("");
   const [idCarneiroPai, setIdCarneiroPai] = useState("");
-  const [status, setStatus] = useState("ATIVO");
+  const [status, setStatus] = useState<TypeStatus>(TypeStatus.ATIVO);
   const [imagem, setImagem] = useState<File | null>(null);
   const [idParto, setIdParto] = useState("");
   const [idCompra, setIdCompra] = useState("");
 
-  const handleNext = () => setStep((prev) => Math.min(prev + 1, 3));
+  const { compras, loading, error } = useCompras();
+  const { ovinos, loading: loadingOvinos, error: errorOvinos } = useOvinos();
+
+  const handleNext = () => {
+    if (step === 1 && (!rfid || !nome || !raca)) {
+      toast.warn("Preencha RFID, Nome e Raça antes de continuar.");
+      return;
+    }
+    if (step === 2 && (!dataNascimento || !grauPureza || !sexo)) {
+      toast.warn(
+        "Preencha Data de Nascimento, Grau de Pureza e Sexo antes de continuar."
+      );
+      return;
+    }
+    setStep((prev) => Math.min(prev + 1, 4));
+  };
+
   const handleBack = () => setStep((prev) => Math.max(prev - 1, 1));
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log({
-      rfid,
-      nome,
-      raca,
-      fbb,
-      dataNascimento,
-      grauPureza,
-      sexo,
-      idOvelhaMae,
-      idCarneiroPai,
-      status,
-      imagem,
-      idParto,
-      idCompra,
-    });
+
+    if (!rfid || !nome || !raca || !grauPureza || !sexo) {
+      toast.warn("Preencha todos os campos obrigatórios.");
+      return;
+    }
+
+    try {
+      const novoOvino: OvinoRequestDTO = {
+        rfid: Number(rfid),
+        nome,
+        raca,
+        fbb: fbb,
+        dataNascimento: `${dataNascimento}:00`,
+        dataCadastro: new Date().toISOString(),
+        typeGrauPureza: grauPureza,
+        sexo,
+        status,
+        maeId: idOvelhaMae ? Number(idOvelhaMae) : undefined,
+        paiId: idCarneiroPai ? Number(idCarneiroPai) : undefined,
+        compraId: idCompra ? Number(idCompra) : undefined,
+        partoId: idParto ? Number(idParto) : undefined,
+        fotoOvino: imagem ? imagem.name : undefined,
+      };
+
+      await OvinoService.salvar(novoOvino);
+      toast.success("Ovino cadastrado com sucesso!");
+
+      setRfid("");
+      setNome("");
+      setRaca("");
+      setFbb("");
+      setDataNascimento("");
+      setGrauPureza("");
+      setSexo("");
+      setIdOvelhaMae("");
+      setIdCarneiroPai("");
+      setStatus(TypeStatus.ATIVO);
+      setImagem(null);
+      setIdParto("");
+      setIdCompra("");
+      setStep(1);
+    } catch (err) {
+      console.error(err);
+      toast.error("Erro ao salvar ovino. Tente novamente.");
+    }
   };
 
   return (
     <div className="cadastrar-ovino-bg flex-column">
+
       <div className="cadastrarOvino-progress-bar flex">
-        <div className={`step step1 ${step >= 1 ? "active" : ""}`}>1</div>
+        <div className={`step ${step >= 1 ? "active" : ""}`}>1</div>
         <div className={`step ${step >= 2 ? "active" : ""}`}>2</div>
-        <div className={`step step3 ${step >= 3 ? "active" : ""}`}>3</div>
+        <div className={`step ${step >= 3 ? "active" : ""}`}>3</div>
+        <div className={`step ${step >= 4 ? "active" : ""}`}>4</div>
       </div>
-      <form
-        className="cadastrarOvino-container flex-column"
-        onSubmit={handleSubmit}
-      >
+
+      <form className="cadastrarOvino-container flex-column" onSubmit={handleSubmit}>
+       
         {step === 1 && (
           <ul className="flex-column">
             <li className="flex-column">
@@ -75,7 +120,6 @@ const CadastrarOvino: React.FC = () => {
                 placeholder="Apenas números"
                 value={rfid}
                 onChange={(e) => setRfid(e.target.value)}
-                required
               />
             </li>
             <li className="flex-column">
@@ -88,19 +132,21 @@ const CadastrarOvino: React.FC = () => {
                 onChange={(e) =>
                   setNome(e.target.value.replace(/[^a-zA-Z0-9 ]/g, ""))
                 }
-                required
               />
             </li>
             <li className="flex-column">
               <label htmlFor="raca">Raça</label>
-              <input
-                type="text"
-                id="raca"
-                placeholder="Insira a raça"
+              <select
                 value={raca}
-                onChange={(e) => setRaca(e.target.value)}
-                required
-              />
+                onChange={(e) => setRaca(e.target.value as TypeRaca)}
+              >
+                <option value="">Selecione...</option>
+                {Object.values(TypeRaca).map((r) => (
+                  <option key={r} value={r}>
+                    {formatEnum(r)}
+                  </option>
+                ))}
+              </select>
             </li>
             <Button type="button" variant="cardPrimary" onClick={handleNext}>
               Próximo
@@ -129,20 +175,18 @@ const CadastrarOvino: React.FC = () => {
                 id="dataNascimento"
                 value={dataNascimento}
                 onChange={(e) => setDataNascimento(e.target.value)}
-                required
               />
             </li>
             <li className="flex-column">
               <label htmlFor="grauPureza">Grau de pureza</label>
               <select
                 value={grauPureza}
-                onChange={(e) => setGrauPureza(e.target.value)}
-                required
+                onChange={(e) => setGrauPureza(e.target.value as TypeGrauPureza)}
               >
                 <option value="">Selecione...</option>
-                {Object.entries(TypeGrauPureza).map(([key, label]) => (
-                  <option key={key} value={key}>
-                    {label}
+                {Object.values(TypeGrauPureza).map((g) => (
+                  <option key={g} value={g}>
+                    {formatEnum(g)}
                   </option>
                 ))}
               </select>
@@ -151,20 +195,18 @@ const CadastrarOvino: React.FC = () => {
               <label htmlFor="sexo">Sexo</label>
               <select
                 value={sexo}
-                onChange={(e) => setSexo(e.target.value)}
-                required
+                onChange={(e) => setSexo(e.target.value as TypeSexo)}
               >
                 <option value="">Selecione...</option>
-                <option value="Masculino">Masculino</option>
-                <option value="Feminino">Feminino</option>
+                {Object.values(TypeSexo).map((s) => (
+                  <option key={s} value={s}>
+                    {formatEnum(s)}
+                  </option>
+                ))}
               </select>
             </li>
             <div className="cadastrarOvino-form-navigation flex">
-              <Button
-                type="button"
-                variant="cardSecondary"
-                onClick={handleBack}
-              >
+              <Button type="button" variant="cardSecondary" onClick={handleBack}>
                 Voltar
               </Button>
               <Button type="button" variant="cardPrimary" onClick={handleNext}>
@@ -180,19 +222,17 @@ const CadastrarOvino: React.FC = () => {
               <label htmlFor="status">Status</label>
               <select
                 value={status}
-                onChange={(e) => setStatus(e.target.value)}
-                required
+                onChange={(e) => setStatus(e.target.value as TypeStatus)}
               >
-                {Object.entries(TypeStatus).map(([key, label]) => (
-                  <option key={key} value={key}>
-                    {label}
+                {Object.values(TypeStatus).map((st) => (
+                  <option key={st} value={st}>
+                    {formatEnum(st)}
                   </option>
                 ))}
               </select>
             </li>
             <li className="flex-column">
-              <label htmlFor="imagem">Insira a imagem</label>
-              <div className="file-input flex">
+              <label htmlFor="imagem">Imagem</label>
               <input
                 type="file"
                 accept="image/*"
@@ -202,10 +242,9 @@ const CadastrarOvino: React.FC = () => {
                   }
                 }}
               />
-              </div>
             </li>
             <li className="flex-column">
-              <label htmlFor="idParto">Parto</label>
+              <label htmlFor="idParto">Parto (ID)</label>
               <input
                 type="text"
                 value={idParto}
@@ -214,18 +253,83 @@ const CadastrarOvino: React.FC = () => {
             </li>
             <li className="flex-column">
               <label htmlFor="idCompra">Compra</label>
-              <input
-                type="text"
-                value={idCompra}
-                onChange={(e) => setIdCompra(e.target.value)}
-              />
+              {loading ? (
+                <p>Carregando compras...</p>
+              ) : error ? (
+                <p style={{ color: "red" }}>{error}</p>
+              ) : (
+                <select
+                  id="idCompra"
+                  value={idCompra}
+                  onChange={(e) => setIdCompra(e.target.value)}
+                >
+                  <option value="">Selecione uma compra...</option>
+                  {compras.map((compra) => (
+                    <option key={compra.id} value={compra.id}>
+                      {compra.dataCompra.split("T")[0]} - R$
+                      {compra.valor.toFixed(2)}
+                    </option>
+                  ))}
+                </select>
+              )}
             </li>
             <div className="cadastrarOvino-form-navigation flex">
-              <Button
-                type="button"
-                variant="cardSecondary"
-                onClick={handleBack}
-              >
+              <Button type="button" variant="cardSecondary" onClick={handleBack}>
+                Voltar
+              </Button>
+              <Button type="button" variant="cardPrimary" onClick={handleNext}>
+                Próximo
+              </Button>
+            </div>
+          </ul>
+        )}
+
+        {step === 4 && (
+          <ul className="flex-column">
+            <li className="flex-column">
+              <label htmlFor="idCarneiroPai">Ovino Pai</label>
+              {loadingOvinos ? (
+                <p>Carregando ovinos...</p>
+              ) : errorOvinos ? (
+                <p style={{ color: "red" }}>{errorOvinos}</p>
+              ) : (
+                <select
+                  id="idCarneiroPai"
+                  value={idCarneiroPai}
+                  onChange={(e) => setIdCarneiroPai(e.target.value)}
+                >
+                  <option value="">Selecione o pai...</option>
+                  {ovinos.map((o) => (
+                    <option key={o.id} value={o.id}>
+                      {o.nome} ({formatEnum(o.raca)})
+                    </option>
+                  ))}
+                </select>
+              )}
+            </li>
+            <li className="flex-column">
+              <label htmlFor="idOvelhaMae">Ovelha Mãe</label>
+              {loadingOvinos ? (
+                <p>Carregando ovinos...</p>
+              ) : errorOvinos ? (
+                <p style={{ color: "red" }}>{errorOvinos}</p>
+              ) : (
+                <select
+                  id="idOvelhaMae"
+                  value={idOvelhaMae}
+                  onChange={(e) => setIdOvelhaMae(e.target.value)}
+                >
+                  <option value="">Selecione a mãe...</option>
+                  {ovinos.map((o) => (
+                    <option key={o.id} value={o.id}>
+                      {o.nome} ({formatEnum(o.raca)})
+                    </option>
+                  ))}
+                </select>
+              )}
+            </li>
+            <div className="cadastrarOvino-form-navigation flex">
+              <Button type="button" variant="cardSecondary" onClick={handleBack}>
                 Voltar
               </Button>
               <Button type="submit" variant="cardPrimary">

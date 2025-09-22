@@ -25,7 +25,7 @@ const FuncionarioCard: React.FC<FuncionarioCardProps> = ({
           <h3>{nome}</h3>
         </div>
       </li>
-      <li className="flex-column">
+      <li className="middle-column flex-column">
          <span className="flex">
           <h3>Endereço:</h3>
           <p>{endereco}</p>

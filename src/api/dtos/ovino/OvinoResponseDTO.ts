@@ -2,9 +2,11 @@ import type { TypeGrauPureza } from "../../enums/typeGrauPureza/TypeGrauPureza";
 import type { TypeRaca } from "../../enums/typeRaca/TypeRaca";
 import type { TypeSexo } from "../../enums/typeSexo/TypeSexo";
 import type { TypeStatus } from "../../enums/typeStatus/TypeStatus";
-import type { Pesagem } from "../pesagem/PesagemModel";
+import type { Compra } from "../../models/compra/CompraModel";
+import type { Parto } from "../../models/parto/PartoModel";
+import type { Pesagem } from "../../models/pesagem/PesagemModel";
 
-export interface Ovino {
+export interface OvinoResponseDTO {
   id: number;
   rfid: number;
   nome: string;
@@ -14,26 +16,12 @@ export interface Ovino {
   dataCadastro?: string;
   typeGrauPureza: TypeGrauPureza;
   sexo: TypeSexo;
-
-  ovinoMae?: {
-    id: number;
-    nome: string;
-    fbb?: string;
-    rfid?: number;
-  };
-
-  ovinoPai?: {
-    id: number;
-    nome: string;
-    fbb?: string;
-    rfid?: number;
-  };
-
+  maeOvino?: { id: number; nome: string }; 
+  paiOvino?: { id: number; nome: string };  
   status: TypeStatus;
   fotoOvino?: string;
-  compra?: { id: number };
-  parto?: { id: number };
+  compra?: Compra;
+  parto?: Parto;
   pesagens?: Pesagem[];
 }
-
 

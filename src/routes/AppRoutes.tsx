@@ -7,17 +7,24 @@ import ProtectedRoute from "./ProtectedRoute";
 import { useAuth } from "../context/AuthContext";
 import SideMenu from "../components/layout/side-menu/SideMenu";
 import "../styles/AppLayout.css";
+import { ToastContainer } from "react-toastify";
 
 const AppRoutes: React.FC = () => {
-  //const { isLoggedIn } = useAuth();
-  const isLoggedIn = true;
+  const { isLoggedIn } = useAuth();
   return (
     <>
       <Navbar />
       <div className={isLoggedIn ? "app-layout flex" : "flex"}>
         {isLoggedIn && <SideMenu />}
         <Routes>
-          <Route path="/dashboard/*" element={<Dashboard />} />
+          <Route
+            path="/dashboard/*"
+            element={
+              <ProtectedRoute>
+                <Dashboard />
+              </ProtectedRoute>
+            }
+          />
           <Route
             path="/"
             element={
@@ -29,6 +36,7 @@ const AppRoutes: React.FC = () => {
             }
           />
         </Routes>
+        <ToastContainer position="top-center" autoClose={3000} />
       </div>
     </>
   );

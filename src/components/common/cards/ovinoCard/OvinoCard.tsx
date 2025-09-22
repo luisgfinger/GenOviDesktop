@@ -2,6 +2,7 @@ import React from "react";
 import "./OvinoCard.css";
 import Ovino from "../../../../assets/images/ovinoImagem.png";
 import Button from "../../buttons/Button";
+import { formatEnum } from "../../../../utils/formatEnum";
 
 interface OvinoCardProps {
   imagem?: string;
@@ -9,8 +10,8 @@ interface OvinoCardProps {
   sexo: string;
   fbb: string;
   raca: string;
-  pai: string;
-  mae: string;
+  pai?: { id: number; nome: string } | undefined;
+  mae?: { id: number; nome: string } | undefined;
   pureza: string;
 }
 
@@ -40,28 +41,24 @@ const OvinoCard: React.FC<OvinoCardProps> = ({
         </span>
         <span className="flex">
           <h3>RAÇA:</h3>
-          <p>{raca}</p>
+          <p>{formatEnum(raca)}</p>
         </span>
         <span className="flex">
           <h3>PAI:</h3>
-          <p>{pai}</p>
+          <p>{pai ? pai.nome : "Não informado"}</p>
         </span>
         <span className="flex">
           <h3>MÃE:</h3>
-          <p>{mae}</p>
+          <p>{mae ? mae.nome : "Não informado"}</p>
         </span>
         <span className="flex">
           <h3>PUREZA:</h3>
-          <p>{pureza}</p>
+          <p>{formatEnum(pureza)}</p>
         </span>
       </li>
       <li className="ovinoCard-buttons flex-column">
-        <Button variant="cardPrimary">
-          Ver mais
-        </Button>
-        <Button variant="cardSecondary">
-          Abrir registros
-        </Button>
+        <Button variant="cardPrimary">Ver mais</Button>
+        <Button variant="cardSecondary">Abrir registros</Button>
       </li>
     </ul>
   );
