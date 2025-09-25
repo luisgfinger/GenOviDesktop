@@ -12,6 +12,7 @@ export const OvinoService = {
   
   salvar: async (payload: OvinoRequestDTO): Promise<Ovino> => {
     const { data } = await Api.post<OvinoResponseDTO>("/user/ovinos", payload);
+    console.log(payload)
     return responseToModel(data);
   },
 };

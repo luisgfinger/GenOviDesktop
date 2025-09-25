@@ -33,19 +33,23 @@ const CadastrarOvino: React.FC = () => {
   const { compras, loading, error } = useCompras();
   const { ovinos, loading: loadingOvinos, error: errorOvinos } = useOvinos();
 
-  const handleNext = () => {
-    if (step === 1 && (!rfid || !nome || !raca)) {
-      toast.warn("Preencha RFID, Nome e Raça antes de continuar.");
-      return;
-    }
-    if (step === 2 && (!dataNascimento || !grauPureza || !sexo)) {
-      toast.warn(
-        "Preencha Data de Nascimento, Grau de Pureza e Sexo antes de continuar."
-      );
-      return;
-    }
-    setStep((prev) => Math.min(prev + 1, 4));
-  };
+const handleNext = () => {
+  if (step === 1 && (!idParto && !idCompra && !dataNascimento)) {
+    toast.warn("Preencha Data de Nascimento ou selecione o Parto para continuar");
+    return;
+  }
+  if (step === 2 && (!raca || !grauPureza || !sexo)) {
+    toast.warn("Preencha Raça, Grau de Pureza e Sexo antes de continuar.");
+    return;
+  }
+  if (step === 3 && (!rfid || !nome)) {
+    toast.warn("Preencha RFID e Nome antes de continuar.");
+    return;
+  }
+
+  setStep((prev) => Math.min(prev + 1, 4));
+};
+
 
   const handleBack = () => setStep((prev) => Math.max(prev - 1, 1));
 
@@ -100,7 +104,6 @@ const CadastrarOvino: React.FC = () => {
 
   return (
     <div className="cadastrar-ovino-bg flex-column">
-
       <div className="cadastrarOvino-progress-bar flex">
         <div className={`step ${step >= 1 ? "active" : ""}`}>1</div>
         <div className={`step ${step >= 2 ? "active" : ""}`}>2</div>
@@ -108,143 +111,14 @@ const CadastrarOvino: React.FC = () => {
         <div className={`step ${step >= 4 ? "active" : ""}`}>4</div>
       </div>
 
-      <form className="cadastrarOvino-container flex-column" onSubmit={handleSubmit}>
-       
+      <form
+        className="cadastrarOvino-container flex-column"
+        onSubmit={handleSubmit}
+      >
         {step === 1 && (
           <ul className="flex-column">
             <li className="flex-column">
-              <label htmlFor="rfid">RFID</label>
-              <input
-                type="number"
-                id="rfid"
-                placeholder="Apenas números"
-                value={rfid}
-                onChange={(e) => setRfid(e.target.value)}
-              />
-            </li>
-            <li className="flex-column">
-              <label htmlFor="nome">Nome</label>
-              <input
-                type="text"
-                id="nome"
-                placeholder="Apenas letras e números"
-                value={nome}
-                onChange={(e) =>
-                  setNome(e.target.value.replace(/[^a-zA-Z0-9 ]/g, ""))
-                }
-              />
-            </li>
-            <li className="flex-column">
-              <label htmlFor="raca">Raça</label>
-              <select
-                value={raca}
-                onChange={(e) => setRaca(e.target.value as TypeRaca)}
-              >
-                <option value="">Selecione...</option>
-                {Object.values(TypeRaca).map((r) => (
-                  <option key={r} value={r}>
-                    {formatEnum(r)}
-                  </option>
-                ))}
-              </select>
-            </li>
-            <Button type="button" variant="cardPrimary" onClick={handleNext}>
-              Próximo
-            </Button>
-          </ul>
-        )}
-
-        {step === 2 && (
-          <ul className="flex-column">
-            <li className="flex-column">
-              <label htmlFor="fbb">FBB</label>
-              <input
-                type="text"
-                id="fbb"
-                placeholder="O-123456"
-                value={fbb}
-                onChange={(e) =>
-                  setFbb(`O-${e.target.value.replace(/\D/g, "")}`)
-                }
-              />
-            </li>
-            <li className="flex-column">
-              <label htmlFor="dataNascimento">Data de nascimento</label>
-              <input
-                type="datetime-local"
-                id="dataNascimento"
-                value={dataNascimento}
-                onChange={(e) => setDataNascimento(e.target.value)}
-              />
-            </li>
-            <li className="flex-column">
-              <label htmlFor="grauPureza">Grau de pureza</label>
-              <select
-                value={grauPureza}
-                onChange={(e) => setGrauPureza(e.target.value as TypeGrauPureza)}
-              >
-                <option value="">Selecione...</option>
-                {Object.values(TypeGrauPureza).map((g) => (
-                  <option key={g} value={g}>
-                    {formatEnum(g)}
-                  </option>
-                ))}
-              </select>
-            </li>
-            <li className="flex-column">
-              <label htmlFor="sexo">Sexo</label>
-              <select
-                value={sexo}
-                onChange={(e) => setSexo(e.target.value as TypeSexo)}
-              >
-                <option value="">Selecione...</option>
-                {Object.values(TypeSexo).map((s) => (
-                  <option key={s} value={s}>
-                    {formatEnum(s)}
-                  </option>
-                ))}
-              </select>
-            </li>
-            <div className="cadastrarOvino-form-navigation flex">
-              <Button type="button" variant="cardSecondary" onClick={handleBack}>
-                Voltar
-              </Button>
-              <Button type="button" variant="cardPrimary" onClick={handleNext}>
-                Próximo
-              </Button>
-            </div>
-          </ul>
-        )}
-
-        {step === 3 && (
-          <ul className="flex-column">
-            <li className="flex-column">
-              <label htmlFor="status">Status</label>
-              <select
-                value={status}
-                onChange={(e) => setStatus(e.target.value as TypeStatus)}
-              >
-                {Object.values(TypeStatus).map((st) => (
-                  <option key={st} value={st}>
-                    {formatEnum(st)}
-                  </option>
-                ))}
-              </select>
-            </li>
-            <li className="flex-column">
-              <label htmlFor="imagem">Imagem</label>
-              <input
-                type="file"
-                accept="image/*"
-                onChange={(e) => {
-                  if (e.target.files && e.target.files[0]) {
-                    setImagem(e.target.files[0]);
-                  }
-                }}
-              />
-            </li>
-            <li className="flex-column">
-              <label htmlFor="idParto">Parto (ID)</label>
+              <label htmlFor="idParto">Parto</label>
               <input
                 type="text"
                 value={idParto}
@@ -273,19 +147,15 @@ const CadastrarOvino: React.FC = () => {
                 </select>
               )}
             </li>
-            <div className="cadastrarOvino-form-navigation flex">
-              <Button type="button" variant="cardSecondary" onClick={handleBack}>
-                Voltar
-              </Button>
-              <Button type="button" variant="cardPrimary" onClick={handleNext}>
-                Próximo
-              </Button>
-            </div>
-          </ul>
-        )}
-
-        {step === 4 && (
-          <ul className="flex-column">
+            <li className="flex-column">
+              <label htmlFor="dataNascimento">Data de nascimento</label>
+              <input
+                type="datetime-local"
+                id="dataNascimento"
+                value={dataNascimento}
+                onChange={(e) => setDataNascimento(e.target.value)}
+              />
+            </li>
             <li className="flex-column">
               <label htmlFor="idCarneiroPai">Ovino Pai</label>
               {loadingOvinos ? (
@@ -328,8 +198,157 @@ const CadastrarOvino: React.FC = () => {
                 </select>
               )}
             </li>
+            <Button type="button" variant="cardPrimary" onClick={handleNext}>
+              Próximo
+            </Button>
+          </ul>
+        )}
+        {step === 2 && (
+          <ul className="flex-column">
+            <li className="flex-column">
+              <label htmlFor="raca">Raça</label>
+              <select
+                value={raca}
+                onChange={(e) => setRaca(e.target.value as TypeRaca)}
+              >
+                <option value="">Selecione...</option>
+                {Object.values(TypeRaca).map((r) => (
+                  <option key={r} value={r}>
+                    {formatEnum(r)}
+                  </option>
+                ))}
+              </select>
+            </li>
+            <li className="flex-column">
+              <label htmlFor="grauPureza">Grau de pureza</label>
+              <select
+                value={grauPureza}
+                onChange={(e) =>
+                  setGrauPureza(e.target.value as TypeGrauPureza)
+                }
+              >
+                <option value="">Selecione...</option>
+                {Object.values(TypeGrauPureza).map((g) => (
+                  <option key={g} value={g}>
+                    {formatEnum(g)}
+                  </option>
+                ))}
+              </select>
+            </li>
+            <li className="flex-column">
+              <label htmlFor="sexo">Sexo</label>
+              <select
+                value={sexo}
+                onChange={(e) => setSexo(e.target.value as TypeSexo)}
+              >
+                <option value="">Selecione...</option>
+                {Object.values(TypeSexo).map((s) => (
+                  <option key={s} value={s}>
+                    {formatEnum(s)}
+                  </option>
+                ))}
+              </select>
+            </li>
             <div className="cadastrarOvino-form-navigation flex">
-              <Button type="button" variant="cardSecondary" onClick={handleBack}>
+              <Button
+                type="button"
+                variant="cardSecondary"
+                onClick={handleBack}
+              >
+                Voltar
+              </Button>
+              <Button type="button" variant="cardPrimary" onClick={handleNext}>
+                Próximo
+              </Button>
+            </div>
+          </ul>
+        )}
+
+        {step === 3 && (
+          <ul className="flex-column">
+            <li className="flex-column">
+              <label htmlFor="rfid">RFID</label>
+              <input
+                type="number"
+                id="rfid"
+                placeholder="Apenas números"
+                value={rfid}
+                onChange={(e) => setRfid(e.target.value)}
+              />
+            </li>
+            <li className="flex-column">
+              <label htmlFor="fbb">FBB</label>
+              <input
+                type="text"
+                id="fbb"
+                placeholder="O-123456"
+                value={fbb}
+                onChange={(e) =>
+                  setFbb(`O-${e.target.value.replace(/\D/g, "")}`)
+                }
+              />
+            </li>
+            <li className="flex-column">
+              <label htmlFor="nome">Nome</label>
+              <input
+                type="text"
+                id="nome"
+                placeholder="Apenas letras e números"
+                value={nome}
+                onChange={(e) =>
+                  setNome(e.target.value.replace(/[^a-zA-Z0-9 ]/g, ""))
+                }
+              />
+            </li>
+            <li className="flex-column">
+              <label htmlFor="status">Status</label>
+              <select
+                value={status}
+                onChange={(e) => setStatus(e.target.value as TypeStatus)}
+              >
+                {Object.values(TypeStatus).map((st) => (
+                  <option key={st} value={st}>
+                    {formatEnum(st)}
+                  </option>
+                ))}
+              </select>
+            </li>
+            <li className="flex-column">
+              <label htmlFor="imagem">Imagem</label>
+              <input
+                type="file"
+                accept="image/*"
+                onChange={(e) => {
+                  if (e.target.files && e.target.files[0]) {
+                    setImagem(e.target.files[0]);
+                  }
+                }}
+              />
+            </li>
+
+            <div className="cadastrarOvino-form-navigation flex">
+              <Button
+                type="button"
+                variant="cardSecondary"
+                onClick={handleBack}
+              >
+                Voltar
+              </Button>
+              <Button type="button" variant="cardPrimary" onClick={handleNext}>
+                Próximo
+              </Button>
+            </div>
+          </ul>
+        )}
+
+        {step === 4 && (
+          <ul className="flex-column">
+            <div className="cadastrarOvino-form-navigation flex">
+              <Button
+                type="button"
+                variant="cardSecondary"
+                onClick={handleBack}
+              >
                 Voltar
               </Button>
               <Button type="submit" variant="cardPrimary">

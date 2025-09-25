@@ -18,15 +18,11 @@ export interface Ovino {
   ovinoMae?: {
     id: number;
     nome: string;
-    fbb?: string;
-    rfid?: number;
   };
 
   ovinoPai?: {
     id: number;
     nome: string;
-    fbb?: string;
-    rfid?: number;
   };
 
   status: TypeStatus;

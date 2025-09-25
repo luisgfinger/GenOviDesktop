@@ -1,63 +1,62 @@
 import React from "react";
 import "./OvinoCard.css";
-import Ovino from "../../../../assets/images/ovinoImagem.png";
+import OvinoDefault from "../../../../assets/images/ovinoImagem.png";
 import Button from "../../buttons/Button";
 import { formatEnum } from "../../../../utils/formatEnum";
+import type { Ovino } from "../../../../api/models/ovino/OvinoModel";
+import { useNavigate } from "react-router-dom";
 
 interface OvinoCardProps {
+  ovino: Ovino;
   imagem?: string;
-  nome: string;
-  sexo: string;
-  fbb: string;
-  raca: string;
-  pai?: { id: number; nome: string } | undefined;
-  mae?: { id: number; nome: string } | undefined;
-  pureza: string;
 }
 
 const OvinoCard: React.FC<OvinoCardProps> = ({
-  imagem = Ovino,
-  nome,
-  sexo,
-  fbb,
-  raca,
-  pai,
-  mae,
-  pureza,
+  ovino,
+  imagem = OvinoDefault,
 }) => {
+  const navigate = useNavigate();
+
   return (
     <ul className="ovinoCard-container flex-column">
       <li className="flex">
-        <img src={imagem} alt={nome} />
+        <img src={imagem} alt={ovino.nome} />
         <div className="flex-column">
-          <h3>{nome}</h3>
-          <p>{sexo}</p>
+          <h3>{ovino.nome}</h3>
+          <p>{formatEnum(ovino.sexo)}</p>
         </div>
       </li>
       <li className="flex-column">
         <span className="flex">
           <h3>FBB:</h3>
-          <p>{fbb}</p>
+          <p>{ovino.fbb}</p>
         </span>
         <span className="flex">
           <h3>RAÇA:</h3>
-          <p>{formatEnum(raca)}</p>
+          <p>{formatEnum(ovino.raca)}</p>
         </span>
         <span className="flex">
           <h3>PAI:</h3>
-          <p>{pai ? pai.nome : "Não informado"}</p>
+          <p>{ovino.ovinoPai?.nome ?? "Não informado"}</p>
         </span>
         <span className="flex">
           <h3>MÃE:</h3>
-          <p>{mae ? mae.nome : "Não informado"}</p>
+          <p>{ovino.ovinoMae?.nome ?? "Não informado"}</p>
         </span>
         <span className="flex">
           <h3>PUREZA:</h3>
-          <p>{formatEnum(pureza)}</p>
+          <p>{formatEnum(ovino.typeGrauPureza)}</p>
         </span>
       </li>
       <li className="ovinoCard-buttons flex-column">
-        <Button variant="cardPrimary">Ver mais</Button>
+        <Button
+          variant="cardPrimary"
+          onClick={() =>
+            navigate(`/dashboard/ovinos/fullinfo`, { state: { ovino } })
+          }
+        >
+          Ver mais
+        </Button>
         <Button variant="cardSecondary">Abrir registros</Button>
       </li>
     </ul>

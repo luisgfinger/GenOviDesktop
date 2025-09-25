@@ -73,18 +73,9 @@ const Gerenciar: React.FC<GerenciarProps> = ({ searchQuery, type }) => {
           {type === "ovino" ? (
             <>
               {(currentData as Ovino[]).map((ovino) => (
-                <OvinoCard
-                  key={ovino.id}
-                  nome={ovino.nome}
-                  sexo={ovino.sexo}
-                  fbb={ovino.fbb ?? "Não informado"}
-                  raca={ovino.raca}
-                  pai={ovino.ovinoPai}
-                  mae={ovino.ovinoMae}
-                  pureza={ovino.typeGrauPureza}
-                />
-              ))}
+                <OvinoCard key={ovino.id} ovino={ovino} />
 
+              ))}
               <OptionCard
                 key="add-ovino"
                 images={[{ src: Add, alt: "add" }]}
