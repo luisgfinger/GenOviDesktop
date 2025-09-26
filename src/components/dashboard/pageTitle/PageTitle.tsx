@@ -29,6 +29,10 @@ const PageTitle: React.FC<PageTitleProps> = ({ onSearch }) => {
         return "Gerenciar Funcionário";
       case "/dashboard/funcionarios/gerenciar":
         return "Gerenciar Funcionários";
+      case "/dashboard/ovinos/reproducoes/criar":
+        return "Registrar Reprodução";
+      case "/dashboard/ovinos/reproducoes/gerenciar":
+        return "Gerenciar Reproduções"
       default:
         return "Dashboard";
     }

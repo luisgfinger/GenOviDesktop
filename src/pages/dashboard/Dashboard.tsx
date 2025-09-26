@@ -6,6 +6,9 @@ import { useState } from "react";
 import DashboardMenu from "../../components/dashboard/dashboardMenu/DashboardMenu";
 import CadastrarFuncionario from "../../components/form/cadastrarFuncionario/CadastrarFuncionario";
 import CadastrarOvino from "../../components/form/cadastrarOvino/CadastrarOvino";
+import OvinoFullInfo from "../../components/dashboard/gerenciar/ovinoFullInfo/OvinoFullInfo";
+import CadastrarReproducao from "../../components/form/cadastrarReproducao/CadastrarReproducao";
+import GerenciarReproducoes from "../../components/dashboard/reproducoes/GerenciarReproducoes";
 
 const Dashboard: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -36,6 +39,9 @@ const Dashboard: React.FC = () => {
             path="funcionarios/cadastrar"
             element={<CadastrarFuncionario/>}
           />
+          <Route path="ovinos/fullinfo" element={<OvinoFullInfo />} />
+          <Route path="ovinos/reproducoes/criar" element={<CadastrarReproducao />}/>
+          <Route path="ovinos/reproducoes/gerenciar" element={<GerenciarReproducoes/>}/>
         </Routes>
       </div>
     </div>

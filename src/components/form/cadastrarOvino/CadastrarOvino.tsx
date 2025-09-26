@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import "./CadastrarOvino.css";
 import Button from "../../common/buttons/Button";
 import { toast } from "react-toastify";
@@ -7,11 +7,11 @@ import { TypeRaca } from "../../../api/enums/typeRaca/TypeRaca";
 import { TypeSexo } from "../../../api/enums/typeSexo/TypeSexo";
 import { TypeGrauPureza } from "../../../api/enums/typeGrauPureza/TypeGrauPureza";
 import { TypeStatus } from "../../../api/enums/typeStatus/TypeStatus";
-import { OvinoService } from "../../../api/services/ovino/OvinoService";
 import { formatEnum } from "../../../utils/formatEnum";
 
 import { useCompras } from "../../../api/hooks/compra/UseCompras";
-import { useOvinos } from "../../../api/hooks/ovino/UseOvinos";
+import { useOvinos } from "../../../api/hooks/ovino/UseOvinos";     
+import { useSalvarOvino } from "../../../api/hooks/ovino/UseOvinos";    
 import type { OvinoRequestDTO } from "../../../api/dtos/ovino/OvinoRequestDTO";
 
 const CadastrarOvino: React.FC = () => {
@@ -32,24 +32,32 @@ const CadastrarOvino: React.FC = () => {
 
   const { compras, loading, error } = useCompras();
   const { ovinos, loading: loadingOvinos, error: errorOvinos } = useOvinos();
+  const { salvar, loading: saving, error: errorSalvar } = useSalvarOvino();
 
-const handleNext = () => {
-  if (step === 1 && (!idParto && !idCompra && !dataNascimento)) {
-    toast.warn("Preencha Data de Nascimento ou selecione o Parto para continuar");
-    return;
-  }
-  if (step === 2 && (!raca || !grauPureza || !sexo)) {
-    toast.warn("Preencha Raça, Grau de Pureza e Sexo antes de continuar.");
-    return;
-  }
-  if (step === 3 && (!rfid || !nome)) {
-    toast.warn("Preencha RFID e Nome antes de continuar.");
-    return;
-  }
+  const machos = useMemo(
+    () => (ovinos ?? []).filter((o) => o.sexo === TypeSexo.MACHO),
+    [ovinos]
+  );
+  const femeas = useMemo(
+    () => (ovinos ?? []).filter((o) => o.sexo === TypeSexo.FEMEA),
+    [ovinos]
+  );
 
-  setStep((prev) => Math.min(prev + 1, 4));
-};
-
+  const handleNext = () => {
+    if (step === 1 && !idParto && !idCompra && !dataNascimento) {
+      toast.warn("Preencha Data de Nascimento ou selecione o Parto para continuar");
+      return;
+    }
+    if (step === 2 && (!raca || !grauPureza || !sexo)) {
+      toast.warn("Preencha Raça, Grau de Pureza e Sexo antes de continuar.");
+      return;
+    }
+    if (step === 3 && (!rfid || !nome)) {
+      toast.warn("Preencha RFID e Nome antes de continuar.");
+      return;
+    }
+    setStep((prev) => Math.min(prev + 1, 4));
+  };
 
   const handleBack = () => setStep((prev) => Math.max(prev - 1, 1));
 
@@ -79,7 +87,7 @@ const handleNext = () => {
         fotoOvino: imagem ? imagem.name : undefined,
       };
 
-      await OvinoService.salvar(novoOvino);
+      await salvar(novoOvino);
       toast.success("Ovino cadastrado com sucesso!");
 
       setRfid("");
@@ -111,20 +119,19 @@ const handleNext = () => {
         <div className={`step ${step >= 4 ? "active" : ""}`}>4</div>
       </div>
 
-      <form
-        className="cadastrarOvino-container flex-column"
-        onSubmit={handleSubmit}
-      >
+      <form className="cadastrarOvino-container flex-column" onSubmit={handleSubmit}>
         {step === 1 && (
           <ul className="flex-column">
             <li className="flex-column">
               <label htmlFor="idParto">Parto</label>
               <input
                 type="text"
+                id="idParto"
                 value={idParto}
                 onChange={(e) => setIdParto(e.target.value)}
               />
             </li>
+
             <li className="flex-column">
               <label htmlFor="idCompra">Compra</label>
               {loading ? (
@@ -147,6 +154,7 @@ const handleNext = () => {
                 </select>
               )}
             </li>
+
             <li className="flex-column">
               <label htmlFor="dataNascimento">Data de nascimento</label>
               <input
@@ -156,6 +164,7 @@ const handleNext = () => {
                 onChange={(e) => setDataNascimento(e.target.value)}
               />
             </li>
+
             <li className="flex-column">
               <label htmlFor="idCarneiroPai">Ovino Pai</label>
               {loadingOvinos ? (
@@ -169,7 +178,7 @@ const handleNext = () => {
                   onChange={(e) => setIdCarneiroPai(e.target.value)}
                 >
                   <option value="">Selecione o pai...</option>
-                  {ovinos.map((o) => (
+                  {machos.map((o) => (
                     <option key={o.id} value={o.id}>
                       {o.nome} ({formatEnum(o.raca)})
                     </option>
@@ -177,6 +186,7 @@ const handleNext = () => {
                 </select>
               )}
             </li>
+
             <li className="flex-column">
               <label htmlFor="idOvelhaMae">Ovelha Mãe</label>
               {loadingOvinos ? (
@@ -190,7 +200,7 @@ const handleNext = () => {
                   onChange={(e) => setIdOvelhaMae(e.target.value)}
                 >
                   <option value="">Selecione a mãe...</option>
-                  {ovinos.map((o) => (
+                  {femeas.map((o) => (
                     <option key={o.id} value={o.id}>
                       {o.nome} ({formatEnum(o.raca)})
                     </option>
@@ -198,16 +208,19 @@ const handleNext = () => {
                 </select>
               )}
             </li>
+
             <Button type="button" variant="cardPrimary" onClick={handleNext}>
               Próximo
             </Button>
           </ul>
         )}
+
         {step === 2 && (
           <ul className="flex-column">
             <li className="flex-column">
               <label htmlFor="raca">Raça</label>
               <select
+                id="raca"
                 value={raca}
                 onChange={(e) => setRaca(e.target.value as TypeRaca)}
               >
@@ -219,13 +232,13 @@ const handleNext = () => {
                 ))}
               </select>
             </li>
+
             <li className="flex-column">
               <label htmlFor="grauPureza">Grau de pureza</label>
               <select
+                id="grauPureza"
                 value={grauPureza}
-                onChange={(e) =>
-                  setGrauPureza(e.target.value as TypeGrauPureza)
-                }
+                onChange={(e) => setGrauPureza(e.target.value as TypeGrauPureza)}
               >
                 <option value="">Selecione...</option>
                 {Object.values(TypeGrauPureza).map((g) => (
@@ -235,9 +248,11 @@ const handleNext = () => {
                 ))}
               </select>
             </li>
+
             <li className="flex-column">
               <label htmlFor="sexo">Sexo</label>
               <select
+                id="sexo"
                 value={sexo}
                 onChange={(e) => setSexo(e.target.value as TypeSexo)}
               >
@@ -249,12 +264,9 @@ const handleNext = () => {
                 ))}
               </select>
             </li>
+
             <div className="cadastrarOvino-form-navigation flex">
-              <Button
-                type="button"
-                variant="cardSecondary"
-                onClick={handleBack}
-              >
+              <Button type="button" variant="cardSecondary" onClick={handleBack}>
                 Voltar
               </Button>
               <Button type="button" variant="cardPrimary" onClick={handleNext}>
@@ -276,6 +288,7 @@ const handleNext = () => {
                 onChange={(e) => setRfid(e.target.value)}
               />
             </li>
+
             <li className="flex-column">
               <label htmlFor="fbb">FBB</label>
               <input
@@ -283,11 +296,10 @@ const handleNext = () => {
                 id="fbb"
                 placeholder="O-123456"
                 value={fbb}
-                onChange={(e) =>
-                  setFbb(`O-${e.target.value.replace(/\D/g, "")}`)
-                }
+                onChange={(e) => setFbb(`O-${e.target.value.replace(/\D/g, "")}`)}
               />
             </li>
+
             <li className="flex-column">
               <label htmlFor="nome">Nome</label>
               <input
@@ -295,43 +307,12 @@ const handleNext = () => {
                 id="nome"
                 placeholder="Apenas letras e números"
                 value={nome}
-                onChange={(e) =>
-                  setNome(e.target.value.replace(/[^a-zA-Z0-9 ]/g, ""))
-                }
-              />
-            </li>
-            <li className="flex-column">
-              <label htmlFor="status">Status</label>
-              <select
-                value={status}
-                onChange={(e) => setStatus(e.target.value as TypeStatus)}
-              >
-                {Object.values(TypeStatus).map((st) => (
-                  <option key={st} value={st}>
-                    {formatEnum(st)}
-                  </option>
-                ))}
-              </select>
-            </li>
-            <li className="flex-column">
-              <label htmlFor="imagem">Imagem</label>
-              <input
-                type="file"
-                accept="image/*"
-                onChange={(e) => {
-                  if (e.target.files && e.target.files[0]) {
-                    setImagem(e.target.files[0]);
-                  }
-                }}
+                onChange={(e) => setNome(e.target.value.replace(/[^a-zA-Z0-9 ]/g, ""))}
               />
             </li>
 
             <div className="cadastrarOvino-form-navigation flex">
-              <Button
-                type="button"
-                variant="cardSecondary"
-                onClick={handleBack}
-              >
+              <Button type="button" variant="cardSecondary" onClick={handleBack}>
                 Voltar
               </Button>
               <Button type="button" variant="cardPrimary" onClick={handleNext}>
@@ -343,18 +324,47 @@ const handleNext = () => {
 
         {step === 4 && (
           <ul className="flex-column">
-            <div className="cadastrarOvino-form-navigation flex">
-              <Button
-                type="button"
-                variant="cardSecondary"
-                onClick={handleBack}
+            <li className="flex-column">
+              <label htmlFor="status">Status</label>
+              <select
+                id="status"
+                value={status}
+                onChange={(e) => setStatus(e.target.value as TypeStatus)}
               >
+                {Object.values(TypeStatus).map((st) => (
+                  <option key={st} value={st}>
+                    {formatEnum(st)}
+                  </option>
+                ))}
+              </select>
+            </li>
+
+            <li className="flex-column">
+              <label htmlFor="imagem">Imagem</label>
+              <div className="file-input flex">
+                <input
+                  type="file"
+                  id="imagem"
+                  accept="image/*"
+                  onChange={(e) => {
+                    if (e.target.files && e.target.files[0]) {
+                      setImagem(e.target.files[0]);
+                    }
+                  }}
+                />
+              </div>
+            </li>
+
+            <div className="cadastrarOvino-form-navigation flex">
+              <Button type="button" variant="cardSecondary" onClick={handleBack}>
                 Voltar
               </Button>
-              <Button type="submit" variant="cardPrimary">
-                Cadastrar
+              <Button type="submit" variant="cardPrimary" disabled={saving}>
+                {saving ? "Salvando..." : "Cadastrar"}
               </Button>
             </div>
+
+            {errorSalvar && <p style={{ color: "red" }}>{errorSalvar}</p>}
           </ul>
         )}
       </form>

@@ -7,10 +7,9 @@ import Vacina from "../../../assets/icons/vacinas.png";
 import Medicamento from "../../../assets/icons/medicamentos.png";
 import Doenca from "../../../assets/icons/doencas.png";
 import Gestacao from "../../../assets/icons/gestacao.png";
+import Reproducao from "../../../assets/icons/reproducao.png";
 
 import "./DashboardMenu.css";
-import { href } from "react-router-dom";
-import { hr } from "framer-motion/client";
 
 interface DashboardMenuProps {
   location: string;
@@ -46,6 +45,11 @@ const DashboardMenu: React.FC<DashboardMenuProps> = ({ location }) => {
       text: "Doenças",
       href: "/",
     },
+     {
+      images: [{ src: Reproducao, alt: "reproducao" }],
+      text: "Reproduções",
+      href: "/",
+    },
     {
       images: [{ src: Gestacao, alt: "gestacao" }],
       text: "Gestações",
@@ -69,6 +73,10 @@ const DashboardMenu: React.FC<DashboardMenuProps> = ({ location }) => {
 
     {text: "Registrar adoecimento", href: "#"},
     {text: "Cadastrar doença", href: "#"},
+    {text: "Mais opções", href: "#"},
+
+    {text: "Registrar reprodução", href: "/dashboard/ovinos/reproducoes/criar"},
+    {text: "Gerenciar reproduções", href: "/dashboard/ovinos/reproducoes/gerenciar"},
     {text: "Mais opções", href: "#"},
 
     {text: "Registrar gestação", href: "#"},

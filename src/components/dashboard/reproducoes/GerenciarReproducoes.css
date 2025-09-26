@@ -1,0 +1,124 @@
+.repros-page {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 90%;
+  align-self: center;
+  margin-top: 30px;
+  margin-bottom: 30px;
+}
+
+.repros-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.repros-header h2 {
+  margin: 0;
+  color: var(--full-black-color);
+}
+
+.repros-filters {
+  display: flex;
+  gap: 12px;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  background: var(--white-color);
+  padding: 12px;
+  border-radius: 8px;
+}
+
+.repros-filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+
+}
+
+.repros-filter-group label {
+  font-size: 13px;
+  color: var(--full-black-color);
+  opacity: 0.9;
+}
+
+.repros-input,
+.repros-select,
+.repros-date {
+  height: 38px;
+  border-radius: 8px;
+  border: 1px solid #eee;
+  background: var(--secondary-color);
+  color: var(--full-black-color);
+  padding: 0 10px;
+  outline: none;
+}
+
+.repros-input {
+  width: 280px;
+}
+
+.repros-select {
+  width: 200px;
+}
+
+.repros-date {
+  width: 170px;
+}
+
+.repros-counter {
+  font-size: 14px;
+  opacity: 0.85;
+}
+
+.repros-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.repros-card {
+  background: var(--white-color);
+  border-radius: 10px;
+  padding: 12px;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 12px;
+  align-items: center;
+  border: 1px solid #f1f1f1;
+}
+
+.repros-col-title {
+  font-size: 20px;
+  opacity: 0.7;
+  margin-bottom: 2px;
+}
+
+.repros-col-main {
+  font-weight: 600;
+  color: var(--full-black-color);
+}
+
+.repros-meta {
+  font-size: 16px;
+  opacity: 0.8;
+}
+
+.repros-empty {
+  padding: 16px;
+  background: var(--white-color);
+  border-radius: 8px;
+  border: 1px solid #f1f1f1;
+}
+
+.repros-pagination {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  justify-content: center;
+}
+
+.repros-page-info {
+  font-size: 14px;
+}
+
