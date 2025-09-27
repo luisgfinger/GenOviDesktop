@@ -1,0 +1,39 @@
+.filters {
+  gap: 12px;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  background: var(--white-color);
+  padding: 12px;
+  border-radius: 8px;
+}
+
+.filter-group {
+  gap: 6px;
+}
+
+.filter-group label {
+  font-size: 13px;
+  color: var(--full-black-color);
+  opacity: 0.9;
+}
+
+
+.filter-input,
+.filter-select,
+.filter-date {
+  height: 38px;
+  border-radius: 8px;
+  border: 1px solid #eee;
+  background: var(--secondary-color);
+  color: var(--full-black-color);
+  padding: 0 10px;
+  outline: none;
+}
+
+.filter-input {
+  width: 280px;
+}
+
+.filter-select {
+  width: 200px;
+}

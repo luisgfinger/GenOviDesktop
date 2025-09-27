@@ -6,4 +6,5 @@ export interface Gestacao {
   ovelhaMae: Ovino;
   ovelhaPai: Ovino;
   reproducao: Reproducao;
+  dataGestacao: string;
 }

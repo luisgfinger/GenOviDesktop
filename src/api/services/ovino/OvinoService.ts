@@ -18,6 +18,7 @@ export const OvinoService = {
 
   findById: async (id: number): Promise<Ovino> => {
     const { data } = await Api.get<OvinoResponseDTO>(`/user/ovinos/${id}`);
+    console.log(data);
     return responseToModel(data);
   },
 };

@@ -8,60 +8,6 @@
   margin-bottom: 30px;
 }
 
-.repros-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.repros-header h2 {
-  margin: 0;
-  color: var(--full-black-color);
-}
-
-.repros-filters {
-  display: flex;
-  gap: 12px;
-  align-items: flex-end;
-  flex-wrap: wrap;
-  background: var(--white-color);
-  padding: 12px;
-  border-radius: 8px;
-}
-
-.repros-filter-group {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-
-}
-
-.repros-filter-group label {
-  font-size: 13px;
-  color: var(--full-black-color);
-  opacity: 0.9;
-}
-
-.repros-input,
-.repros-select,
-.repros-date {
-  height: 38px;
-  border-radius: 8px;
-  border: 1px solid #eee;
-  background: var(--secondary-color);
-  color: var(--full-black-color);
-  padding: 0 10px;
-  outline: none;
-}
-
-.repros-input {
-  width: 280px;
-}
-
-.repros-select {
-  width: 200px;
-}
-
 .repros-date {
   width: 170px;
 }
