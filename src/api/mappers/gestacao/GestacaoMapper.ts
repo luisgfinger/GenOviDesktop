@@ -6,7 +6,6 @@ export const gestacaoMapper = {
     reproducaoId: dto.reproducaoId ?? undefined,
     ovelhaMaeId: dto.ovelhaMaeId,
     ovelhaPaiId: dto.ovelhaPaiId,
-    observacoes: dto.observacoes,
     dataGestacao: dto.dataGestacao,
   }),
 
@@ -15,7 +14,6 @@ export const gestacaoMapper = {
     reproducao: data.reproducaoId,
     ovelhaMae: data.ovelhaMae,
     ovelhaPai: data.ovelhaPai,
-    observacoes: data.observacoes,
     dataGestacao: data.dataGestacao,
   }),
 };

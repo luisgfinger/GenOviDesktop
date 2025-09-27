@@ -1,15 +1,15 @@
 import React, { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import "./GerenciarReproducoes.css";
+import "./GerenciarGestacoes.css";
 
 import Button from "../../common/buttons/Button";
 import PaginationMenu from "../../common/paginationMenu/PaginationMenu";
-import { useReproducoes } from "../../../api/hooks/reproducao/UseReproducoes";
-import { useOvinos } from "../../../api/hooks/ovino/UseOvinos";
-import type { ReproducaoResponseDTO } from "../../../api/dtos/reproducao/ReproducaoResponseDTO";
+import FilterBar from "../../common/filter-bar/FilterBar";
+
+import { useGestacoes } from "../../../api/hooks/gestacao/UseGestacoes";
+import type { GestacaoResponseDTO } from "../../../api/dtos/gestacao/GestacaoResponseDTO";
 import { TypeReproducao } from "../../../api/enums/typeReproducao/TypeReproducao";
 import { formatEnum } from "../../../utils/formatEnum";
-import FilterBar from "../../common/filter-bar/FilterBar";
 
 function formatISODateTime(iso?: string) {
   if (!iso) return "—";
@@ -27,16 +27,10 @@ function normalize(s?: string) {
     .toLowerCase();
 }
 
-type ReproducaoUI = ReproducaoResponseDTO & {
-  carneiroPai?: { id: number; nome?: string; fbb?: string; rfid?: number };
-  ovelhaMae?: { id: number; nome?: string; fbb?: string; rfid?: number };
-};
-
 const PAGE_SIZE = 5;
 
-const GerenciarReproducoes: React.FC = () => {
-  const { reproducoes, loading, error } = useReproducoes();
-  const { ovinos } = useOvinos();
+const GerenciarGestacoes: React.FC = () => {
+  const { gestacoes, loading, error } = useGestacoes();
 
   const [q, setQ] = useState("");
   const [tipo, setTipo] = useState<string>("TODOS");
@@ -45,60 +39,48 @@ const GerenciarReproducoes: React.FC = () => {
   const [page, setPage] = useState(1);
   const [viewAll, setViewAll] = useState(false);
 
-  const reprosHydrated: ReproducaoUI[] = useMemo(() => {
-    return (reproducoes ?? []).map((r) => {
-      const carneiroPai =
-        r.carneiroPai?.id && ovinos
-          ? ovinos.find((o) => o.id === r.carneiroPai?.id) ?? r.carneiroPai
-          : r.carneiroPai;
+  const items = useMemo<GestacaoResponseDTO[]>(() => gestacoes ?? [], [gestacoes]);
 
-      const ovelhaMae =
-        r.ovelhaMae?.id && ovinos
-          ? ovinos.find((o) => o.id === r.ovelhaMae?.id) ?? r.ovelhaMae
-          : r.ovelhaMae;
-
-      return { ...r, carneiroPai, ovelhaMae };
-    });
-  }, [reproducoes, ovinos]);
-
-  const filtered: ReproducaoUI[] = useMemo(() => {
+  const filtered: GestacaoResponseDTO[] = useMemo(() => {
     const query = normalize(q.trim());
     const df = dateFrom ? new Date(`${dateFrom}T00:00:00`) : null;
     const dt = dateTo ? new Date(`${dateTo}T23:59:59`) : null;
 
-    return reprosHydrated
-      .filter((r) => {
-        if (tipo !== "TODOS" && r.typeReproducao !== (tipo as TypeReproducao))
+    return items
+      .filter((g) => {
+        if (tipo !== "TODOS" && g.reproducao?.typeReproducao !== (tipo as TypeReproducao)) {
           return false;
-
+        }
         if (df || dt) {
-          const d = new Date(r.dataReproducao ?? "");
+          const d = new Date(g.dataGestacao ?? "");
           if (Number.isNaN(d.getTime())) return false;
           if (df && d < df) return false;
           if (dt && d > dt) return false;
         }
 
         if (!query) return true;
+
         const campos = [
-          r.observacoes ?? "",
-          r.typeReproducao ?? "",
-          r.carneiroPai?.nome ?? "",
-          r.carneiroPai?.fbb ?? "",
-          String(r.carneiroPai?.rfid ?? ""),
-          r.ovelhaMae?.nome ?? "",
-          r.ovelhaMae?.fbb ?? "",
-          String(r.ovelhaMae?.rfid ?? ""),
-          formatISODateTime(r.dataReproducao),
+          g.ovelhaPai?.nome ?? "",
+          g.ovelhaPai?.fbb ?? "",
+          String(g.ovelhaPai?.rfid ?? ""),
+          g.ovelhaMae?.nome ?? "",
+          g.ovelhaMae?.fbb ?? "",
+          String(g.ovelhaMae?.rfid ?? ""),
+          g.reproducao?.observacoes ?? "",
+          g.reproducao?.typeReproducao ?? "",
+          formatISODateTime(g.reproducao?.dataReproducao),
+          formatISODateTime(g.dataGestacao),
         ].map((x) => normalize(x));
 
         return campos.some((c) => c.includes(query));
       })
       .sort((a, b) => {
-        const da = new Date(a.dataReproducao ?? "").getTime();
-        const db = new Date(b.dataReproducao ?? "").getTime();
+        const da = new Date(a.dataGestacao ?? "").getTime();
+        const db = new Date(b.dataGestacao ?? "").getTime();
         return (db || 0) - (da || 0);
       });
-  }, [reprosHydrated, q, tipo, dateFrom, dateTo]);
+  }, [items, q, tipo, dateFrom, dateTo]);
 
   const totalPages = viewAll ? 1 : Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
   const currentPage = viewAll ? 1 : Math.min(page, totalPages);
@@ -114,16 +96,16 @@ const GerenciarReproducoes: React.FC = () => {
     setViewAll(false);
   };
 
-  if (loading) return <p>Carregando reproduções…</p>;
+  if (loading) return <p>Carregando gestações…</p>;
   if (error) return <p style={{ color: "red" }}>{error}</p>;
 
   return (
-    <div className="repros-page">
-      <div className="repros-header flex">
-        <h2>Reproduções</h2>
-        <Link to="/dashboard/ovinos/reproducoes/criar">
+    <div className="gest-page">
+      <div className="gest-header flex">
+        <h2>Gestações</h2>
+        <Link to="/dashboard/ovinos/gestacoes/criar">
           <Button type="button" variant="cardPrimary">
-            Nova Reprodução
+            Nova Gestação
           </Button>
         </Link>
       </div>
@@ -143,55 +125,61 @@ const GerenciarReproducoes: React.FC = () => {
         placeholder="Buscar por pai/mãe, FBB, RFID, observações…"
       />
 
-      <div className="repros-counter">
+      <div className="gest-counter">
         Mostrando <strong>{pageItems.length}</strong> de{" "}
         <strong>{filtered.length}</strong> resultado(s).
       </div>
 
       {pageItems.length === 0 ? (
-        <div className="repros-empty">Nenhuma reprodução encontrada.</div>
+        <div className="gest-empty">Nenhuma gestação encontrada.</div>
       ) : (
-        <div className="repros-list">
-          {pageItems.map((r) => (
-            <div key={r.id} className="repros-card">
+        <div className="gest-list">
+          {pageItems.map((g) => (
+            <div key={g.id} className="gest-card">
               <div>
-                <div className="repros-col-title">Carneiro (pai)</div>
-                <div className="repros-col-main">{r.carneiroPai?.nome ?? "—"}</div>
-                <div className="repros-meta">
-                  FBB: {r.carneiroPai?.fbb ?? "—"} • RFID: {r.carneiroPai?.rfid ?? "—"}
+                <div className="gest-col-title">Carneiro (Macho)</div>
+                <div className="gest-col-main">{g.ovelhaPai?.nome ?? "—"}</div>
+                <div className="gest-meta">
+                  FBB: {g.ovelhaPai?.fbb ?? "—"} • RFID: {g.ovelhaPai?.rfid ?? "—"}
                 </div>
               </div>
 
               <div>
-                <div className="repros-col-title">Ovelha (mãe)</div>
-                <div className="repros-col-main">{r.ovelhaMae?.nome ?? "—"}</div>
-                <div className="repros-meta">
-                  FBB: {r.ovelhaMae?.fbb ?? "—"} • RFID: {r.ovelhaMae?.rfid ?? "—"}
+                <div className="gest-col-title">Ovelha (Fêmea)</div>
+                <div className="gest-col-main">{g.ovelhaMae?.nome ?? "—"}</div>
+                <div className="gest-meta">
+                  FBB: {g.ovelhaMae?.fbb ?? "—"} • RFID: {g.ovelhaMae?.rfid ?? "—"}
                 </div>
               </div>
 
               <div>
-                <div className="repros-col-title">Detalhes</div>
-                <div className="repros-meta">
+                <div className="gest-col-title">Detalhes</div>
+                <div className="gest-meta">
                   <span>
-                    <strong>Tipo:</strong>{" "}
-                    {r.typeReproducao ? formatEnum(r.typeReproducao) : "—"}
+                    <strong>Tipo Reprodução:</strong>{" "}
+                    {g.reproducao?.typeReproducao
+                      ? formatEnum(g.reproducao.typeReproducao)
+                      : "—"}
                   </span>
                   <br />
                   <span>
-                    <strong>Data:</strong> {formatISODateTime(r.dataReproducao)}
+                    <strong>Data Reprodução:</strong>{" "}
+                    {formatISODateTime(g.reproducao?.dataReproducao)}
                   </span>
                   <br />
-                  {r.observacoes && <em>{r.observacoes}</em>}
+                  <span>
+                    <strong>Data Gestação:</strong> {formatISODateTime(g.dataGestacao)}
+                  </span>
+                  <br />
+                  {g.reproducao?.observacoes && <em>{g.reproducao.observacoes}</em>}
                 </div>
               </div>
             </div>
           ))}
         </div>
       )}
-
       {!viewAll && totalPages > 1 && (
-        <div className="repros-pagination">
+        <div className="gest-pagination">
           <PaginationMenu
             currentPage={currentPage}
             totalPages={totalPages}
@@ -206,12 +194,8 @@ const GerenciarReproducoes: React.FC = () => {
       )}
 
       {viewAll && filtered.length > PAGE_SIZE && (
-        <div className="repros-pagination">
-          <Button
-            type="button"
-            variant="cardSecondary"
-            onClick={() => setViewAll(false)}
-          >
+        <div className="gest-pagination">
+          <Button type="button" variant="cardSecondary" onClick={() => setViewAll(false)}>
             Voltar à paginação
           </Button>
         </div>
@@ -220,4 +204,4 @@ const GerenciarReproducoes: React.FC = () => {
   );
 };
 
-export default GerenciarReproducoes;
+export default GerenciarGestacoes;

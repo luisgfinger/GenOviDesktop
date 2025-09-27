@@ -4,19 +4,32 @@ import { formatEnum } from "../../../utils/formatEnum";
 import Button from "../buttons/Button";
 import "./FilterBar.css";
 
+type TypeOption = { value: string; label: string };
+
 interface FilterBarProps {
   q: string;
   setQ: (value: string) => void;
+
   tipo: string;
   setTipo: (value: string) => void;
+
   dateFrom: string;
   setDateFrom: (value: string) => void;
   dateTo: string;
   setDateTo: (value: string) => void;
+
   clearFilters: () => void;
   setPage: (page: number) => void;
   setViewAll: (value: boolean) => void;
+
   placeholder?: string;
+
+  typeOptions?: Array<TypeOption | string>;
+
+  typeLabel?: string;
+
+  allOptionLabel?: string;
+  allOptionValue?: string;
 }
 
 const FilterBar: React.FC<FilterBarProps> = ({
@@ -32,7 +45,21 @@ const FilterBar: React.FC<FilterBarProps> = ({
   setPage,
   setViewAll,
   placeholder = "Buscar...",
+  typeOptions,
+  typeLabel = "Tipo",
+  allOptionLabel = "Todos",
+  allOptionValue = "TODOS",
 }) => {
+  const normalizedOptions: TypeOption[] =
+    typeOptions && typeOptions.length > 0
+      ? typeOptions.map((opt) =>
+          typeof opt === "string" ? { value: opt, label: formatEnum(opt) } : opt
+        )
+      : Object.values(TypeReproducao).map((t) => ({
+          value: t,
+          label: formatEnum(t),
+        }));
+
   return (
     <div className="filters flex">
       <div className="filter-group flex-column">
@@ -52,7 +79,7 @@ const FilterBar: React.FC<FilterBarProps> = ({
       </div>
 
       <div className="filter-group flex-column">
-        <label htmlFor="tipo">Tipo</label>
+        <label htmlFor="tipo">{typeLabel}</label>
         <select
           id="tipo"
           className="filter-select"
@@ -63,10 +90,10 @@ const FilterBar: React.FC<FilterBarProps> = ({
             setViewAll(false);
           }}
         >
-          <option value="TODOS">Todos</option>
-          {Object.values(TypeReproducao).map((t) => (
-            <option key={t} value={t}>
-              {formatEnum(t)}
+          <option value={allOptionValue}>{allOptionLabel}</option>
+          {normalizedOptions.map((opt) => (
+            <option key={opt.value} value={opt.value}>
+              {opt.label}
             </option>
           ))}
         </select>

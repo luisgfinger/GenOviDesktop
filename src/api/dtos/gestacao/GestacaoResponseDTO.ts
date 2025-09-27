@@ -6,6 +6,5 @@ export interface GestacaoResponseDTO {
   reproducao?: ReproducaoResponseDTO;
   ovelhaMae: Ovino;
   ovelhaPai: Ovino;
-  observacoes?: string;
   dataGestacao: string;
 }

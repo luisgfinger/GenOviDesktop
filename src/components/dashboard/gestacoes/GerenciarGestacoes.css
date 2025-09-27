@@ -1,4 +1,4 @@
-.repros-page {
+.gest-page {
   display: flex;
   flex-direction: column;
   gap: 16px;
@@ -7,32 +7,30 @@
   margin-top: 30px;
   margin-bottom: 30px;
 }
-.repros-header {
+
+.gest-header {
+  display: flex;
   justify-content: space-between;
   align-items: center;
 }
 
-.repros-header h2 {
+.gest-header h2 {
   margin: 0;
   color: var(--full-black-color);
 }
 
-.repros-date {
-  width: 170px;
-}
-
-.repros-counter {
+.gest-counter {
   font-size: 14px;
   opacity: 0.85;
 }
 
-.repros-list {
+.gest-list {
   display: flex;
   flex-direction: column;
   gap: 12px;
 }
 
-.repros-card {
+.gest-card {
   background: var(--white-color);
   border-radius: 10px;
   padding: 12px;
@@ -43,37 +41,32 @@
   border: 1px solid #f1f1f1;
 }
 
-.repros-col-title {
+.gest-col-title {
   font-size: 20px;
   opacity: 0.7;
   margin-bottom: 2px;
 }
 
-.repros-col-main {
+.gest-col-main {
   font-weight: 600;
   color: var(--full-black-color);
 }
 
-.repros-meta {
+.gest-meta {
   font-size: 16px;
   opacity: 0.8;
 }
 
-.repros-empty {
+.gest-empty {
   padding: 16px;
   background: var(--white-color);
   border-radius: 8px;
   border: 1px solid #f1f1f1;
 }
 
-.repros-pagination {
+.gest-pagination {
   display: flex;
   gap: 8px;
   align-items: center;
   justify-content: center;
 }
-
-.repros-page-info {
-  font-size: 14px;
-}
-

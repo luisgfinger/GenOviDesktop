@@ -28,9 +28,7 @@ const CadastrarGestacao: React.FC = () => {
   const [reproducaoId, setReproducaoId] = useState<string>("");
   const [ovelhaMaeId, setOvelhaMaeId] = useState<string>("");
   const [ovelhaPaiId, setOvelhaPaiId] = useState<string>("");
-  const [observacoes, setObservacoes] = useState<string>("");
-
-  const [dataGestacao, setDataGestacao] = useState<string>(""); // NOVO ESTADO
+  const [dataGestacao, setDataGestacao] = useState<string>(""); 
 
   const [carneiroPaiNome, setCarneiroPaiNome] = useState<string>("");
   const [ovelhaMaeNome, setOvelhaMaeNome] = useState<string>("");
@@ -83,10 +81,10 @@ const CadastrarGestacao: React.FC = () => {
       ovelhaMaeId: Number(ovelhaMaeId),
       ovelhaPaiId: Number(ovelhaPaiId),
       dataGestacao: dataGestacao ? new Date(dataGestacao).toISOString() : "",
-      observacoes: observacoes || undefined,
     };
 
     try {
+      console.log("DTO enviado:", dto);
       await criarGestacao(dto);
       toast.success("Gestação cadastrada com sucesso!");
       setReproducaoId("");
@@ -94,7 +92,6 @@ const CadastrarGestacao: React.FC = () => {
       setOvelhaMaeId("");
       setCarneiroPaiNome("");
       setOvelhaMaeNome("");
-      setObservacoes("");
       setDataGestacao("");
     } catch (err) {
       console.error(err);
@@ -135,7 +132,7 @@ const CadastrarGestacao: React.FC = () => {
             ) : errorOvinos ? (
               <p style={{ color: "red" }}>{errorOvinos}</p>
             ) : (
-              <select id="ovelhaPaiId" value={ovelhaPaiId} onChange={(e) => setOvelhaPaiId(e.target.value)}>
+              <select id="ovelhaPaiId" value={ovelhaPaiId} onChange={(e) => setOvelhaPaiId(e.target.value)} required>
                 <option value="">Selecione o carneiro...</option>
                 {machos.map((o) => (
                   <option key={o.id} value={String(o.id)}>
@@ -155,7 +152,7 @@ const CadastrarGestacao: React.FC = () => {
             ) : errorOvinos ? (
               <p style={{ color: "red" }}>{errorOvinos}</p>
             ) : (
-              <select id="ovelhaMaeId" value={ovelhaMaeId} onChange={(e) => setOvelhaMaeId(e.target.value)}>
+              <select id="ovelhaMaeId" value={ovelhaMaeId} onChange={(e) => setOvelhaMaeId(e.target.value)} required>
                 <option value="">Selecione a ovelha...</option>
                 {femeas.map((o) => (
                   <option key={o.id} value={String(o.id)}>
@@ -172,18 +169,9 @@ const CadastrarGestacao: React.FC = () => {
               id="dataGestacao"
               value={dataGestacao}
               onChange={(e) => setDataGestacao(e.target.value)}
+              required
             />
           </li>
-          <li className="flex-column">
-            <label htmlFor="observacoes">Observações</label>
-            <textarea
-              id="observacoes"
-              value={observacoes}
-              onChange={(e) => setObservacoes(e.target.value)}
-              placeholder="Anotações adicionais (opcional)"
-            />
-          </li>
-
           <div className="cadastrarGestacao-form-navigation">
             <Button type="submit" variant="cardPrimary" disabled={saving}>
               {saving ? "Salvando..." : "Cadastrar gestação"}
