@@ -34,8 +34,8 @@ export const modelToRequest = (ovino: Ovino): OvinoRequestDTO => ({
   sexo: ovino.sexo,
   maeId: ovino.ovinoMae?.id && ovino.ovinoMae.id > 0 ? ovino.ovinoMae.id : undefined,
   paiId: ovino.ovinoPai?.id && ovino.ovinoPai.id > 0 ? ovino.ovinoPai.id : undefined,
-  compraId: ovino.compra?.id && ovino.compra.id > 0 ? ovino.compra.id : undefined,
-  partoId: ovino.parto?.id && ovino.parto.id > 0 ? ovino.parto.id : undefined,
+  compra: ovino.compra?.id && ovino.compra.id > 0 ? ovino.compra.id : undefined,
+  parto: ovino.parto?.id && ovino.parto.id > 0 ? ovino.parto.id : undefined,
   status: ovino.status,
   fotoOvino: ovino.fotoOvino,
 });

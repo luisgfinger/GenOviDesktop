@@ -19,7 +19,6 @@ function mapGestacao(raw: any): GestacaoResponseDTO {
       : ({} as ReproducaoResponseDTO),
     ovelhaPai: (raw.ovelhaPai ?? raw.carneiroId ?? {}) as Ovino,
     ovelhaMae: (raw.ovelhaMae ?? raw.ovelhaId ?? {}) as Ovino,
-    observacoes: raw.observacoes ?? undefined,
     dataGestacao: raw.dataGestacao ?? "",
   };
 }

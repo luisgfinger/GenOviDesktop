@@ -83,8 +83,8 @@ const DashboardMenu: React.FC<DashboardMenuProps> = ({ location }) => {
     {text: "Gerenciar gestações", href: "/dashboard/ovinos/gestacoes/gerenciar"},
     {text: "Mais opções", href: "#"},
 
-    {text: "Registrar parto", href: "#"},
-    {text: "Gerenciar partos", href: "#"},
+    {text: "Registrar parto", href: "/dashboard/ovinos/partos/criar"},
+    {text: "Gerenciar partos", href: "/dashboard/ovinos/partos/gerenciar"},
     {text: "Mais opções", href: "#"},
 
 

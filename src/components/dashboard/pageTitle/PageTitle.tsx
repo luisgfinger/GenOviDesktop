@@ -37,6 +37,10 @@ const PageTitle: React.FC<PageTitleProps> = ({ onSearch }) => {
         return "Registrar Gestação";
       case "/dashboard/ovinos/gestacoes/gerenciar":
         return "Gerenciar Gestações";
+         case "/dashboard/ovinos/partos/criar":
+        return "Registrar Parto";
+      case "/dashboard/ovinos/partos/gerenciar":
+        return "Gerenciar Partos";
       default:
         return "Dashboard";
     }

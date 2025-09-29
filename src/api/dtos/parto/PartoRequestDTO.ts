@@ -1,5 +1,6 @@
 export interface PartoRequestDTO {
-  ovinoMaeId: number;
-  ovinoPaiId: number;
-  gestacaoId: number;
+  ovelhaMaeId: number;
+  ovelhaPaiId: number;
+  gestacaoId?: number;
+  dataParto: string;
 }

@@ -14,8 +14,8 @@ export interface OvinoRequestDTO {
   sexo: TypeSexo;
   status: TypeStatus;
   fotoOvino?: string;
-  compraId?: number;
-  partoId?: number;
+  compra?: number;
+  parto?: number;
   maeId?: number; 
   paiId?: number; 
 }

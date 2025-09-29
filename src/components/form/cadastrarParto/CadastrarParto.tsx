@@ -1,0 +1,188 @@
+import React, { useMemo, useState } from "react";
+import "./CadastrarParto.css";
+import Button from "../../common/buttons/Button";
+import { toast } from "react-toastify";
+
+import { useOvinos } from "../../../api/hooks/ovino/UseOvinos";
+import { useGestacoes } from "../../../api/hooks/gestacao/UseGestacoes";
+import { useCriarParto } from "../../../api/hooks/parto/UsePartos";
+import { formatEnum } from "../../../utils/formatEnum";
+
+import { TypeSexo } from "../../../api/enums/typeSexo/TypeSexo";
+import { TypeStatus } from "../../../api/enums/typeStatus/TypeStatus";
+
+import type { PartoRequestDTO } from "../../../api/dtos/parto/PartoRequestDTO";
+import type { GestacaoResponseDTO } from "../../../api/dtos/gestacao/GestacaoResponseDTO";
+
+function formatISODate(iso?: string) {
+  if (!iso) return "—";
+  const d = new Date(iso);
+  return Number.isNaN(d.getTime()) ? "—" : d.toLocaleDateString();
+}
+
+const CadastrarParto: React.FC = () => {
+  const { ovinos, loading: loadingOvinos, error: errorOvinos } = useOvinos();
+  const { gestacoes, loading: loadingRepros, error: errorRepros } = useGestacoes();
+  const { criarParto, loading: saving, error: errorSalvar } = useCriarParto();
+
+  const [gestacaoId, setGestacaoId] = useState<string>("");
+  const [ovelhaMaeId, setOvelhaMaeId] = useState<string>("");
+  const [ovelhaPaiId, setOvelhaPaiId] = useState<string>("");
+  const [dataParto, setDataParto] = useState<string>(""); 
+
+  const [carneiroPaiNome, setCarneiroPaiNome] = useState<string>("");
+  const [ovelhaMaeNome, setOvelhaMaeNome] = useState<string>("");
+
+  const gestacoesById = useMemo(() => {
+    const m = new Map<string, GestacaoResponseDTO>();
+    (gestacoes ?? []).forEach((r) => m.set(String(r.id), r));
+    return m;
+  }, [gestacoes]);
+
+  const machos = useMemo(
+    () => (ovinos ?? []).filter((o) => o.sexo === TypeSexo.MACHO && o.status === TypeStatus.ATIVO),
+    [ovinos]
+  );
+
+  const femeas = useMemo(
+    () => (ovinos ?? []).filter((o) => o.sexo === TypeSexo.FEMEA && o.status === TypeStatus.ATIVO),
+    [ovinos]
+  );
+
+  const handleSelectGestacao = (id: string) => {
+    setGestacaoId(id);
+
+    if (id) {
+      const r = gestacoesById.get(id);
+      if (r) {
+        setOvelhaPaiId(String(r.ovelhaPai?.id ?? ""));
+        setOvelhaMaeId(String(r.ovelhaMae?.id ?? ""));
+        setCarneiroPaiNome(r.ovelhaPai?.nome || `#${r.ovelhaPai?.id ?? ""}`);
+        setOvelhaMaeNome(r.ovelhaMae?.nome || `#${r.ovelhaMae?.id ?? ""}`);
+      }
+    } else {
+      setOvelhaPaiId("");
+      setOvelhaMaeId("");
+      setCarneiroPaiNome("");
+      setOvelhaMaeNome("");
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!ovelhaMaeId || !ovelhaPaiId) {
+      toast.warn("Selecione ovelha e carneiro.");
+      return;
+    }
+
+    const dto: PartoRequestDTO = {
+      gestacaoId: gestacaoId ? Number(gestacaoId) : undefined,
+      ovelhaMaeId: Number(ovelhaMaeId),
+      ovelhaPaiId: Number(ovelhaPaiId),
+      dataParto: dataParto ? new Date(dataParto).toISOString() : "",
+    };
+
+    try {
+      console.log("DTO enviado:", dto);
+      await criarParto(dto);
+      toast.success("Parto cadastrado com sucesso!");
+      setGestacaoId("");
+      setOvelhaPaiId("");
+      setOvelhaMaeId("");
+      setCarneiroPaiNome("");
+      setOvelhaMaeNome("");
+      setDataParto("");
+    } catch (err) {
+      console.error(err);
+      toast.error("Erro ao cadastrar parto.");
+    }
+  };
+
+  return (
+    <div className="cadastrar-parto-bg flex-column">
+      <form className="cadastrarParto-container flex-column" onSubmit={handleSubmit}>
+        <ul className="flex-column">
+      
+          <li className="flex-column">
+            <label htmlFor="gestacaoId">Gestação (opcional)</label>
+            {loadingRepros ? (
+              <p>Carregando gestações...</p>
+            ) : errorRepros ? (
+              <p style={{ color: "red" }}>{errorRepros}</p>
+            ) : (
+              <select id="gestacaoId" value={gestacaoId} onChange={(e) => handleSelectGestacao(e.target.value)}>
+                <option value="">Nenhuma (informar manualmente)</option>
+                {(gestacoes ?? []).map((r) => (
+                  <option key={r.id} value={String(r.id)}>
+                    {r.ovelhaPai?.nome || `#${r.ovelhaPai?.id}`} ×{" "}
+                    {r.ovelhaMae?.nome || `#${r.ovelhaMae?.id}`} • {formatISODate(r.dataGestacao)}
+                  </option>
+                ))}
+              </select>
+            )}
+          </li>
+
+          <li className="flex-column">
+            <label htmlFor="ovelhaPaiId">Carneiro (pai)</label>
+            {gestacaoId ? (
+              <input type="text" value={carneiroPaiNome} readOnly disabled />
+            ) : loadingOvinos ? (
+              <p>Carregando ovinos...</p>
+            ) : errorOvinos ? (
+              <p style={{ color: "red" }}>{errorOvinos}</p>
+            ) : (
+              <select id="ovelhaPaiId" value={ovelhaPaiId} onChange={(e) => setOvelhaPaiId(e.target.value)} required>
+                <option value="">Selecione o carneiro...</option>
+                {machos.map((o) => (
+                  <option key={o.id} value={String(o.id)}>
+                    {o.nome} • {formatEnum(o.raca)} • {formatISODate(o.dataNascimento)}
+                  </option>
+                ))}
+              </select>
+            )}
+          </li>
+
+          <li className="flex-column">
+            <label htmlFor="ovelhaMaeId">Ovelha (mãe)</label>
+            {gestacaoId ? (
+              <input type="text" value={ovelhaMaeNome} readOnly disabled />
+            ) : loadingOvinos ? (
+              <p>Carregando ovinos...</p>
+            ) : errorOvinos ? (
+              <p style={{ color: "red" }}>{errorOvinos}</p>
+            ) : (
+              <select id="ovelhaMaeId" value={ovelhaMaeId} onChange={(e) => setOvelhaMaeId(e.target.value)} required>
+                <option value="">Selecione a ovelha...</option>
+                {femeas.map((o) => (
+                  <option key={o.id} value={String(o.id)}>
+                    {o.nome} • {formatEnum(o.raca)} • {formatISODate(o.dataNascimento)}
+                  </option>
+                ))}
+              </select>
+            )}
+          </li>
+          <li className="flex-column">
+            <label htmlFor="dataParto">Data do parto</label>
+            <input
+              type="date"
+              id="dataParto"
+              value={dataParto}
+              onChange={(e) => setDataParto(e.target.value)}
+              required
+            />
+          </li>
+          <div className="cadastrarParto-form-navigation">
+            <Button type="submit" variant="cardPrimary" disabled={saving}>
+              {saving ? "Salvando..." : "Cadastrar parto"}
+            </Button>
+          </div>
+
+          {errorSalvar && <p style={{ color: "red" }}>{errorSalvar}</p>}
+        </ul>
+      </form>
+    </div>
+  );
+};
+
+export default CadastrarParto;

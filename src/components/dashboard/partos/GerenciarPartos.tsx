@@ -1,14 +1,13 @@
 import React, { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import "./GerenciarGestacoes.css";
+import "./GerenciarPartos.css";
 
 import Button from "../../common/buttons/Button";
 import PaginationMenu from "../../common/paginationMenu/PaginationMenu";
 import FilterBar from "../../common/filter-bar/FilterBar";
 
-import { useGestacoes } from "../../../api/hooks/gestacao/UseGestacoes";
-import type { GestacaoResponseDTO } from "../../../api/dtos/gestacao/GestacaoResponseDTO";
-import { TypeReproducao } from "../../../api/enums/typeReproducao/TypeReproducao";
+import { usePartos } from "../../../api/hooks/parto/UsePartos";
+import type { PartoResponseDTO } from "../../../api/dtos/parto/PartoResponseDTO";
 import { formatEnum } from "../../../utils/formatEnum";
 
 function formatISODateTime(iso?: string) {
@@ -29,8 +28,8 @@ function normalize(s?: string) {
 
 const PAGE_SIZE = 5;
 
-const GerenciarGestacoes: React.FC = () => {
-  const { gestacoes, loading, error } = useGestacoes();
+const GerenciarPartos: React.FC = () => {
+  const { partos, loading, error } = usePartos();
 
   const [q, setQ] = useState("");
   const [tipo, setTipo] = useState<string>("TODOS");
@@ -39,45 +38,39 @@ const GerenciarGestacoes: React.FC = () => {
   const [page, setPage] = useState(1);
   const [viewAll, setViewAll] = useState(false);
 
-  const items = useMemo<GestacaoResponseDTO[]>(() => gestacoes ?? [], [gestacoes]);
+  const items = useMemo<PartoResponseDTO[]>(() => partos ?? [], [partos]);
 
-  const filtered: GestacaoResponseDTO[] = useMemo(() => {
+  const filtered: PartoResponseDTO[] = useMemo(() => {
     const query = normalize(q.trim());
     const df = dateFrom ? new Date(`${dateFrom}T00:00:00`) : null;
     const dt = dateTo ? new Date(`${dateTo}T23:59:59`) : null;
 
     return items
-      .filter((g) => {
-        if (tipo !== "TODOS" && g.reproducao?.typeReproducao !== (tipo as TypeReproducao)) {
-          return false;
-        }
+      .filter((p) => {
         if (df || dt) {
-          const d = new Date(g.dataGestacao ?? "");
+          const d = new Date(p.dataParto ?? "");
           if (Number.isNaN(d.getTime())) return false;
           if (df && d < df) return false;
           if (dt && d > dt) return false;
         }
-
         if (!query) return true;
 
         const campos = [
-          g.ovelhaPai?.nome ?? "",
-          g.ovelhaPai?.fbb ?? "",
-          String(g.ovelhaPai?.rfid ?? ""),
-          g.ovelhaMae?.nome ?? "",
-          g.ovelhaMae?.fbb ?? "",
-          String(g.ovelhaMae?.rfid ?? ""),
-          g.reproducao?.observacoes ?? "",
-          g.reproducao?.typeReproducao ?? "",
-          formatISODateTime(g.reproducao?.dataReproducao),
-          formatISODateTime(g.dataGestacao),
+          p.ovelhaPai?.nome ?? "",
+          p.ovelhaPai?.fbb ?? "",
+          String(p.ovelhaPai?.rfid ?? ""),
+          p.ovelhaMae?.nome ?? "",
+          p.ovelhaMae?.fbb ?? "",
+          String(p.ovelhaMae?.rfid ?? ""),
+          formatISODateTime(p.gestacao?.dataGestacao),
+          formatISODateTime(p.dataParto),
         ].map((x) => normalize(x));
 
         return campos.some((c) => c.includes(query));
       })
       .sort((a, b) => {
-        const da = new Date(a.dataGestacao ?? "").getTime();
-        const db = new Date(b.dataGestacao ?? "").getTime();
+        const da = new Date(a.dataParto ?? "").getTime();
+        const db = new Date(b.dataParto ?? "").getTime();
         return (db || 0) - (da || 0);
       });
   }, [items, q, tipo, dateFrom, dateTo]);
@@ -103,9 +96,9 @@ const GerenciarGestacoes: React.FC = () => {
     <div className="gest-page">
       <div className="gest-header flex">
         <h2>Gestações</h2>
-        <Link to="/dashboard/ovinos/gestacoes/criar">
+        <Link to="/dashboard/ovinos/partos/criar">
           <Button type="button" variant="cardPrimary">
-            Nova Gestação
+            Nova Parto
           </Button>
         </Link>
       </div>
@@ -131,7 +124,7 @@ const GerenciarGestacoes: React.FC = () => {
       </div>
 
       {pageItems.length === 0 ? (
-        <div className="gest-empty">Nenhuma gestação encontrada.</div>
+        <div className="gest-empty">Nenhum parto encontrado.</div>
       ) : (
         <div className="gest-list">
           {pageItems.map((g) => (
@@ -155,23 +148,16 @@ const GerenciarGestacoes: React.FC = () => {
               <div>
                 <div className="gest-col-title">Detalhes</div>
                 <div className="gest-meta">
+                  <br />
                   <span>
-                    <strong>Tipo Reprodução:</strong>{" "}
-                    {g.reproducao?.typeReproducao
-                      ? formatEnum(g.reproducao.typeReproducao)
-                      : "Não informado"}
+                    <strong>Data Gestação:</strong>{" "}
+                    {formatISODateTime(g.gestacao?.dataGestacao) ?? "Não informado"}
                   </span>
                   <br />
                   <span>
-                    <strong>Data Reprodução:</strong>{" "}
-                    {formatISODateTime(g.reproducao?.dataReproducao) ?? "Não informado"}
+                    <strong>Data Parto:</strong> {formatISODateTime(g.dataParto)}
                   </span>
                   <br />
-                  <span>
-                    <strong>Data Gestação:</strong> {formatISODateTime(g.dataGestacao)}
-                  </span>
-                  <br />
-                  {g.reproducao?.observacoes && <em>{g.reproducao.observacoes}</em>}
                 </div>
               </div>
             </div>
@@ -204,4 +190,4 @@ const GerenciarGestacoes: React.FC = () => {
   );
 };
 
-export default GerenciarGestacoes;
+export default GerenciarPartos;

@@ -10,9 +10,12 @@ import { TypeStatus } from "../../../api/enums/typeStatus/TypeStatus";
 import { formatEnum } from "../../../utils/formatEnum";
 
 import { useCompras } from "../../../api/hooks/compra/UseCompras";
-import { useOvinos } from "../../../api/hooks/ovino/UseOvinos";     
-import { useSalvarOvino } from "../../../api/hooks/ovino/UseOvinos";    
+import { useOvinos } from "../../../api/hooks/ovino/UseOvinos";
+import { useSalvarOvino } from "../../../api/hooks/ovino/UseOvinos";
+import { usePartos } from "../../../api/hooks/parto/UsePartos";
+
 import type { OvinoRequestDTO } from "../../../api/dtos/ovino/OvinoRequestDTO";
+import { PartoService } from "../../../api/services/parto/PartoService";
 
 const CadastrarOvino: React.FC = () => {
   const [step, setStep] = useState(1);
@@ -33,6 +36,7 @@ const CadastrarOvino: React.FC = () => {
   const { compras, loading, error } = useCompras();
   const { ovinos, loading: loadingOvinos, error: errorOvinos } = useOvinos();
   const { salvar, loading: saving, error: errorSalvar } = useSalvarOvino();
+  const { partos, loading: loadingPartos, error: errorPartos } = usePartos();
 
   const machos = useMemo(
     () => (ovinos ?? []).filter((o) => o.sexo === TypeSexo.MACHO),
@@ -42,6 +46,35 @@ const CadastrarOvino: React.FC = () => {
     () => (ovinos ?? []).filter((o) => o.sexo === TypeSexo.FEMEA),
     [ovinos]
   );
+
+  const handleSelectParto = async (partoId: string) => {
+    setIdParto(partoId);
+
+    if (!partoId) {
+      setDataNascimento("");
+      setIdOvelhaMae("");
+      setIdCarneiroPai("");
+      return;
+    }
+
+    try {
+      const parto = await PartoService.buscarPorId(Number(partoId));
+
+      if (parto.dataParto) {
+        const formatted = parto.dataParto.substring(0, 16);
+        setDataNascimento(formatted);
+      }
+      if (parto.ovelhaMae) {
+        setIdOvelhaMae(String(parto.ovelhaMae.id));
+      }
+      if (parto.ovelhaPai) {
+        setIdCarneiroPai(String(parto.ovelhaPai.id));
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error("Erro ao buscar dados do parto.");
+    }
+  };
 
   const handleNext = () => {
     if (step === 1 && !idParto && !idCompra && !dataNascimento) {
@@ -74,16 +107,16 @@ const CadastrarOvino: React.FC = () => {
         rfid: Number(rfid),
         nome,
         raca,
-        fbb: fbb,
-        dataNascimento: `${dataNascimento}:00`,
+        fbb,
+        dataNascimento: dataNascimento ? `${dataNascimento}:00` : undefined,
         dataCadastro: new Date().toISOString(),
         typeGrauPureza: grauPureza,
         sexo,
         status,
         maeId: idOvelhaMae ? Number(idOvelhaMae) : undefined,
         paiId: idCarneiroPai ? Number(idCarneiroPai) : undefined,
-        compraId: idCompra ? Number(idCompra) : undefined,
-        partoId: idParto ? Number(idParto) : undefined,
+        compra: idCompra ? Number(idCompra) : undefined,
+        parto: idParto ? Number(idParto) : undefined,
         fotoOvino: imagem ? imagem.name : undefined,
       };
 
@@ -124,14 +157,27 @@ const CadastrarOvino: React.FC = () => {
           <ul className="flex-column">
             <li className="flex-column">
               <label htmlFor="idParto">Parto</label>
-              <input
-                type="text"
-                id="idParto"
-                value={idParto}
-                onChange={(e) => setIdParto(e.target.value)}
-              />
+              {loadingPartos ? (
+                <p>Carregando partos...</p>
+              ) : errorPartos ? (
+                <p style={{ color: "red" }}>{errorPartos}</p>
+              ) : (
+                <select
+                  id="idParto"
+                  value={idParto}
+                  onChange={(e) => handleSelectParto(e.target.value)}
+                >
+                  <option value="">Selecione um parto...</option>
+                  {partos.map((parto) => (
+                    <option key={parto.id} value={parto.id}>
+                      {parto.dataParto?.split("T")[0]} - Mãe:{" "}
+                      {parto.ovelhaMae?.nome ?? "?"} | Pai:{" "}
+                      {parto.ovelhaPai?.nome ?? "?"}
+                    </option>
+                  ))}
+                </select>
+              )}
             </li>
-
             <li className="flex-column">
               <label htmlFor="idCompra">Compra</label>
               {loading ? (
@@ -143,6 +189,7 @@ const CadastrarOvino: React.FC = () => {
                   id="idCompra"
                   value={idCompra}
                   onChange={(e) => setIdCompra(e.target.value)}
+                  disabled={!!idParto}
                 >
                   <option value="">Selecione uma compra...</option>
                   {compras.map((compra) => (
@@ -154,7 +201,6 @@ const CadastrarOvino: React.FC = () => {
                 </select>
               )}
             </li>
-
             <li className="flex-column">
               <label htmlFor="dataNascimento">Data de nascimento</label>
               <input
@@ -162,51 +208,40 @@ const CadastrarOvino: React.FC = () => {
                 id="dataNascimento"
                 value={dataNascimento}
                 onChange={(e) => setDataNascimento(e.target.value)}
+                disabled={!!idParto}
               />
             </li>
-
             <li className="flex-column">
               <label htmlFor="idCarneiroPai">Ovino Pai</label>
-              {loadingOvinos ? (
-                <p>Carregando ovinos...</p>
-              ) : errorOvinos ? (
-                <p style={{ color: "red" }}>{errorOvinos}</p>
-              ) : (
-                <select
-                  id="idCarneiroPai"
-                  value={idCarneiroPai}
-                  onChange={(e) => setIdCarneiroPai(e.target.value)}
-                >
-                  <option value="">Selecione o pai...</option>
-                  {machos.map((o) => (
-                    <option key={o.id} value={o.id}>
-                      {o.nome} ({formatEnum(o.raca)})
-                    </option>
-                  ))}
-                </select>
-              )}
+              <select
+                id="idCarneiroPai"
+                value={idCarneiroPai}
+                onChange={(e) => setIdCarneiroPai(e.target.value)}
+                disabled={!!idParto}
+              >
+                <option value="">Selecione o pai...</option>
+                {machos.map((o) => (
+                  <option key={o.id} value={o.id}>
+                    {o.nome} ({formatEnum(o.raca)})
+                  </option>
+                ))}
+              </select>
             </li>
-
             <li className="flex-column">
               <label htmlFor="idOvelhaMae">Ovelha Mãe</label>
-              {loadingOvinos ? (
-                <p>Carregando ovinos...</p>
-              ) : errorOvinos ? (
-                <p style={{ color: "red" }}>{errorOvinos}</p>
-              ) : (
-                <select
-                  id="idOvelhaMae"
-                  value={idOvelhaMae}
-                  onChange={(e) => setIdOvelhaMae(e.target.value)}
-                >
-                  <option value="">Selecione a mãe...</option>
-                  {femeas.map((o) => (
-                    <option key={o.id} value={o.id}>
-                      {o.nome} ({formatEnum(o.raca)})
-                    </option>
-                  ))}
-                </select>
-              )}
+              <select
+                id="idOvelhaMae"
+                value={idOvelhaMae}
+                onChange={(e) => setIdOvelhaMae(e.target.value)}
+                disabled={!!idParto}
+              >
+                <option value="">Selecione a mãe...</option>
+                {femeas.map((o) => (
+                  <option key={o.id} value={o.id}>
+                    {o.nome} ({formatEnum(o.raca)})
+                  </option>
+                ))}
+              </select>
             </li>
 
             <Button type="button" variant="cardPrimary" onClick={handleNext}>
@@ -214,7 +249,6 @@ const CadastrarOvino: React.FC = () => {
             </Button>
           </ul>
         )}
-
         {step === 2 && (
           <ul className="flex-column">
             <li className="flex-column">
@@ -275,7 +309,6 @@ const CadastrarOvino: React.FC = () => {
             </div>
           </ul>
         )}
-
         {step === 3 && (
           <ul className="flex-column">
             <li className="flex-column">
@@ -296,7 +329,9 @@ const CadastrarOvino: React.FC = () => {
                 id="fbb"
                 placeholder="O-123456"
                 value={fbb}
-                onChange={(e) => setFbb(`O-${e.target.value.replace(/\D/g, "")}`)}
+                onChange={(e) =>
+                  setFbb(`O-${e.target.value.replace(/\D/g, "")}`)
+                }
               />
             </li>
 
@@ -307,7 +342,9 @@ const CadastrarOvino: React.FC = () => {
                 id="nome"
                 placeholder="Apenas letras e números"
                 value={nome}
-                onChange={(e) => setNome(e.target.value.replace(/[^a-zA-Z0-9 ]/g, ""))}
+                onChange={(e) =>
+                  setNome(e.target.value.replace(/[^a-zA-Z0-9 ]/g, ""))
+                }
               />
             </li>
 
@@ -321,7 +358,6 @@ const CadastrarOvino: React.FC = () => {
             </div>
           </ul>
         )}
-
         {step === 4 && (
           <ul className="flex-column">
             <li className="flex-column">
