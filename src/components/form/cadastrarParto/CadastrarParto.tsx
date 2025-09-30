@@ -20,15 +20,31 @@ function formatISODate(iso?: string) {
   return Number.isNaN(d.getTime()) ? "—" : d.toLocaleDateString();
 }
 
-const CadastrarParto: React.FC = () => {
+interface CadastrarPartoProps {
+  onSuccess?: (
+    partoId: number,
+    qtdFilhotes: number,
+    maeId: number,
+    paiId: number,
+    dataPartoISO: string
+  ) => void;
+}
+
+const CadastrarParto: React.FC<CadastrarPartoProps> = ({ onSuccess }) => { 
+
   const { ovinos, loading: loadingOvinos, error: errorOvinos } = useOvinos();
-  const { gestacoes, loading: loadingRepros, error: errorRepros } = useGestacoes();
+  const {
+    gestacoes,
+    loading: loadingRepros,
+    error: errorRepros,
+  } = useGestacoes();
   const { criarParto, loading: saving, error: errorSalvar } = useCriarParto();
 
   const [gestacaoId, setGestacaoId] = useState<string>("");
   const [ovelhaMaeId, setOvelhaMaeId] = useState<string>("");
   const [ovelhaPaiId, setOvelhaPaiId] = useState<string>("");
-  const [dataParto, setDataParto] = useState<string>(""); 
+  const [dataParto, setDataParto] = useState<string>("");
+  const [qtdFilhotes, setQtdFilhotes] = useState<number>(1);
 
   const [carneiroPaiNome, setCarneiroPaiNome] = useState<string>("");
   const [ovelhaMaeNome, setOvelhaMaeNome] = useState<string>("");
@@ -40,12 +56,18 @@ const CadastrarParto: React.FC = () => {
   }, [gestacoes]);
 
   const machos = useMemo(
-    () => (ovinos ?? []).filter((o) => o.sexo === TypeSexo.MACHO && o.status === TypeStatus.ATIVO),
+    () =>
+      (ovinos ?? []).filter(
+        (o) => o.sexo === TypeSexo.MACHO && o.status === TypeStatus.ATIVO
+      ),
     [ovinos]
   );
 
   const femeas = useMemo(
-    () => (ovinos ?? []).filter((o) => o.sexo === TypeSexo.FEMEA && o.status === TypeStatus.ATIVO),
+    () =>
+      (ovinos ?? []).filter(
+        (o) => o.sexo === TypeSexo.FEMEA && o.status === TypeStatus.ATIVO
+      ),
     [ovinos]
   );
 
@@ -85,8 +107,17 @@ const CadastrarParto: React.FC = () => {
 
     try {
       console.log("DTO enviado:", dto);
-      await criarParto(dto);
+      const partoCriado = await criarParto(dto);
       toast.success("Parto cadastrado com sucesso!");
+
+      onSuccess?.(
+        partoCriado.id,
+        qtdFilhotes,
+        Number(ovelhaMaeId),
+        Number(ovelhaPaiId),
+        dto.dataParto
+      );
+
       setGestacaoId("");
       setOvelhaPaiId("");
       setOvelhaMaeId("");
@@ -101,9 +132,11 @@ const CadastrarParto: React.FC = () => {
 
   return (
     <div className="cadastrar-parto-bg flex-column">
-      <form className="cadastrarParto-container flex-column" onSubmit={handleSubmit}>
+      <form
+        className="cadastrarParto-container flex-column"
+        onSubmit={handleSubmit}
+      >
         <ul className="flex-column">
-      
           <li className="flex-column">
             <label htmlFor="gestacaoId">Gestação (opcional)</label>
             {loadingRepros ? (
@@ -111,12 +144,17 @@ const CadastrarParto: React.FC = () => {
             ) : errorRepros ? (
               <p style={{ color: "red" }}>{errorRepros}</p>
             ) : (
-              <select id="gestacaoId" value={gestacaoId} onChange={(e) => handleSelectGestacao(e.target.value)}>
+              <select
+                id="gestacaoId"
+                value={gestacaoId}
+                onChange={(e) => handleSelectGestacao(e.target.value)}
+              >
                 <option value="">Nenhuma (informar manualmente)</option>
                 {(gestacoes ?? []).map((r) => (
                   <option key={r.id} value={String(r.id)}>
                     {r.ovelhaPai?.nome || `#${r.ovelhaPai?.id}`} ×{" "}
-                    {r.ovelhaMae?.nome || `#${r.ovelhaMae?.id}`} • {formatISODate(r.dataGestacao)}
+                    {r.ovelhaMae?.nome || `#${r.ovelhaMae?.id}`} •{" "}
+                    {formatISODate(r.dataGestacao)}
                   </option>
                 ))}
               </select>
@@ -132,11 +170,17 @@ const CadastrarParto: React.FC = () => {
             ) : errorOvinos ? (
               <p style={{ color: "red" }}>{errorOvinos}</p>
             ) : (
-              <select id="ovelhaPaiId" value={ovelhaPaiId} onChange={(e) => setOvelhaPaiId(e.target.value)} required>
+              <select
+                id="ovelhaPaiId"
+                value={ovelhaPaiId}
+                onChange={(e) => setOvelhaPaiId(e.target.value)}
+                required
+              >
                 <option value="">Selecione o carneiro...</option>
                 {machos.map((o) => (
                   <option key={o.id} value={String(o.id)}>
-                    {o.nome} • {formatEnum(o.raca)} • {formatISODate(o.dataNascimento)}
+                    {o.nome} • {formatEnum(o.raca)} •{" "}
+                    {formatISODate(o.dataNascimento)}
                   </option>
                 ))}
               </select>
@@ -152,11 +196,17 @@ const CadastrarParto: React.FC = () => {
             ) : errorOvinos ? (
               <p style={{ color: "red" }}>{errorOvinos}</p>
             ) : (
-              <select id="ovelhaMaeId" value={ovelhaMaeId} onChange={(e) => setOvelhaMaeId(e.target.value)} required>
+              <select
+                id="ovelhaMaeId"
+                value={ovelhaMaeId}
+                onChange={(e) => setOvelhaMaeId(e.target.value)}
+                required
+              >
                 <option value="">Selecione a ovelha...</option>
                 {femeas.map((o) => (
                   <option key={o.id} value={String(o.id)}>
-                    {o.nome} • {formatEnum(o.raca)} • {formatISODate(o.dataNascimento)}
+                    {o.nome} • {formatEnum(o.raca)} •{" "}
+                    {formatISODate(o.dataNascimento)}
                   </option>
                 ))}
               </select>
@@ -170,6 +220,16 @@ const CadastrarParto: React.FC = () => {
               value={dataParto}
               onChange={(e) => setDataParto(e.target.value)}
               required
+            />
+          </li>
+          <li className="flex-column">
+            <label htmlFor="qtdFilhotes">Quantidade de filhotes</label>
+            <input
+              id="qtdFilhotes"
+              type="number"
+              min={1}
+              value={qtdFilhotes}
+              onChange={(e) => setQtdFilhotes(Number(e.target.value))}
             />
           </li>
           <div className="cadastrarParto-form-navigation">

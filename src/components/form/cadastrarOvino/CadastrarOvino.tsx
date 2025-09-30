@@ -17,20 +17,38 @@ import { usePartos } from "../../../api/hooks/parto/UsePartos";
 import type { OvinoRequestDTO } from "../../../api/dtos/ovino/OvinoRequestDTO";
 import { PartoService } from "../../../api/services/parto/PartoService";
 
-const CadastrarOvino: React.FC = () => {
+interface CadastrarOvinoProps {
+  partoId?: number;
+  maeId?: number;
+  paiId?: number;
+  dataNascimento?: string;
+  onSuccess?: () => void;
+}
+
+const CadastrarOvino: React.FC<CadastrarOvinoProps> = ({
+  partoId,
+  maeId,
+  paiId,
+  dataNascimento,
+  onSuccess,
+}) => {
+  const toLocalInput = (iso?: string) => (iso ? iso.substring(0, 16) : "");
+
   const [step, setStep] = useState(1);
   const [rfid, setRfid] = useState("");
   const [nome, setNome] = useState("");
   const [raca, setRaca] = useState<TypeRaca | "">("");
   const [fbb, setFbb] = useState("");
-  const [dataNascimento, setDataNascimento] = useState("");
+  const [dataNasc, setDataNasc] = useState(toLocalInput(dataNascimento));
   const [grauPureza, setGrauPureza] = useState<TypeGrauPureza | "">("");
   const [sexo, setSexo] = useState<TypeSexo | "">("");
-  const [idOvelhaMae, setIdOvelhaMae] = useState("");
-  const [idCarneiroPai, setIdCarneiroPai] = useState("");
+  const [idOvelhaMae, setIdOvelhaMae] = useState(maeId ? String(maeId) : "");
+  const [idCarneiroPai, setIdCarneiroPai] = useState(
+    paiId ? String(paiId) : ""
+  );
   const [status, setStatus] = useState<TypeStatus>(TypeStatus.ATIVO);
   const [imagem, setImagem] = useState<File | null>(null);
-  const [idParto, setIdParto] = useState("");
+  const [idParto, setIdParto] = useState(partoId ? String(partoId) : "");
   const [idCompra, setIdCompra] = useState("");
 
   const { compras, loading, error } = useCompras();
@@ -51,7 +69,7 @@ const CadastrarOvino: React.FC = () => {
     setIdParto(partoId);
 
     if (!partoId) {
-      setDataNascimento("");
+      setDataNasc("");
       setIdOvelhaMae("");
       setIdCarneiroPai("");
       return;
@@ -61,8 +79,7 @@ const CadastrarOvino: React.FC = () => {
       const parto = await PartoService.buscarPorId(Number(partoId));
 
       if (parto.dataParto) {
-        const formatted = parto.dataParto.substring(0, 16);
-        setDataNascimento(formatted);
+        setDataNasc(parto.dataParto.substring(0, 16));
       }
       if (parto.ovelhaMae) {
         setIdOvelhaMae(String(parto.ovelhaMae.id));
@@ -77,8 +94,10 @@ const CadastrarOvino: React.FC = () => {
   };
 
   const handleNext = () => {
-    if (step === 1 && !idParto && !idCompra && !dataNascimento) {
-      toast.warn("Preencha Data de Nascimento ou selecione o Parto para continuar");
+    if (step === 1 && !idParto && !idCompra && !dataNasc) {
+      toast.warn(
+        "Preencha Data de Nascimento ou selecione o Parto para continuar"
+      );
       return;
     }
     if (step === 2 && (!raca || !grauPureza || !sexo)) {
@@ -108,7 +127,7 @@ const CadastrarOvino: React.FC = () => {
         nome,
         raca,
         fbb,
-        dataNascimento: dataNascimento ? `${dataNascimento}:00` : undefined,
+        dataNascimento: dataNasc ? `${dataNasc}:00` : undefined,
         dataCadastro: new Date().toISOString(),
         typeGrauPureza: grauPureza,
         sexo,
@@ -117,24 +136,22 @@ const CadastrarOvino: React.FC = () => {
         paiId: idCarneiroPai ? Number(idCarneiroPai) : undefined,
         compra: idCompra ? Number(idCompra) : undefined,
         parto: idParto ? Number(idParto) : undefined,
-        fotoOvino: imagem ? imagem.name : undefined,
+        fotoOvino: imagem?.name,
       };
 
       await salvar(novoOvino);
       toast.success("Ovino cadastrado com sucesso!");
+      onSuccess?.();
 
       setRfid("");
       setNome("");
       setRaca("");
       setFbb("");
-      setDataNascimento("");
+      setDataNasc(toLocalInput(dataNascimento));
       setGrauPureza("");
       setSexo("");
-      setIdOvelhaMae("");
-      setIdCarneiroPai("");
       setStatus(TypeStatus.ATIVO);
       setImagem(null);
-      setIdParto("");
       setIdCompra("");
       setStep(1);
     } catch (err) {
@@ -152,7 +169,11 @@ const CadastrarOvino: React.FC = () => {
         <div className={`step ${step >= 4 ? "active" : ""}`}>4</div>
       </div>
 
-      <form className="cadastrarOvino-container flex-column" onSubmit={handleSubmit}>
+      <form
+        className="cadastrarOvino-container flex-column"
+        onSubmit={handleSubmit}
+      >
+        {/* STEP 1 */}
         {step === 1 && (
           <ul className="flex-column">
             <li className="flex-column">
@@ -166,6 +187,7 @@ const CadastrarOvino: React.FC = () => {
                   id="idParto"
                   value={idParto}
                   onChange={(e) => handleSelectParto(e.target.value)}
+                  disabled={!!partoId}
                 >
                   <option value="">Selecione um parto...</option>
                   {partos.map((parto) => (
@@ -178,6 +200,7 @@ const CadastrarOvino: React.FC = () => {
                 </select>
               )}
             </li>
+
             <li className="flex-column">
               <label htmlFor="idCompra">Compra</label>
               {loading ? (
@@ -201,16 +224,18 @@ const CadastrarOvino: React.FC = () => {
                 </select>
               )}
             </li>
+
             <li className="flex-column">
               <label htmlFor="dataNascimento">Data de nascimento</label>
               <input
                 type="datetime-local"
                 id="dataNascimento"
-                value={dataNascimento}
-                onChange={(e) => setDataNascimento(e.target.value)}
+                value={dataNasc}
+                onChange={(e) => setDataNasc(e.target.value)}
                 disabled={!!idParto}
               />
             </li>
+
             <li className="flex-column">
               <label htmlFor="idCarneiroPai">Ovino Pai</label>
               <select
@@ -227,6 +252,7 @@ const CadastrarOvino: React.FC = () => {
                 ))}
               </select>
             </li>
+
             <li className="flex-column">
               <label htmlFor="idOvelhaMae">Ovelha Mãe</label>
               <select
@@ -249,6 +275,8 @@ const CadastrarOvino: React.FC = () => {
             </Button>
           </ul>
         )}
+
+        {/* STEP 2 */}
         {step === 2 && (
           <ul className="flex-column">
             <li className="flex-column">
@@ -272,7 +300,9 @@ const CadastrarOvino: React.FC = () => {
               <select
                 id="grauPureza"
                 value={grauPureza}
-                onChange={(e) => setGrauPureza(e.target.value as TypeGrauPureza)}
+                onChange={(e) =>
+                  setGrauPureza(e.target.value as TypeGrauPureza)
+                }
               >
                 <option value="">Selecione...</option>
                 {Object.values(TypeGrauPureza).map((g) => (
@@ -300,7 +330,11 @@ const CadastrarOvino: React.FC = () => {
             </li>
 
             <div className="cadastrarOvino-form-navigation flex">
-              <Button type="button" variant="cardSecondary" onClick={handleBack}>
+              <Button
+                type="button"
+                variant="cardSecondary"
+                onClick={handleBack}
+              >
                 Voltar
               </Button>
               <Button type="button" variant="cardPrimary" onClick={handleNext}>
@@ -309,6 +343,8 @@ const CadastrarOvino: React.FC = () => {
             </div>
           </ul>
         )}
+
+        {/* STEP 3 */}
         {step === 3 && (
           <ul className="flex-column">
             <li className="flex-column">
@@ -349,7 +385,11 @@ const CadastrarOvino: React.FC = () => {
             </li>
 
             <div className="cadastrarOvino-form-navigation flex">
-              <Button type="button" variant="cardSecondary" onClick={handleBack}>
+              <Button
+                type="button"
+                variant="cardSecondary"
+                onClick={handleBack}
+              >
                 Voltar
               </Button>
               <Button type="button" variant="cardPrimary" onClick={handleNext}>
@@ -358,6 +398,8 @@ const CadastrarOvino: React.FC = () => {
             </div>
           </ul>
         )}
+
+        {/* STEP 4 */}
         {step === 4 && (
           <ul className="flex-column">
             <li className="flex-column">
@@ -392,7 +434,11 @@ const CadastrarOvino: React.FC = () => {
             </li>
 
             <div className="cadastrarOvino-form-navigation flex">
-              <Button type="button" variant="cardSecondary" onClick={handleBack}>
+              <Button
+                type="button"
+                variant="cardSecondary"
+                onClick={handleBack}
+              >
                 Voltar
               </Button>
               <Button type="submit" variant="cardPrimary" disabled={saving}>
