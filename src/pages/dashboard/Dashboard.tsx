@@ -13,6 +13,10 @@ import CadastrarGestacao from "../../components/form/cadastrarGestacao/Cadastrar
 import GerenciarGestacoes from "../../components/dashboard/gestacoes/GerenciarGestacoes";
 import GerenciarPartos from "../../components/dashboard/partos/GerenciarPartos";
 import CadastrarPartoComFilhotes from "../../components/form/cadastrarParto/CadastrarPartoComFilhotes";
+import CadastrarDoenca from "../../components/form/cadastrarDoenca/CadastrarDoenca";
+import GerenciarDoencas from "../../components/dashboard/doencas/GerenciarDoencas";
+import CadastrarOcorrenciaDoenca from "../../components/form/cadastrarOcorrenciaDoenca/CadastrarOcorrenciaDoenca";
+import GerenciarOcorrenciaDoencas from "../../components/dashboard/ocorrenciaDoencas/GerenciarOcorrenciaDoencas";
 
 const Dashboard: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -50,6 +54,10 @@ const Dashboard: React.FC = () => {
           <Route path="ovinos/gestacoes/gerenciar" element={<GerenciarGestacoes/>}/>
           <Route path="ovinos/partos/criar" element={<CadastrarPartoComFilhotes/>}/>
           <Route path="ovinos/partos/gerenciar" element={<GerenciarPartos/>}/>
+          <Route path="ovinos/doencas/criar" element={<CadastrarDoenca />}/>
+          <Route path="ovinos/doencas/gerenciar" element={<GerenciarDoencas searchQuery={searchQuery}/>}/>
+          <Route path="ovinos/doencas/adoecimento" element={<CadastrarOcorrenciaDoenca />}/>
+          <Route path="ovinos/doencas/doentes" element={<GerenciarOcorrenciaDoencas />}/>
         </Routes>
       </div>
     </div>

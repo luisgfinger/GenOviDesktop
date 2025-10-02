@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import "./CadastrarFuncionario.css";
 import Button from "../../common/buttons/Button";
-import { FuncionarioService } from "../../../api/services/funcionario/FuncionarioService";
 import { toast } from "react-toastify";
+import { useCriarFuncionario } from "../../../api/hooks/funcionario/UseFuncionarios";
 
 const CadastrarFuncionario: React.FC = () => {
   const [cpfCnpj, setCpfCnpj] = useState<string>("");
@@ -11,11 +11,13 @@ const CadastrarFuncionario: React.FC = () => {
   const [telefone, setTelefone] = useState<string>("");
   const [dataAdmissao, setDataAdmissao] = useState<string>("");
 
+  const { criarFuncionario, loading } = useCriarFuncionario();
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!nome || !cpfCnpj || !endereco || !telefone || !dataAdmissao) {
-      toast.warn("⚠️ Preencha todos os campos obrigatórios.");
+      toast.warn("Preencha todos os campos obrigatórios.");
       return;
     }
 
@@ -28,17 +30,16 @@ const CadastrarFuncionario: React.FC = () => {
         dataAdmissao: `${dataAdmissao}T00:00:00`,
       };
 
-      await FuncionarioService.salvar(novoFuncionario);
-      toast.success("✅ Funcionário cadastrado com sucesso!");
+      await criarFuncionario(novoFuncionario);
+      toast.success("Funcionário cadastrado com sucesso!");
 
       setNome("");
       setCpfCnpj("");
       setEndereco("");
       setTelefone("");
       setDataAdmissao("");
-    } catch (err) {
-      console.error(err);
-      toast.error("❌ Erro ao salvar funcionário. Tente novamente.");
+    } catch {
+      toast.error("Erro ao salvar funcionário. Tente novamente.");
     }
   };
 
@@ -107,10 +108,10 @@ const CadastrarFuncionario: React.FC = () => {
               required
             />
           </li>
-          <Button variant="cadastrar" type="submit">
-            Cadastrar funcionário
-          </Button>
         </ul>
+        <Button variant="cadastrar" type="submit" disabled={loading}>
+            {loading ? "Cadastrando..." : "Cadastrar funcionário"}
+          </Button>
       </form>
     </div>
   );

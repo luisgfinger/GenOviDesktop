@@ -1,0 +1,164 @@
+.cadastrar-ocorrenciaDoenca-bg {
+  width: 100%;
+  height: 100%;
+  background-color: var(--primary-color);
+  align-items: center;
+}
+
+.cadastrarOcorrenciaDoenca-container {
+  background-color: var(--white-color);
+  width: 720px;
+  max-width: 92vw;
+  height: auto;
+  align-self: center;
+  justify-self: center;
+  margin-top: 40px;
+  margin-bottom: 60px;
+  border-radius: 10px;
+  padding: 18px 0;
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.06);
+}
+
+.cadastrarOcorrenciaDoenca-container h3,
+.cadastrarOcorrenciaDoenca-container label {
+  color: var(--full-black-color);
+}
+
+.cadastrarOcorrenciaDoenca-container ul {
+  gap: 28px;
+  align-items: center;
+  margin-top: 10px;
+  padding: 0 24px;
+}
+
+.cadastrarOcorrenciaDoenca-container input,
+.cadastrarOcorrenciaDoenca-container select,
+.cadastrarOcorrenciaDoenca-container textarea {
+  width: 560px;
+  max-width: 100%;
+  height: 40px;
+  border-radius: 10px;
+  border: none;
+  background-color: var(--secondary-color);
+  padding: 8px 10px;
+  color: var(--full-black-color);
+  outline: none;
+}
+
+.cadastrarOcorrenciaDoenca-container textarea {
+  min-height: 90px;
+  height: auto;
+  resize: vertical;
+  line-height: 1.35;
+}
+
+.ocorrenciaDoenca-toolbar {
+  width: 560px;
+  max-width: 100%;
+}
+
+.ocorrenciaDoenca-toolbar>span {
+  gap: 8px;
+}
+
+.ocorrenciaDoenca-chipbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  width: 560px;
+  max-width: 100%;
+  margin-top: 8px;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 8px;
+  border-radius: 999px;
+  border: 1px solid #e5e5e5;
+  color: #222;
+  font-size: 12px;
+}
+
+.chip__close {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-size: 14px;
+  line-height: 1;
+  color: #444;
+}
+
+.ocorrenciaDoenca-list {
+  width: 560px;
+  max-width: 100%;
+  max-height: 320px;
+  overflow: auto;
+  border: 1px solid #eee;
+  border-radius: 8px;
+  padding: 8px;
+  background-color: var(--secondary-color);
+}
+
+.ocorrenciaDoenca-list ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.ocorrenciaDoenca-list-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 4px;
+  border-bottom: 1px solid #f1f1f1;
+}
+
+.ocorrenciaDoenca-list-item>input {
+ width: 10%;
+ background: none;
+}
+
+.ocorrenciaDoenca-list-item:last-child {
+  border-bottom: none;
+}
+
+.ocorrenciaDoenca-list-item:hover {
+  background: #fafafa;
+}
+
+.ocorrenciaDoenca-list-item__label {
+  cursor: pointer;
+  flex: 1;
+}
+
+.ocorrenciaDoenca-list-item__name {
+  font-weight: 600;
+  color: var(--full-black-color);
+}
+
+.ocorrenciaDoenca-list-item__meta {
+  font-size: 12px;
+  opacity: 0.8;
+}
+
+.ocorrenciaDoenca-count {
+  width: 560px;
+  max-width: 100%;
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  opacity: 0.8;
+}
+
+.cadastrarOcorrenciaDoenca-form-navigation {
+  display: flex;
+  gap: 24px;
+}
+
+.cadastrarOcorrenciaDoenca-container button {
+  margin-bottom: 18px;
+}
+
+

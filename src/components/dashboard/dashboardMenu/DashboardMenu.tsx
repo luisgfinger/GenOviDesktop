@@ -71,9 +71,9 @@ const DashboardMenu: React.FC<DashboardMenuProps> = ({ location }) => {
     { text: "Cadastrar medicamento", href: "#" },
     {text: "Mais opções", href: "#"},
 
-    {text: "Registrar adoecimento", href: "#"},
-    {text: "Cadastrar doença", href: "#"},
-    {text: "Mais opções", href: "#"},
+    {text: "Registrar adoecimento", href: "/dashboard/ovinos/doencas/adoecimento"},
+    {text: "Animais doentes", href: "/dashboard/ovinos/doencas/doentes"},
+    {text: "Gerenciar doenças", href: "/dashboard/ovinos/doencas/gerenciar"},
 
     {text: "Registrar reprodução", href: "/dashboard/ovinos/reproducoes/criar"},
     {text: "Gerenciar reproduções", href: "/dashboard/ovinos/reproducoes/gerenciar"},

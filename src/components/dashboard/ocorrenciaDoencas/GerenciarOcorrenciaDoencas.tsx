@@ -1,13 +1,13 @@
 import React, { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import "./GerenciarPartos.css";
+import "./GerenciarOcorrenciaDoencas.css";
 
 import Button from "../../common/buttons/Button";
 import PaginationMenu from "../../common/paginationMenu/PaginationMenu";
 import FilterBar from "../../common/filter-bar/FilterBar";
 
-import { usePartos } from "../../../api/hooks/parto/UsePartos";
-import type { PartoResponseDTO } from "../../../api/dtos/parto/PartoResponseDTO";
+import { useOcorrenciasDoenca } from "../../../api/hooks/ocorrenciaDoencas/UseOcorrenciaDoencas";
+import type { OcorrenciaDoencaResponseDTO } from "../../../api/dtos/ocorrendiaDoenca/OcorrenciaDoencaResponseDTO";
 
 function formatISODateTime(iso?: string) {
   if (!iso) return "—";
@@ -27,8 +27,8 @@ function normalize(s?: string) {
 
 const PAGE_SIZE = 5;
 
-const GerenciarPartos: React.FC = () => {
-  const { partos, loading, error } = usePartos();
+const GerenciarOcorrenciaDoencas: React.FC = () => {
+  const { ocorrencias, loading, error } = useOcorrenciasDoenca();
 
   const [q, setQ] = useState("");
   const [tipo, setTipo] = useState<string>("TODOS");
@@ -37,9 +37,9 @@ const GerenciarPartos: React.FC = () => {
   const [page, setPage] = useState(1);
   const [viewAll, setViewAll] = useState(false);
 
-  const items = useMemo<PartoResponseDTO[]>(() => partos ?? [], [partos]);
+  const items = useMemo<OcorrenciaDoencaResponseDTO[]>(() => ocorrencias ?? [], [ocorrencias]);
 
-  const filtered: PartoResponseDTO[] = useMemo(() => {
+  const filtered: OcorrenciaDoencaResponseDTO[] = useMemo(() => {
     const query = normalize(q.trim());
     const df = dateFrom ? new Date(`${dateFrom}T00:00:00`) : null;
     const dt = dateTo ? new Date(`${dateTo}T23:59:59`) : null;
@@ -47,7 +47,7 @@ const GerenciarPartos: React.FC = () => {
     return items
       .filter((p) => {
         if (df || dt) {
-          const d = new Date(p.dataParto ?? "");
+          const d = new Date(p.dataInicio ?? "");
           if (Number.isNaN(d.getTime())) return false;
           if (df && d < df) return false;
           if (dt && d > dt) return false;
@@ -55,21 +55,19 @@ const GerenciarPartos: React.FC = () => {
         if (!query) return true;
 
         const campos = [
-          p.ovelhaPai?.nome ?? "",
-          p.ovelhaPai?.fbb ?? "",
-          String(p.ovelhaPai?.rfid ?? ""),
-          p.ovelhaMae?.nome ?? "",
-          p.ovelhaMae?.fbb ?? "",
-          String(p.ovelhaMae?.rfid ?? ""),
-          formatISODateTime(p.gestacao?.dataGestacao),
-          formatISODateTime(p.dataParto),
+          p.ovino.nome ?? "",
+          p.doenca.nome ?? "",
+          String(p.ovino.rfid ?? ""),
+          p.ovino.fbb ?? "",
+          formatISODateTime(p.dataInicio),
+          formatISODateTime(p.dataInicio),
         ].map((x) => normalize(x));
 
         return campos.some((c) => c.includes(query));
       })
       .sort((a, b) => {
-        const da = new Date(a.dataParto ?? "").getTime();
-        const db = new Date(b.dataParto ?? "").getTime();
+        const da = new Date(a.dataInicio ?? "").getTime();
+        const db = new Date(b.dataInicio ?? "").getTime();
         return (db || 0) - (da || 0);
       });
   }, [items, q, tipo, dateFrom, dateTo]);
@@ -88,16 +86,16 @@ const GerenciarPartos: React.FC = () => {
     setViewAll(false);
   };
 
-  if (loading) return <p>Carregando partos…</p>;
+  if (loading) return <p>Carregando doentes…</p>;
   if (error) return <p style={{ color: "red" }}>{error}</p>;
 
   return (
     <div className="gest-page">
       <div className="gest-header flex">
-        <h2>Partos</h2>
-        <Link to="/dashboard/ovinos/partos/criar">
+        <h2>Doentes</h2>
+        <Link to="/dashboard/ovinos/ocorrenciaDoencas/criar">
           <Button type="button" variant="cardPrimary">
-            Novo Parto
+            Novo Adoecimento
           </Button>
         </Link>
       </div>
@@ -105,8 +103,6 @@ const GerenciarPartos: React.FC = () => {
       <FilterBar
         q={q}
         setQ={setQ}
-        tipo={tipo}
-        setTipo={setTipo}
         dateFrom={dateFrom}
         setDateFrom={setDateFrom}
         dateTo={dateTo}
@@ -114,7 +110,7 @@ const GerenciarPartos: React.FC = () => {
         clearFilters={clearFilters}
         setPage={setPage}
         setViewAll={setViewAll}
-        placeholder="Buscar por pai/mãe, FBB, RFID, observações…"
+        placeholder="Buscar por nome, doença, FBB, RFID..."
       />
 
       <div className="gest-counter">
@@ -123,40 +119,31 @@ const GerenciarPartos: React.FC = () => {
       </div>
 
       {pageItems.length === 0 ? (
-        <div className="gest-empty">Nenhum parto encontrado.</div>
+        <div className="gest-empty">Nenhum doente encontrado.</div>
       ) : (
         <div className="gest-list">
           {pageItems.map((g) => (
             <div key={g.id} className="gest-card">
               <div>
-                <div className="gest-col-title">Carneiro (Macho)</div>
-                <div className="gest-col-main">{g.ovelhaPai?.nome ?? "—"}</div>
+                <div className="gest-col-title">Ovino</div>
+                <div className="gest-col-main">{g.ovino.nome ?? "—"}</div>
                 <div className="gest-meta">
-                  FBB: {g.ovelhaPai?.fbb ?? "—"} • RFID: {g.ovelhaPai?.rfid ?? "—"}
+                  FBB: {g.ovino.fbb ?? "—"} • RFID: {g.ovino.rfid ?? "—"}
                 </div>
               </div>
-
-              <div>
-                <div className="gest-col-title">Ovelha (Fêmea)</div>
-                <div className="gest-col-main">{g.ovelhaMae?.nome ?? "—"}</div>
-                <div className="gest-meta">
-                  FBB: {g.ovelhaMae?.fbb ?? "—"} • RFID: {g.ovelhaMae?.rfid ?? "—"}
-                </div>
-              </div>
-
               <div>
                 <div className="gest-col-title">Detalhes</div>
                 <div className="gest-meta">
                   <br />
                   <span>
-                    <strong>Data Gestação:</strong>{" "}
-                    {formatISODateTime(g.gestacao?.dataGestacao) ?? "Não informado"}
+                    <strong>Data Início:</strong>{" "}
+                    {formatISODateTime(g.dataInicio) ?? "Não informado"}
                   </span>
                   <br />
                   <span>
-                    <strong>Data Parto:</strong> {formatISODateTime(g.dataParto)}
+                    <strong>Doença:</strong>{" "}
+                    {g.doenca.nome ?? "Não informado"}
                   </span>
-                  <br />
                 </div>
               </div>
             </div>
@@ -189,4 +176,4 @@ const GerenciarPartos: React.FC = () => {
   );
 };
 
-export default GerenciarPartos;
+export default GerenciarOcorrenciaDoencas;

@@ -1,5 +1,5 @@
 export interface Doenca{
-    id: string;
+    id: number;
     nome: string;
     descricao: string;
 }

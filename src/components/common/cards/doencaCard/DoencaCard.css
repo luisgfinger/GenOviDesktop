@@ -1,0 +1,53 @@
+.doencaCard-container {
+  background-color: var(--primary-color);
+  height: 390px;
+  width: 300px;
+  border-radius: 10px;
+  transition: transform 0.3s ease;
+  gap: 10px;
+  align-items: center;
+}
+
+.doencaCard-container:hover{
+  cursor: pointer;
+  transform: scale(1.08);
+}
+
+.doencaCard-container .middle-column{
+    min-height: 230px;
+}
+
+.doencaCard-container li {
+  border-radius: 10px;
+  padding-top: 13px;
+  width: 80%;
+}
+
+.doencaCard-container li:first-child {
+  justify-content: center;
+  align-items: center;
+}
+
+.doencaCard-container li h3 {
+  color: var(--full-black-color);
+  padding-left: 9px;
+}
+
+.doencaCard-container li p {
+  padding-left: 9px;
+}
+
+.doencaCard-container li span{
+  align-items: center;
+  text-align: justify;
+  gap: 6px;
+}
+
+.doencaCard-container li span h3,p{
+  font-size: 17px;
+}
+
+.doencaCard-buttons{
+    align-items: center;
+    gap: 10px;
+}

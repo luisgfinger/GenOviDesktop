@@ -22,21 +22,13 @@ const OvinoListSheet: React.FC<OvinoListSheetProps> = ({ ovinos }) => {
         {selectedOvino && (
           <motion.div
             key={selectedOvino.rfid}
-            initial={{ opacity: 0, scale: 0.8 }} 
-            animate={{ opacity: 1, scale: 1 }}    
-            exit={{ opacity: 0, scale: 0.8 }}   
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.8 }}
             transition={{ duration: 0.3, ease: "easeOut" }}
-            style={{ transformOrigin: "center" }} 
+            style={{ transformOrigin: "center" }}
           >
-            <OvinoCard
-              nome={selectedOvino.nome}
-              sexo={selectedOvino.sexo}
-              fbb={selectedOvino.fbb ?? "Não informado"}
-              raca={selectedOvino.raca}
-              pai={selectedOvino.rfidPai ?? "Não informado"}
-              mae={selectedOvino.rfidMae ?? "Não informado"}
-              pureza={selectedOvino.grauPureza}
-            />
+            <OvinoCard ovino={selectedOvino} />
           </motion.div>
         )}
       </AnimatePresence>
@@ -66,9 +58,9 @@ const OvinoListSheet: React.FC<OvinoListSheetProps> = ({ ovinos }) => {
             <span className="flex">{ovino.nome}</span>
             <span className="flex">{ovino.raca}</span>
             <span className="flex">{ovino.sexo}</span>
-            <span className="flex">{ovino.rfidMae}</span>
-            <span className="flex">{ovino.rfidPai}</span>
-            <span className="flex">{ovino.grauPureza}</span>
+            <span className="flex">{ovino.ovinoMae?.nome ?? "Não informado"}</span>
+            <span className="flex">{ovino.ovinoPai?.nome ?? "Não informado"}</span>
+            <span className="flex">{ovino.typeGrauPureza}</span>
           </li>
         ))}
       </ul>
