@@ -17,6 +17,9 @@ import CadastrarDoenca from "../../components/form/cadastrarDoenca/CadastrarDoen
 import GerenciarDoencas from "../../components/dashboard/doencas/GerenciarDoencas";
 import CadastrarOcorrenciaDoenca from "../../components/form/cadastrarOcorrenciaDoenca/CadastrarOcorrenciaDoenca";
 import GerenciarOcorrenciaDoencas from "../../components/dashboard/ocorrenciaDoencas/GerenciarOcorrenciaDoencas";
+import CadastrarMedicamento from "../../components/form/cadastrarMedicamento/CadastrarMedicamento";
+import GerenciarMedicamentos from "../../components/dashboard/medicamentos/GerenciarMedicamentos";
+import CadastrarAplicacao from "../../components/form/cadastrarAplicacao/CadastrarAplicacao";
 
 const Dashboard: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -58,6 +61,12 @@ const Dashboard: React.FC = () => {
           <Route path="ovinos/doencas/gerenciar" element={<GerenciarDoencas searchQuery={searchQuery}/>}/>
           <Route path="ovinos/doencas/adoecimento" element={<CadastrarOcorrenciaDoenca />}/>
           <Route path="ovinos/doencas/doentes" element={<GerenciarOcorrenciaDoencas />}/>
+          <Route path="ovinos/medicamentos/criar" element={<CadastrarMedicamento isVacina={false}/>}/>
+          <Route path="ovinos/medicamentos/gerenciar" element={<GerenciarMedicamentos searchQuery={searchQuery} isVacina={false}/>}/>
+          <Route path="ovinos/medicamentos/aplicar" element={<CadastrarAplicacao isVacina={false}/>}/>
+          <Route path="ovinos/vacinas/aplicar" element={<CadastrarAplicacao isVacina={true}/>}/>
+          <Route path="ovinos/vacinas/criar" element={<CadastrarMedicamento isVacina={true}/>}/>
+           <Route path="ovinos/vacinas/gerenciar" element={<GerenciarMedicamentos searchQuery={searchQuery} isVacina={true}/>}/>
         </Routes>
       </div>
     </div>

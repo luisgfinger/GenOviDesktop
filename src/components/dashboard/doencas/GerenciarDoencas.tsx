@@ -58,7 +58,7 @@ const Gerenciar: React.FC<GerenciarProps> = ({ searchQuery}) => {
                 images={[{ src: Add, alt: "add" }]}
                 text="Cadastrar"
                 href="/dashboard/ovinos/doencas/criar"
-                style={{ width: "250px", height: "390px" }}
+                style={{ width: "250px", height: "420px" }}
               />
         </div>
       {!viewAll && data.length > itemsPerPage && (

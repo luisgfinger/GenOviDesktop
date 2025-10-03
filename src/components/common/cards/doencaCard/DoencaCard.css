@@ -1,6 +1,6 @@
 .doencaCard-container {
   background-color: var(--primary-color);
-  height: 390px;
+  height: 420px;
   width: 300px;
   border-radius: 10px;
   transition: transform 0.3s ease;

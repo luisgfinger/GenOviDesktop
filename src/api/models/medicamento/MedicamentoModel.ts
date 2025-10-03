@@ -1,8 +1,12 @@
+import type { Doenca } from "../doenca/DoencaModel";
+
 export interface Medicamento {
-    id: string;
-    isVacina: boolean;
+    id: number;
+    nome: string;
     fabricante: string;
-    quantidadeDoses: string;
-    intervaloDoses: string;
-    idDoenca: string;
+    doencas: Doenca[];
+    quantidadeDoses: number;
+    intervaloDoses: number;
+    isVacina: boolean;
+    
 }

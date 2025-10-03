@@ -63,13 +63,13 @@ const DashboardMenu: React.FC<DashboardMenuProps> = ({ location }) => {
   ];
 
   const ovinoChildrenOptions = [
-    { text: "Registrar vacinação", href: "#" },
-    { text: "Cadastrar vacina", href: "#" },
-    {text: "Mais opções", href: "#"},
+    { text: "Registrar vacinação", href: "/dashboard/ovinos/vacinas/aplicar" },
+    { text: "Cadastrar vacina", href: "/dashboard/ovinos/vacinas/criar" },
+    {text: "Gerenciar vacinas", href: "/dashboard/ovinos/vacinas/gerenciar"},
 
-    { text: "Registrar medicação", href: "#" },
-    { text: "Cadastrar medicamento", href: "#" },
-    {text: "Mais opções", href: "#"},
+    { text: "Registrar aplicação", href: "/dashboard/ovinos/medicamentos/aplicar" },
+    { text: "Cadastrar medicamento", href: "/dashboard/ovinos/medicamentos/criar" },
+    {text: "Gerenciar medicamentos", href: "/dashboard/ovinos/medicamentos/gerenciar"},
 
     {text: "Registrar adoecimento", href: "/dashboard/ovinos/doencas/adoecimento"},
     {text: "Animais doentes", href: "/dashboard/ovinos/doencas/doentes"},

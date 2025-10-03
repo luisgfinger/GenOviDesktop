@@ -1,0 +1,13 @@
+.gerenciar-container {
+  padding-top: 25px;
+  justify-content: center;
+  align-items: center;
+  gap: 26px;
+  padding-bottom: 30px;
+}
+
+.gerenciar-container-inside {
+  display: grid;
+  grid-template-columns: repeat(3, max-content);
+  gap: 26px;
+}

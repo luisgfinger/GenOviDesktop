@@ -35,8 +35,6 @@ const PageTitle: React.FC<PageTitleProps> = ({ onSearch }) => {
         return "Gerenciar Reproduções";
       case "/dashboard/ovinos/gestacoes/criar":
         return "Registrar Gestação";
-      case "/dashboard/ovinos/gestacoes/gerenciar":
-        return "Gerenciar Gestações";
       case "/dashboard/ovinos/partos/criar":
         return "Registrar Parto";
       case "/dashboard/ovinos/partos/gerenciar":
@@ -49,8 +47,20 @@ const PageTitle: React.FC<PageTitleProps> = ({ onSearch }) => {
         return "Gerenciar Doenças";
       case "/dashboard/ovinos/doencas/adoecimento":
         return "Gerenciar Adoecimento";
-         case "/dashboard/ovinos/doencas/doentes":
+      case "/dashboard/ovinos/doencas/doentes":
         return "Animais doentes";
+      case "/dashboard/ovinos/medicamentos/criar":
+        return "Cadastrar Medicamento";
+      case "/dashboard/ovinos/medicamentos/gerenciar":
+        return "Gerenciar Medicamentos";
+      case "/dashboard/ovinos/medicamentos/aplicar":
+        return "Registrar aplicação de medicamento";
+      case "/dashboard/ovinos/vacinas/criar":
+        return "Cadastrar Vacina";
+      case "/dashboard/ovinos/vacinas/gerenciar":
+        return "Gerenciar Vacinas";
+      case "/dashboard/ovinos/vacinas/aplicar":
+        return "Registrar aplicação de vacinas";
       default:
         return "Dashboard";
     }

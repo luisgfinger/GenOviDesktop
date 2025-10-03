@@ -1,7 +1,9 @@
+import type { Medicamento } from "../medicamento/MedicamentoModel";
+import type { Ovino } from "../ovino/OvinoModel";
+
 export interface Aplicacao{
-    id: string;
-    data: string;
-    dataProximaDose: string;
-    idVacina: string;
-    idOvino: string;
+    id: number;
+    ovino: Ovino;
+    dataAplicacao: string;
+    medicamento: Medicamento;
 }
