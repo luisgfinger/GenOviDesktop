@@ -9,10 +9,26 @@ import { useCriarParto } from "../../../api/hooks/parto/UsePartos";
 import { formatEnum } from "../../../utils/formatEnum";
 
 import { TypeSexo } from "../../../api/enums/typeSexo/TypeSexo";
-import { TypeStatus } from "../../../api/enums/typeStatus/TypeStatus";
-
 import type { PartoRequestDTO } from "../../../api/dtos/parto/PartoRequestDTO";
 import type { GestacaoResponseDTO } from "../../../api/dtos/gestacao/GestacaoResponseDTO";
+
+function monthsBetween(iso?: string): number {
+  if (!iso) return 0;
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return 0;
+
+  const now = new Date();
+  let months =
+    (now.getFullYear() - d.getFullYear()) * 12 +
+    (now.getMonth() - d.getMonth());
+
+  if (now.getDate() < d.getDate()) months--;
+  return Math.max(0, months);
+}
+
+const MIN_MALE_MONTHS = 7;  
+const MIN_FEMALE_MONTHS = 8;
+
 
 function formatISODate(iso?: string) {
   if (!iso) return "—";
@@ -55,21 +71,25 @@ const CadastrarParto: React.FC<CadastrarPartoProps> = ({ onSuccess }) => {
     return m;
   }, [gestacoes]);
 
-  const machos = useMemo(
-    () =>
-      (ovinos ?? []).filter(
-        (o) => o.sexo === TypeSexo.MACHO && o.status === TypeStatus.ATIVO
-      ),
-    [ovinos]
-  );
+const machos = useMemo(
+  () =>
+    (ovinos ?? []).filter(
+      (o) =>
+        o.sexo === TypeSexo.MACHO &&
+        monthsBetween(o.dataNascimento) >= MIN_MALE_MONTHS
+    ),
+  [ovinos]
+);
 
-  const femeas = useMemo(
-    () =>
-      (ovinos ?? []).filter(
-        (o) => o.sexo === TypeSexo.FEMEA && o.status === TypeStatus.ATIVO
-      ),
-    [ovinos]
-  );
+const femeas = useMemo(
+  () =>
+    (ovinos ?? []).filter(
+      (o) =>
+        o.sexo === TypeSexo.FEMEA &&
+        monthsBetween(o.dataNascimento) >= MIN_FEMALE_MONTHS
+    ),
+  [ovinos]
+);
 
   const handleSelectGestacao = (id: string) => {
     setGestacaoId(id);

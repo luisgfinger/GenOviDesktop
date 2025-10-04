@@ -90,8 +90,8 @@ const GerenciarOcorrenciaDoencas: React.FC = () => {
   if (error) return <p style={{ color: "red" }}>{error}</p>;
 
   return (
-    <div className="gest-page">
-      <div className="gest-header flex">
+    <div className="ocorrencia-page">
+      <div className="ocorrencia-header flex">
         <h2>Doentes</h2>
         <Link to="/dashboard/ovinos/ocorrenciaDoencas/criar">
           <Button type="button" variant="cardPrimary">
@@ -113,27 +113,27 @@ const GerenciarOcorrenciaDoencas: React.FC = () => {
         placeholder="Buscar por nome, doença, FBB, RFID..."
       />
 
-      <div className="gest-counter">
+      <div className="ocorrencia-counter">
         Mostrando <strong>{pageItems.length}</strong> de{" "}
         <strong>{filtered.length}</strong> resultado(s).
       </div>
 
       {pageItems.length === 0 ? (
-        <div className="gest-empty">Nenhum doente encontrado.</div>
+        <div className="ocorrencia-empty">Nenhum doente encontrado.</div>
       ) : (
-        <div className="gest-list">
+        <div className="ocorrencia-list">
           {pageItems.map((g) => (
-            <div key={g.id} className="gest-card">
+            <div key={g.id} className="ocorrencia-card">
               <div>
-                <div className="gest-col-title">Ovino</div>
-                <div className="gest-col-main">{g.ovino.nome ?? "—"}</div>
-                <div className="gest-meta">
+                <div className="ocorrencia-col-title">Ovino</div>
+                <div className="ocorrencia-col-main">{g.ovino.nome ?? "—"}</div>
+                <div className="ocorrencia-meta">
                   FBB: {g.ovino.fbb ?? "—"} • RFID: {g.ovino.rfid ?? "—"}
                 </div>
               </div>
               <div>
-                <div className="gest-col-title">Detalhes</div>
-                <div className="gest-meta">
+                <div className="ocorrencia-col-title">Detalhes</div>
+                <div className="ocorrencia-meta">
                   <br />
                   <span>
                     <strong>Data Início:</strong>{" "}
@@ -151,7 +151,7 @@ const GerenciarOcorrenciaDoencas: React.FC = () => {
         </div>
       )}
       {!viewAll && totalPages > 1 && (
-        <div className="gest-pagination">
+        <div className="ocorrencia-pagination">
           <PaginationMenu
             currentPage={currentPage}
             totalPages={totalPages}
@@ -166,7 +166,7 @@ const GerenciarOcorrenciaDoencas: React.FC = () => {
       )}
 
       {viewAll && filtered.length > PAGE_SIZE && (
-        <div className="gest-pagination">
+        <div className="ocorrencia-pagination">
           <Button type="button" variant="cardSecondary" onClick={() => setViewAll(false)}>
             Voltar à paginação
           </Button>

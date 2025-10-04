@@ -17,6 +17,23 @@ import { usePartos } from "../../../api/hooks/parto/UsePartos";
 import type { OvinoRequestDTO } from "../../../api/dtos/ovino/OvinoRequestDTO";
 import { PartoService } from "../../../api/services/parto/PartoService";
 
+function monthsBetween(iso?: string): number {
+  if (!iso) return 0;
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return 0;
+
+  const now = new Date();
+  let months =
+    (now.getFullYear() - d.getFullYear()) * 12 +
+    (now.getMonth() - d.getMonth());
+
+  if (now.getDate() < d.getDate()) months--;
+  return Math.max(0, months);
+}
+
+const MIN_MALE_MONTHS = 7;
+const MIN_FEMALE_MONTHS = 8;
+
 interface CadastrarOvinoProps {
   partoId?: number;
   maeId?: number;
@@ -55,13 +72,22 @@ const CadastrarOvino: React.FC<CadastrarOvinoProps> = ({
   const { ovinos, loading: loadingOvinos, error: errorOvinos } = useOvinos();
   const { salvar, loading: saving, error: errorSalvar } = useSalvarOvino();
   const { partos, loading: loadingPartos, error: errorPartos } = usePartos();
-
   const machos = useMemo(
-    () => (ovinos ?? []).filter((o) => o.sexo === TypeSexo.MACHO),
+    () =>
+      (ovinos ?? []).filter(
+        (o) =>
+          o.sexo === TypeSexo.MACHO &&
+          monthsBetween(o.dataNascimento) >= MIN_MALE_MONTHS
+      ),
     [ovinos]
   );
   const femeas = useMemo(
-    () => (ovinos ?? []).filter((o) => o.sexo === TypeSexo.FEMEA),
+    () =>
+      (ovinos ?? []).filter(
+        (o) =>
+          o.sexo === TypeSexo.FEMEA &&
+          monthsBetween(o.dataNascimento) >= MIN_FEMALE_MONTHS
+      ),
     [ovinos]
   );
 
@@ -173,7 +199,6 @@ const CadastrarOvino: React.FC<CadastrarOvinoProps> = ({
         className="cadastrarOvino-container flex-column"
         onSubmit={handleSubmit}
       >
-        {/* STEP 1 */}
         {step === 1 && (
           <ul className="flex-column">
             <li className="flex-column">
@@ -275,8 +300,6 @@ const CadastrarOvino: React.FC<CadastrarOvinoProps> = ({
             </Button>
           </ul>
         )}
-
-        {/* STEP 2 */}
         {step === 2 && (
           <ul className="flex-column">
             <li className="flex-column">
@@ -343,8 +366,6 @@ const CadastrarOvino: React.FC<CadastrarOvinoProps> = ({
             </div>
           </ul>
         )}
-
-        {/* STEP 3 */}
         {step === 3 && (
           <ul className="flex-column">
             <li className="flex-column">
@@ -398,8 +419,6 @@ const CadastrarOvino: React.FC<CadastrarOvinoProps> = ({
             </div>
           </ul>
         )}
-
-        {/* STEP 4 */}
         {step === 4 && (
           <ul className="flex-column">
             <li className="flex-column">

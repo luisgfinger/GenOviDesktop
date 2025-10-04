@@ -24,7 +24,7 @@ export function useReproducoes() {
     fetchData();
   }, []);
 
-  return { reproducoes, loading, error };
+  return { reproducoes, setReproducoes, loading, error };
 }
 
 export function useReproducao(id: number | null) {
@@ -80,4 +80,53 @@ export function useCriarReproducao() {
   };
 
   return { criarReproducao, novaReproducao, loading, error };
+}
+
+export function useEditarReproducao() {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [reproducaoEditada, setReproducaoEditada] = useState<ReproducaoResponseDTO | null>(null);
+
+  const editarReproducao = async (id: number, dto: ReproducaoRequestDTO) => {
+    setLoading(true);
+    setError(null);
+
+    try {
+      const updated = await ReproducaoService.editar(id, dto);
+      setReproducaoEditada(updated);
+      return updated;
+    } catch (err) {
+      console.error("Erro ao editar reprodução:", err);
+      setError("Não foi possível editar a reprodução.");
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return { editarReproducao, reproducaoEditada, loading, error };
+}
+
+export function useRemoverReproducao() {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [removida, setRemovida] = useState(false);
+
+  const removerReproducao = async (id: number) => {
+    setLoading(true);
+    setError(null);
+
+    try {
+      await ReproducaoService.remover(id);
+      setRemovida(true);
+    } catch (err) {
+      console.error("Erro ao remover reprodução:", err);
+      setError("Não foi possível remover a reprodução.");
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return { removerReproducao, removida, loading, error };
 }

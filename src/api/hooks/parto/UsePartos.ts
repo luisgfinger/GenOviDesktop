@@ -14,8 +14,8 @@ export function usePartos() {
         const data = await PartoService.listar();
         setPartos(data);
       } catch (err) {
-        console.error("Erro ao buscar gestações:", err);
-        setError("Não foi possível carregar as gestações.");
+        console.error("Erro ao buscar partos:", err);
+        setError("Não foi possível carregar os partos.");
       } finally {
         setLoading(false);
       }
@@ -35,7 +35,7 @@ export function useParto(id: number | null) {
   useEffect(() => {
     if (id === null) {
       setLoading(false);
-      setError("ID inválido para buscar parto");
+      setError("ID inválido para buscar parto.");
       return;
     }
 
@@ -60,7 +60,7 @@ export function useParto(id: number | null) {
 export function useCriarParto() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [novaParto, setNovaParto] = useState<PartoResponseDTO | null>(null);
+  const [novoParto, setNovoParto] = useState<PartoResponseDTO | null>(null);
 
   const criarParto = async (dto: PartoRequestDTO) => {
     setLoading(true);
@@ -68,7 +68,7 @@ export function useCriarParto() {
 
     try {
       const created = await PartoService.criar(dto);
-      setNovaParto(created);
+      setNovoParto(created);
       return created;
     } catch (err) {
       console.error("Erro ao cadastrar parto:", err);
@@ -79,5 +79,54 @@ export function useCriarParto() {
     }
   };
 
-  return { criarParto, novaParto, loading, error };
+  return { criarParto, novoParto, loading, error };
+}
+
+export function useEditarParto() {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [partoEditado, setPartoEditado] = useState<PartoResponseDTO | null>(null);
+
+  const editarParto = async (id: number, dto: PartoRequestDTO) => {
+    setLoading(true);
+    setError(null);
+
+    try {
+      const updated = await PartoService.editar(id, dto);
+      setPartoEditado(updated);
+      return updated;
+    } catch (err) {
+      console.error("Erro ao editar parto:", err);
+      setError("Não foi possível editar o parto.");
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return { editarParto, partoEditado, loading, error };
+}
+
+export function useRemoverParto() {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [removido, setRemovido] = useState(false);
+
+  const removerParto = async (id: number) => {
+    setLoading(true);
+    setError(null);
+
+    try {
+      await PartoService.remover(id);
+      setRemovido(true);
+    } catch (err) {
+      console.error("Erro ao remover parto:", err);
+      setError("Não foi possível remover o parto.");
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return { removerParto, removido, loading, error };
 }

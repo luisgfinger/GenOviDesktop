@@ -21,4 +21,18 @@ export const OvinoService = {
     console.log(data);
     return responseToModel(data);
   },
+
+  editar: async (id: number, payload: OvinoRequestDTO): Promise<Ovino> => {
+    const { data } = await Api.put<OvinoResponseDTO>(
+      `/user/ovinos/${id}`,
+      payload
+    );
+    console.log("Editando ovino:", id, payload);
+    return responseToModel(data);
+  },
+
+  remover: async (id: number): Promise<void> => {
+    await Api.delete(`/user/ovinos/${id}`);
+    console.log("Ovino removido:", id);
+  },
 };

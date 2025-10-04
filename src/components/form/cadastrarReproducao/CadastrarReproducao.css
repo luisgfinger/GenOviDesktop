@@ -48,7 +48,6 @@
 .cadastrarReproducao-container textarea {
   min-height: 90px;
   height: auto;
-  resize: vertical;
   line-height: 1.35;
 }
 

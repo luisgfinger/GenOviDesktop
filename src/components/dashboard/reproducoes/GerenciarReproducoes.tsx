@@ -10,6 +10,8 @@ import type { ReproducaoResponseDTO } from "../../../api/dtos/reproducao/Reprodu
 import { TypeReproducao } from "../../../api/enums/typeReproducao/TypeReproducao";
 import { formatEnum } from "../../../utils/formatEnum";
 import FilterBar from "../../common/filter-bar/FilterBar";
+import ActionButtons from "../../common/buttons/ActionButtons";
+import ReproducaoDetalhes from "./ReproducoesDetalhes";
 
 function formatISODateTime(iso?: string) {
   if (!iso) return "—";
@@ -45,16 +47,18 @@ const GerenciarReproducoes: React.FC = () => {
   const [page, setPage] = useState(1);
   const [viewAll, setViewAll] = useState(false);
 
+  const [selectedRepro, setSelectedRepro] = useState<ReproducaoUI | null>(null);
+
   const reprosHydrated: ReproducaoUI[] = useMemo(() => {
     return (reproducoes ?? []).map((r) => {
       const carneiroPai =
         r.carneiroPai?.id && ovinos
-          ? ovinos.find((o) => o.id === r.carneiroPai?.id) ?? r.carneiroPai
+          ? (ovinos.find((o) => o.id === r.carneiroPai?.id) ?? r.carneiroPai)
           : r.carneiroPai;
 
       const ovelhaMae =
         r.ovelhaMae?.id && ovinos
-          ? ovinos.find((o) => o.id === r.ovelhaMae?.id) ?? r.ovelhaMae
+          ? (ovinos.find((o) => o.id === r.ovelhaMae?.id) ?? r.ovelhaMae)
           : r.ovelhaMae;
 
       return { ...r, carneiroPai, ovelhaMae };
@@ -100,10 +104,14 @@ const GerenciarReproducoes: React.FC = () => {
       });
   }, [reprosHydrated, q, tipo, dateFrom, dateTo]);
 
-  const totalPages = viewAll ? 1 : Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+  const totalPages = viewAll
+    ? 1
+    : Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
   const currentPage = viewAll ? 1 : Math.min(page, totalPages);
   const startIdx = (currentPage - 1) * PAGE_SIZE;
-  const pageItems = viewAll ? filtered : filtered.slice(startIdx, startIdx + PAGE_SIZE);
+  const pageItems = viewAll
+    ? filtered
+    : filtered.slice(startIdx, startIdx + PAGE_SIZE);
 
   const clearFilters = () => {
     setQ("");
@@ -156,20 +164,24 @@ const GerenciarReproducoes: React.FC = () => {
             <div key={r.id} className="repros-card">
               <div>
                 <div className="repros-col-title">Carneiro (pai)</div>
-                <div className="repros-col-main">{r.carneiroPai?.nome ?? "—"}</div>
+                <div className="repros-col-main">
+                  {r.carneiroPai?.nome ?? "—"}
+                </div>
                 <div className="repros-meta">
-                  FBB: {r.carneiroPai?.fbb ?? "—"} • RFID: {r.carneiroPai?.rfid ?? "—"}
+                  FBB: {r.carneiroPai?.fbb ?? "—"} • RFID:{" "}
+                  {r.carneiroPai?.rfid ?? "—"}
                 </div>
               </div>
-
               <div>
                 <div className="repros-col-title">Ovelha (mãe)</div>
-                <div className="repros-col-main">{r.ovelhaMae?.nome ?? "—"}</div>
+                <div className="repros-col-main">
+                  {r.ovelhaMae?.nome ?? "—"}
+                </div>
                 <div className="repros-meta">
-                  FBB: {r.ovelhaMae?.fbb ?? "—"} • RFID: {r.ovelhaMae?.rfid ?? "—"}
+                  FBB: {r.ovelhaMae?.fbb ?? "—"} • RFID:{" "}
+                  {r.ovelhaMae?.rfid ?? "—"}
                 </div>
               </div>
-
               <div>
                 <div className="repros-col-title">Detalhes</div>
                 <div className="repros-meta">
@@ -181,8 +193,28 @@ const GerenciarReproducoes: React.FC = () => {
                   <span>
                     <strong>Data:</strong> {formatISODateTime(r.dataReproducao)}
                   </span>
-                  <br />
-                  {r.observacoes && <em>{r.observacoes}</em>}
+                </div>
+              </div>
+              <div>
+                <div className="repros-meta">
+                  <span>
+                    <Button
+                      variant="cardSecondary"
+                      onClick={() => setSelectedRepro(r)}
+                    >
+                      Ver mais
+                    </Button>
+                  </span>
+                </div>
+              </div>
+              <div>
+                <div className="repros-meta">
+                  <span>
+                    <ActionButtons
+                      onEdit={() => setSelectedRepro(r)}
+                      showRemove={false}
+                    />
+                  </span>
                 </div>
               </div>
             </div>
@@ -215,6 +247,13 @@ const GerenciarReproducoes: React.FC = () => {
             Voltar à paginação
           </Button>
         </div>
+      )}
+
+      {selectedRepro && (
+        <ReproducaoDetalhes
+          reproducao={selectedRepro}
+          onClose={() => setSelectedRepro(null)}
+        />
       )}
     </div>
   );

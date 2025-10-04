@@ -37,10 +37,10 @@
   border-radius: 10px;
   padding: 12px;
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
   gap: 12px;
   align-items: center;
-  border: 1px solid #f1f1f1;
+  border: 1px solid #f1f1f1; 
 }
 
 .repros-col-title {
@@ -57,6 +57,7 @@
 .repros-meta {
   font-size: 16px;
   opacity: 0.8;
+  max-width: 520px;
 }
 
 .repros-empty {

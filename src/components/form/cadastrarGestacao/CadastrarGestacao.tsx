@@ -14,6 +14,23 @@ import { TypeStatus } from "../../../api/enums/typeStatus/TypeStatus";
 import type { GestacaoRequestDTO } from "../../../api/dtos/gestacao/GestacaoRequestDTO";
 import type { ReproducaoResponseDTO } from "../../../api/dtos/reproducao/ReproducaoResponseDTO";
 
+function monthsBetween(iso?: string): number {
+  if (!iso) return 0;
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return 0;
+
+  const now = new Date();
+  let months =
+    (now.getFullYear() - d.getFullYear()) * 12 +
+    (now.getMonth() - d.getMonth());
+
+  if (now.getDate() < d.getDate()) months--;
+  return Math.max(0, months);
+}
+
+const MIN_MALE_MONTHS = 7;  
+const MIN_FEMALE_MONTHS = 8;
+
 function formatISODate(iso?: string) {
   if (!iso) return "—";
   const d = new Date(iso);
@@ -39,15 +56,26 @@ const CadastrarGestacao: React.FC = () => {
     return m;
   }, [reproducoes]);
 
-  const machos = useMemo(
-    () => (ovinos ?? []).filter((o) => o.sexo === TypeSexo.MACHO && o.status === TypeStatus.ATIVO),
-    [ovinos]
-  );
+const machos = useMemo(
+  () =>
+    (ovinos ?? []).filter(
+      (o) =>
+        o.sexo === TypeSexo.MACHO &&
+        monthsBetween(o.dataNascimento) >= MIN_MALE_MONTHS
+    ),
+  [ovinos]
+);
 
-  const femeas = useMemo(
-    () => (ovinos ?? []).filter((o) => o.sexo === TypeSexo.FEMEA && o.status === TypeStatus.ATIVO),
-    [ovinos]
-  );
+const femeas = useMemo(
+  () =>
+    (ovinos ?? []).filter(
+      (o) =>
+        o.sexo === TypeSexo.FEMEA &&
+        monthsBetween(o.dataNascimento) >= MIN_FEMALE_MONTHS
+    ),
+  [ovinos]
+);
+
 
   const handleSelectReproducao = (id: string) => {
     setReproducaoId(id);

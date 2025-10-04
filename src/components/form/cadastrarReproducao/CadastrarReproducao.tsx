@@ -323,9 +323,9 @@ const CadastrarReproducao: React.FC<Props> = ({ minAgeMonths = 12 }) => {
               value={observacoes}
               onChange={(e) => setObservacoes(e.target.value)}
               placeholder="Anotações adicionais (opcional)"
+              maxLength={255}
             />
           </li>
-
           <div className="cadastrarReproducao-form-navigation">
             <Button type="submit" variant="cardPrimary" disabled={saving}>
               {saving ? "Salvando..." : "Cadastrar reproduções"}

@@ -25,7 +25,6 @@
   object-fit: cover;
   border-radius: 12px;
   margin-right: 20px;
-  border: 2px solid var(--full-black-color);
 }
 
 .ovinoCardFull-header h2 {
@@ -91,3 +90,4 @@
 .edit-button:hover img {
   opacity: 1;
 }
+

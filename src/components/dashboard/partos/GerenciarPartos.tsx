@@ -4,10 +4,12 @@ import "./GerenciarPartos.css";
 
 import Button from "../../common/buttons/Button";
 import PaginationMenu from "../../common/paginationMenu/PaginationMenu";
-import FilterBar from "../../common/filter-bar/FilterBar";
-
 import { usePartos } from "../../../api/hooks/parto/UsePartos";
+import { useOvinos } from "../../../api/hooks/ovino/UseOvinos";
 import type { PartoResponseDTO } from "../../../api/dtos/parto/PartoResponseDTO";
+import FilterBar from "../../common/filter-bar/FilterBar";
+import ActionButtons from "../../common/buttons/ActionButtons";
+import PartoDetalhes from "./PartoDetalhes";
 
 function formatISODateTime(iso?: string) {
   if (!iso) return "—";
@@ -25,26 +27,47 @@ function normalize(s?: string) {
     .toLowerCase();
 }
 
+type PartoUI = PartoResponseDTO & {
+  ovelhaPai?: { id: number; nome?: string; fbb?: string; rfid?: number };
+  ovelhaMae?: { id: number; nome?: string; fbb?: string; rfid?: number };
+};
+
 const PAGE_SIZE = 5;
 
 const GerenciarPartos: React.FC = () => {
   const { partos, loading, error } = usePartos();
+  const { ovinos } = useOvinos();
 
   const [q, setQ] = useState("");
-  const [tipo, setTipo] = useState<string>("TODOS");
   const [dateFrom, setDateFrom] = useState("");
   const [dateTo, setDateTo] = useState("");
   const [page, setPage] = useState(1);
   const [viewAll, setViewAll] = useState(false);
 
-  const items = useMemo<PartoResponseDTO[]>(() => partos ?? [], [partos]);
+  const [selectedParto, setSelectedParto] = useState<PartoUI | null>(null);
 
-  const filtered: PartoResponseDTO[] = useMemo(() => {
+  const partosHydrated: PartoUI[] = useMemo(() => {
+    return (partos ?? []).map((p) => {
+      const ovelhaPai =
+        p.ovelhaPai?.id && ovinos
+          ? (ovinos.find((o) => o.id === p.ovelhaPai?.id) ?? p.ovelhaPai)
+          : p.ovelhaPai;
+
+      const ovelhaMae =
+        p.ovelhaMae?.id && ovinos
+          ? (ovinos.find((o) => o.id === p.ovelhaMae?.id) ?? p.ovelhaMae)
+          : p.ovelhaMae;
+
+      return { ...p, ovelhaPai, ovelhaMae };
+    });
+  }, [partos, ovinos]);
+
+  const filtered: PartoUI[] = useMemo(() => {
     const query = normalize(q.trim());
     const df = dateFrom ? new Date(`${dateFrom}T00:00:00`) : null;
     const dt = dateTo ? new Date(`${dateTo}T23:59:59`) : null;
 
-    return items
+    return partosHydrated
       .filter((p) => {
         if (df || dt) {
           const d = new Date(p.dataParto ?? "");
@@ -52,16 +75,15 @@ const GerenciarPartos: React.FC = () => {
           if (df && d < df) return false;
           if (dt && d > dt) return false;
         }
-        if (!query) return true;
 
+        if (!query) return true;
         const campos = [
           p.ovelhaPai?.nome ?? "",
-          p.ovelhaPai?.fbb ?? "",
-          String(p.ovelhaPai?.rfid ?? ""),
           p.ovelhaMae?.nome ?? "",
+          p.ovelhaPai?.fbb ?? "",
           p.ovelhaMae?.fbb ?? "",
+          String(p.ovelhaPai?.rfid ?? ""),
           String(p.ovelhaMae?.rfid ?? ""),
-          formatISODateTime(p.gestacao?.dataGestacao),
           formatISODateTime(p.dataParto),
         ].map((x) => normalize(x));
 
@@ -72,16 +94,19 @@ const GerenciarPartos: React.FC = () => {
         const db = new Date(b.dataParto ?? "").getTime();
         return (db || 0) - (da || 0);
       });
-  }, [items, q, tipo, dateFrom, dateTo]);
+  }, [partosHydrated, q, dateFrom, dateTo]);
 
-  const totalPages = viewAll ? 1 : Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+  const totalPages = viewAll
+    ? 1
+    : Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
   const currentPage = viewAll ? 1 : Math.min(page, totalPages);
   const startIdx = (currentPage - 1) * PAGE_SIZE;
-  const pageItems = viewAll ? filtered : filtered.slice(startIdx, startIdx + PAGE_SIZE);
+  const pageItems = viewAll
+    ? filtered
+    : filtered.slice(startIdx, startIdx + PAGE_SIZE);
 
   const clearFilters = () => {
     setQ("");
-    setTipo("TODOS");
     setDateFrom("");
     setDateTo("");
     setPage(1);
@@ -92,8 +117,8 @@ const GerenciarPartos: React.FC = () => {
   if (error) return <p style={{ color: "red" }}>{error}</p>;
 
   return (
-    <div className="gest-page">
-      <div className="gest-header flex">
+    <div className="partos-page">
+      <div className="partos-header flex">
         <h2>Partos</h2>
         <Link to="/dashboard/ovinos/partos/criar">
           <Button type="button" variant="cardPrimary">
@@ -105,8 +130,6 @@ const GerenciarPartos: React.FC = () => {
       <FilterBar
         q={q}
         setQ={setQ}
-        tipo={tipo}
-        setTipo={setTipo}
         dateFrom={dateFrom}
         setDateFrom={setDateFrom}
         dateTo={dateTo}
@@ -114,57 +137,73 @@ const GerenciarPartos: React.FC = () => {
         clearFilters={clearFilters}
         setPage={setPage}
         setViewAll={setViewAll}
-        placeholder="Buscar por pai/mãe, FBB, RFID, observações…"
+        placeholder="Buscar por pai/mãe, FBB, RFID…"
       />
 
-      <div className="gest-counter">
+      <div className="partos-counter">
         Mostrando <strong>{pageItems.length}</strong> de{" "}
         <strong>{filtered.length}</strong> resultado(s).
       </div>
 
       {pageItems.length === 0 ? (
-        <div className="gest-empty">Nenhum parto encontrado.</div>
+        <div className="partos-empty">Nenhum parto encontrado.</div>
       ) : (
-        <div className="gest-list">
-          {pageItems.map((g) => (
-            <div key={g.id} className="gest-card">
+        <div className="partos-list">
+          {pageItems.map((p) => (
+            <div
+              key={p.id}
+              className="partos-card"
+            >
               <div>
-                <div className="gest-col-title">Carneiro (Macho)</div>
-                <div className="gest-col-main">{g.ovelhaPai?.nome ?? "—"}</div>
-                <div className="gest-meta">
-                  FBB: {g.ovelhaPai?.fbb ?? "—"} • RFID: {g.ovelhaPai?.rfid ?? "—"}
+                <div className="partos-col-title">Ovelha (mãe)</div>
+                <div className="partos-col-main">{p.ovelhaMae?.nome ?? "—"}</div>
+                <div className="partos-meta">
+                  FBB: {p.ovelhaMae?.fbb ?? "—"} • RFID:{" "}
+                  {p.ovelhaMae?.rfid ?? "—"}
                 </div>
               </div>
 
               <div>
-                <div className="gest-col-title">Ovelha (Fêmea)</div>
-                <div className="gest-col-main">{g.ovelhaMae?.nome ?? "—"}</div>
-                <div className="gest-meta">
-                  FBB: {g.ovelhaMae?.fbb ?? "—"} • RFID: {g.ovelhaMae?.rfid ?? "—"}
+                <div className="partos-col-title">Carneiro (pai)</div>
+                <div className="partos-col-main">
+                  {p.ovelhaPai?.nome ?? "—"}
+                </div>
+                <div className="partos-meta">
+                  FBB: {p.ovelhaPai?.fbb ?? "—"} • RFID:{" "}
+                  {p.ovelhaPai?.rfid ?? "—"}
                 </div>
               </div>
 
               <div>
-                <div className="gest-col-title">Detalhes</div>
-                <div className="gest-meta">
-                  <br />
-                  <span>
-                    <strong>Data Gestação:</strong>{" "}
-                    {formatISODateTime(g.gestacao?.dataGestacao) ?? "Não informado"}
-                  </span>
-                  <br />
-                  <span>
-                    <strong>Data Parto:</strong> {formatISODateTime(g.dataParto)}
-                  </span>
-                  <br />
+                <div className="partos-col-title">Data do Parto</div>
+                <div className="partos-meta">{formatISODateTime(p.dataParto)}</div>
+              </div>
+
+              <div>
+                <div className="partos-meta">
+                  <Button
+                    variant="cardSecondary"
+                    onClick={() => setSelectedParto(p)}
+                  >
+                    Ver mais
+                  </Button>
+                </div>
+              </div>
+              <div>
+                <div className="partos-meta">
+                  <ActionButtons
+                    onEdit={() => setSelectedParto(p)}
+                    showRemove={false}
+                  />
                 </div>
               </div>
             </div>
           ))}
         </div>
       )}
+
       {!viewAll && totalPages > 1 && (
-        <div className="gest-pagination">
+        <div className="partos-pagination">
           <PaginationMenu
             currentPage={currentPage}
             totalPages={totalPages}
@@ -179,11 +218,22 @@ const GerenciarPartos: React.FC = () => {
       )}
 
       {viewAll && filtered.length > PAGE_SIZE && (
-        <div className="gest-pagination">
-          <Button type="button" variant="cardSecondary" onClick={() => setViewAll(false)}>
+        <div className="partos-pagination">
+          <Button
+            type="button"
+            variant="cardSecondary"
+            onClick={() => setViewAll(false)}
+          >
             Voltar à paginação
           </Button>
         </div>
+      )}
+
+      {selectedParto && (
+        <PartoDetalhes
+          parto={selectedParto}
+          onClose={() => setSelectedParto(null)}
+        />
       )}
     </div>
   );

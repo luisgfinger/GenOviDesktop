@@ -35,7 +35,7 @@ export function useGestacao(id: number | null) {
   useEffect(() => {
     if (id === null) {
       setLoading(false);
-      setError("ID inválido para buscar gestação");
+      setError("ID inválido para buscar gestação.");
       return;
     }
 
@@ -60,7 +60,9 @@ export function useGestacao(id: number | null) {
 export function useCriarGestacao() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [novaGestacao, setNovaGestacao] = useState<GestacaoResponseDTO | null>(null);
+  const [novaGestacao, setNovaGestacao] = useState<GestacaoResponseDTO | null>(
+    null
+  );
 
   const criarGestacao = async (dto: GestacaoRequestDTO) => {
     setLoading(true);
@@ -80,4 +82,55 @@ export function useCriarGestacao() {
   };
 
   return { criarGestacao, novaGestacao, loading, error };
+}
+
+export function useEditarGestacao() {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [gestacaoEditada, setGestacaoEditada] =
+    useState<GestacaoResponseDTO | null>(null);
+
+  const editarGestacao = async (id: number, dto: GestacaoRequestDTO) => {
+    setLoading(true);
+    setError(null);
+
+    try {
+      const updated = await GestacaoService.editar(id, dto);
+      setGestacaoEditada(updated);
+      return updated;
+    } catch (err) {
+      console.error("Erro ao editar gestação:", err);
+      setError("Não foi possível editar a gestação.");
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return { editarGestacao, gestacaoEditada, loading, error };
+}
+
+export function useRemoverGestacao() {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<boolean>(false);
+
+  const removerGestacao = async (id: number) => {
+    setLoading(true);
+    setError(null);
+    setSuccess(false);
+
+    try {
+      await GestacaoService.remover(id);
+      setSuccess(true);
+    } catch (err) {
+      console.error("Erro ao remover gestação:", err);
+      setError("Não foi possível remover a gestação.");
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return { removerGestacao, success, loading, error };
 }
