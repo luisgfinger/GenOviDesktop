@@ -57,6 +57,7 @@ export function useAplicacao(id: number | null) {
   return { aplicacao, loading, error };
 }
 
+
 export function useCriarAplicacao() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -80,4 +81,53 @@ export function useCriarAplicacao() {
   };
 
   return { criarAplicacao, novaAplicacao, loading, error };
+}
+
+export function useEditarAplicacao() {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [aplicacaoEditada, setAplicacaoEditada] = useState<AplicacaoResponseDTO | null>(null);
+
+  const editarAplicacao = async (id: number, dto: AplicacaoRequestDTO) => {
+    setLoading(true);
+    setError(null);
+
+    try {
+      const updated = await AplicacaoService.editar(id, dto);
+      setAplicacaoEditada(updated);
+      return updated;
+    } catch (err) {
+      console.error("Erro ao editar aplicação:", err);
+      setError("Não foi possível editar a aplicação.");
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return { editarAplicacao, aplicacaoEditada, loading, error };
+}
+
+export function useRemoverAplicacao() {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [removida, setRemovida] = useState<boolean>(false);
+
+  const removerAplicacao = async (id: number) => {
+    setLoading(true);
+    setError(null);
+
+    try {
+      await AplicacaoService.remover(id);
+      setRemovida(true);
+    } catch (err) {
+      console.error("Erro ao remover aplicação:", err);
+      setError("Não foi possível remover a aplicação.");
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return { removerAplicacao, removida, loading, error };
 }

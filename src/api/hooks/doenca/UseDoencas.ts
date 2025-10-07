@@ -3,6 +3,7 @@ import { DoencaService } from "../../services/doenca/DoencaService";
 import type { DoencaRequestDTO } from "../../dtos/doenca/DoencaRequestDTO";
 import type { DoencaResponseDTO } from "../../dtos/doenca/DoencaResponseDTO";
 
+
 export function useDoencas() {
   const [doencas, setDoencas] = useState<DoencaResponseDTO[]>([]);
   const [loading, setLoading] = useState(true);
@@ -26,6 +27,7 @@ export function useDoencas() {
 
   return { doencas, loading, error };
 }
+
 
 export function useDoenca(id: number | null) {
   const [doenca, setDoenca] = useState<DoencaResponseDTO | null>(null);
@@ -80,4 +82,54 @@ export function useCriarDoenca() {
   };
 
   return { criarDoenca, novaDoenca, loading, error };
+}
+
+export function useEditarDoenca() {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [doencaEditada, setDoencaEditada] = useState<DoencaResponseDTO | null>(null);
+
+  const editarDoenca = async (id: number, dto: DoencaRequestDTO) => {
+    setLoading(true);
+    setError(null);
+
+    try {
+      const updated = await DoencaService.editar(id, dto);
+      setDoencaEditada(updated);
+      return updated;
+    } catch (err) {
+      console.error("Erro ao editar doença:", err);
+      setError("Não foi possível editar a doença.");
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return { editarDoenca, doencaEditada, loading, error };
+}
+
+export function useRemoverDoenca() {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState(false);
+
+  const removerDoenca = async (id: number) => {
+    setLoading(true);
+    setError(null);
+    setSuccess(false);
+
+    try {
+      await DoencaService.remover(id);
+      setSuccess(true);
+    } catch (err) {
+      console.error("Erro ao remover doença:", err);
+      setError("Não foi possível remover a doença.");
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return { removerDoenca, success, loading, error };
 }

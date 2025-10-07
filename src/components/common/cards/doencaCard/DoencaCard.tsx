@@ -1,33 +1,43 @@
 import React from "react";
 import "./DoencaCard.css";
-import Button from "../../buttons/Button";
+import ActionButtons from "../../buttons/ActionButtons";
+import type { Doenca } from "../../../../api/models/doenca/DoencaModel";
 
 interface DoencaCardProps {
+  id: number;
   nome: string;
   descricao: string;
+  onEdit: (id: number) => void;
+  onRemove: (id: number) => void;
 }
 
 const DoencaCard: React.FC<DoencaCardProps> = ({
+  id,
   nome,
   descricao,
+  onEdit,
+  onRemove,
 }) => {
-
   return (
     <ul className="doencaCard-container flex-column">
-      <li className="flex">
+      <li className="flex doencaCard-header">
         <div className="flex-column">
           <h3>{nome}</h3>
         </div>
       </li>
+
       <li className="middle-column flex-column">
-         <span className="flex-column">
-          <h3>Descrição:</h3>
-          <p>{descricao}</p>
+        <span className="flex-column">
+          <strong>Descrição:</strong>
+          <p>{descricao || "—"}</p>
         </span>
       </li>
+
       <li className="doencaCard-buttons flex-column">
-        <Button variant="cardPrimary">Ver mais</Button>
-        <Button variant="cardSecondary">Abrir registros</Button>
+        <ActionButtons
+          onEdit={() => onEdit(id)}
+          onRemove={() => onRemove(id)}
+        />
       </li>
     </ul>
   );

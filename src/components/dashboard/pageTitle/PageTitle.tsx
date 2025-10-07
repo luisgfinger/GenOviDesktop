@@ -61,6 +61,10 @@ const PageTitle: React.FC<PageTitleProps> = ({ onSearch }) => {
         return "Gerenciar Vacinas";
       case "/dashboard/ovinos/vacinas/aplicar":
         return "Registrar aplicação de vacinas";
+      case "/dashboard/ovinos/vacinas/vacinacoes":
+        return "Vacinações";
+      case "/dashboard/ovinos/medicamentos/medicacoes":
+        return "Medicações";
       default:
         return "Dashboard";
     }

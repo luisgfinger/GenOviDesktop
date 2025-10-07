@@ -105,26 +105,26 @@ export function useEditarOvino() {
   return { editar, editedOvino, loading, error };
 }
 
-export function useRemoverOvino() {
+export function useDesativarOvino() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
 
-  const remover = async (id: number) => {
+  const desativar = async (id: number) => {
     setLoading(true);
     setError(null);
     setSuccess(false);
     try {
-      await OvinoService.remover(id);
+      await OvinoService.desativar(id);
       setSuccess(true);
     } catch (err) {
-      console.error("Erro ao remover ovino:", err);
-      setError("Não foi possível remover o ovino.");
+      console.error("Erro ao desativar ovino:", err);
+      setError("Não foi possível desativar o ovino.");
       throw err;
     } finally {
       setLoading(false);
     }
   };
 
-  return { remover, success, loading, error };
+  return { desativar, success, loading, error };
 }

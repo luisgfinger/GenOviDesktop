@@ -4,64 +4,99 @@ import PaginationMenu from "../../common/paginationMenu/PaginationMenu";
 import DoencaCard from "../../common/cards/doencaCard/DoencaCard";
 import OptionCard from "../../common/cards/optionCard/OptionCard";
 import Add from "../../../assets/icons/add.png";
+import { toast } from "react-toastify";
 
-import { useDoencas } from "../../../api/hooks/doenca/UseDoencas";
+import {
+  useDoencas,
+  useRemoverDoenca,
+} from "../../../api/hooks/doenca/UseDoencas";
+import type { DoencaResponseDTO } from "../../../api/dtos/doenca/DoencaResponseDTO";
+import DoencaDetalhes from "./DoencaDetalhes";
 
-import type { Doenca } from "../../../api/models/doenca/DoencaModel";
-
-interface GerenciarProps {
+interface GerenciarDoencasProps {
   searchQuery: string;
 }
 
-const Gerenciar: React.FC<GerenciarProps> = ({ searchQuery}) => {
-
+const GerenciarDoencas: React.FC<GerenciarDoencasProps> = ({ searchQuery }) => {
   const { doencas, loading: loadingDoencas } = useDoencas();
+  const { removerDoenca } = useRemoverDoenca();
 
   const [viewAll, setViewAll] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
+  const [selectedDoenca, setSelectedDoenca] =
+    useState<DoencaResponseDTO | null>(null);
+
   const itemsPerPage = 6;
 
-  const loading = loadingDoencas;
-
   const filteredDoencas = useMemo(() => {
-    if (!searchQuery) return doencas;
-    return doencas.filter((d) =>
-      [d.id.toString(), d.nome, d.descricao]
-        .filter(Boolean)
-        .some((field) =>
-          field!.toLowerCase().includes(searchQuery.toLowerCase())
-        )
-    );
+    let list = doencas;
+
+    if (searchQuery) {
+      list = list.filter((d) =>
+        [d.id.toString(), d.nome, d.descricao]
+          .filter(Boolean)
+          .some((field) =>
+            field!.toLowerCase().includes(searchQuery.toLowerCase())
+          )
+      );
+    }
+
+    return list;
   }, [doencas, searchQuery]);
 
-  const data = filteredDoencas;
-  const totalPages = Math.ceil(data.length / itemsPerPage);
-  const currentData = data.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
-  );
+  const totalPages = Math.ceil(filteredDoencas.length / itemsPerPage);
+  const currentData = viewAll
+    ? filteredDoencas
+    : filteredDoencas.slice(
+        (currentPage - 1) * itemsPerPage,
+        currentPage * itemsPerPage
+      );
 
-  if (loading) return <p>Carregando...</p>;
+  const handleEdit = (id: number) => {
+    const d = doencas.find((doenca) => doenca.id === id);
+    if (d) setSelectedDoenca(d);
+  };
+
+  const handleRemove = async (id: number) => {
+    if (!window.confirm("Tem certeza que deseja remover esta doença?")) return;
+
+    try {
+      await removerDoenca(id);
+      toast.success("🗑️ Doença removida com sucesso!");
+      window.location.reload();
+    } catch {
+      toast.error("❌ Erro ao remover a doença.");
+    }
+  };
+
+  if (loadingDoencas) return <p>Carregando...</p>;
 
   return (
     <div className="gerenciar-container flex-column">
-        <div className="gerenciar-container-inside"> 
-              {(currentData as Doenca[]).map((doenca) => (
-                <DoencaCard
-                  key={doenca.id}
-                  nome={doenca.nome}
-                  descricao={doenca.descricao}
-                />
-              ))}
-              <OptionCard
-                key="add-doenca"
-                images={[{ src: Add, alt: "add" }]}
-                text="Cadastrar"
-                href="/dashboard/ovinos/doencas/criar"
-                style={{ width: "250px", height: "420px" }}
-              />
-        </div>
-      {!viewAll && data.length > itemsPerPage && (
+      <h2>Doenças</h2>
+
+      <div className="gerenciar-container-inside">
+        {currentData.map((d) => (
+          <DoencaCard
+            key={d.id}
+            id={d.id}
+            nome={d.nome}
+            descricao={d.descricao}
+            onEdit={handleEdit}
+            onRemove={handleRemove}
+          />
+        ))}
+
+        <OptionCard
+          key="add-doenca"
+          images={[{ src: Add, alt: "add" }]}
+          text="Cadastrar Doença"
+          href="/dashboard/ovinos/doencas/criar"
+          style={{ width: "250px", height: "250px" }}
+        />
+      </div>
+
+      {!viewAll && filteredDoencas.length > itemsPerPage && (
         <PaginationMenu
           currentPage={currentPage}
           totalPages={totalPages}
@@ -79,8 +114,15 @@ const Gerenciar: React.FC<GerenciarProps> = ({ searchQuery}) => {
           Ver menos
         </button>
       )}
+
+      {selectedDoenca && (
+        <DoencaDetalhes
+          doenca={selectedDoenca}
+          onClose={() => setSelectedDoenca(null)}
+        />
+      )}
     </div>
   );
 };
 
-export default Gerenciar;
+export default GerenciarDoencas;

@@ -63,13 +63,15 @@ const DashboardMenu: React.FC<DashboardMenuProps> = ({ location }) => {
   ];
 
   const ovinoChildrenOptions = [
-    { text: "Registrar vacinação", href: "/dashboard/ovinos/vacinas/aplicar" },
+    { text: "Registrar vacinação", href: "/dashboard/ovinos/aplicacoes/cadastrar/vacina" },
+    { text: "Gerenciar vacinanões", href: "/dashboard/ovinos/vacinas/vacinacoes"},
     { text: "Cadastrar vacina", href: "/dashboard/ovinos/vacinas/criar" },
-    {text: "Gerenciar vacinas", href: "/dashboard/ovinos/vacinas/gerenciar"},
-
-    { text: "Registrar aplicação", href: "/dashboard/ovinos/medicamentos/aplicar" },
+    { text: "Gerenciar vacinas", href: "/dashboard/ovinos/vacinas/gerenciar" },
+    
+    { text: "Registrar aplicação", href: "/dashboard/ovinos/aplicacoes/cadastrar/medicamento" },
+    {text: "Gerenciar aplicações", href: "/dashboard/ovinos/medicamentos/medicacoes"},
     { text: "Cadastrar medicamento", href: "/dashboard/ovinos/medicamentos/criar" },
-    {text: "Gerenciar medicamentos", href: "/dashboard/ovinos/medicamentos/gerenciar"},
+    { text: "Gerenciar medicamentos", href: "/dashboard/ovinos/medicamentos/gerenciar" },
 
     {text: "Registrar adoecimento", href: "/dashboard/ovinos/doencas/adoecimento"},
     {text: "Animais doentes", href: "/dashboard/ovinos/doencas/doentes"},
@@ -86,8 +88,6 @@ const DashboardMenu: React.FC<DashboardMenuProps> = ({ location }) => {
     {text: "Registrar parto", href: "/dashboard/ovinos/partos/criar"},
     {text: "Gerenciar partos", href: "/dashboard/ovinos/partos/gerenciar"},
     {text: "Mais opções", href: "#"},
-
-
   ];
 
   const funcionariosCardOptions = [
@@ -127,7 +127,6 @@ const DashboardMenu: React.FC<DashboardMenuProps> = ({ location }) => {
               />
             ))}
       </li>
-
       {location === "ovino" && (
         <>
           <li>
@@ -136,8 +135,8 @@ const DashboardMenu: React.FC<DashboardMenuProps> = ({ location }) => {
           <li className="dashboardMenu-content-optionsLine flex">
             {ovinosCardOptions2.map((option, index) => {
               const childrenForCard = ovinoChildrenOptions.slice(
-                index * 3,
-                index * 3 + 3
+                index * 4,
+                index * 4 + 4
               );
 
               return (
@@ -156,4 +155,5 @@ const DashboardMenu: React.FC<DashboardMenuProps> = ({ location }) => {
     </ul>
   );
 };
+
 export default DashboardMenu;

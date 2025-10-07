@@ -8,12 +8,13 @@ function mapAplicacao(raw: any): AplicacaoResponseDTO {
   return {
     id: raw.id,
     ovino: (raw.ovino ?? raw.ovinoId ?? {}) as Ovino,
+    dataAplicacao: raw.dataAplicacao ?? "",
     medicamento: (raw.medicamento ?? raw.medicamentoId ?? {}) as Medicamento,
-    dataAplicacao: raw.data ?? "",
   };
 }
 
 export class AplicacaoService {
+ 
   static async listarTodos(): Promise<AplicacaoResponseDTO[]> {
     const { data } = await Api.get<any[]>("/user/aplicacoes");
     return data.map(mapAplicacao);
@@ -24,14 +25,25 @@ export class AplicacaoService {
     return mapAplicacao(data);
   }
 
-  static async criar(
-    dto: AplicacaoRequestDTO
-  ): Promise<AplicacaoResponseDTO> {
+  static async criar(dto: AplicacaoRequestDTO): Promise<AplicacaoResponseDTO> {
     const payload: any = Object.fromEntries(
       Object.entries(dto).filter(([_, v]) => v !== undefined)
     );
 
     const { data } = await Api.post<any>("/user/aplicacoes", payload);
     return mapAplicacao(data);
+  }
+
+  static async editar(id: number, dto: AplicacaoRequestDTO): Promise<AplicacaoResponseDTO> {
+    const payload: any = Object.fromEntries(
+      Object.entries(dto).filter(([_, v]) => v !== undefined)
+    );
+
+    const { data } = await Api.put<any>(`/user/aplicacoes/${id}`, payload);
+    return mapAplicacao(data);
+  }
+
+  static async remover(id: number): Promise<void> {
+    await Api.delete(`/user/aplicacoes/${id}`);
   }
 }

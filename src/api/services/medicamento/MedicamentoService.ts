@@ -16,6 +16,7 @@ function mapMedicamento(raw: any): MedicamentoResponseDTO {
 }
 
 export class MedicamentoService {
+  
   static async listarTodos(): Promise<MedicamentoResponseDTO[]> {
     const { data } = await Api.get<any[]>("/user/medicamentos");
     return data.map(mapMedicamento);
@@ -33,9 +34,25 @@ export class MedicamentoService {
       Object.entries(dto).filter(([_, v]) => v !== undefined)
     );
 
-    console.log(payload);
-
     const { data } = await Api.post<any>("/user/medicamentos", payload);
     return mapMedicamento(data);
+  }
+
+  static async atualizar(
+    id: number,
+    dto: MedicamentoRequestDTO
+  ): Promise<MedicamentoResponseDTO> {
+    const payload: any = Object.fromEntries(
+      Object.entries(dto).filter(([_, v]) => v !== undefined)
+    );
+
+    const { data } = await Api.put<any>(`/user/medicamentos/${id}`, payload);
+    console.log("Medicamento atualizado:", id, payload);
+    return mapMedicamento(data);
+  }
+
+  static async remover(id: number): Promise<void> {
+    await Api.delete(`/user/medicamentos/${id}`);
+    console.log("Medicamento removido:", id);
   }
 }

@@ -4,14 +4,14 @@ import type { AplicacaoResponseDTO } from "../../../api/dtos/aplicacao/Aplicacao
 export const aplicacaoMapper = {
   toRequest: (dto: AplicacaoRequestDTO): any => ({
     ovinoId: dto.ovinoId,
+    dataAplicacao: dto.dataAplicacao,
     medicamentoId: dto.medicamentoId,
-    data: dto.data,
   }),
 
   fromResponse: (data: any): AplicacaoResponseDTO => ({
     id: data.id,
     ovino: data.ovino,
+    dataAplicacao: data.data,
     medicamento: data.medicamento,
-    data: data.data,
   }),
 };

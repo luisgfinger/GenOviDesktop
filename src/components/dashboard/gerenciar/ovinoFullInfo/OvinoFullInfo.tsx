@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useLocation, useParams } from "react-router-dom";
+import { useLocation, useParams, useNavigate } from "react-router-dom";
 import OvinoCardFull from "../../../common/cards/ovinoCard/OvinoCardFull";
 import type { Ovino } from "../../../../api/models/ovino/OvinoModel";
 import { OvinoService } from "../../../../api/services/ovino/OvinoService";
@@ -17,6 +17,7 @@ import { CompraService } from "../../../../api/services/compra/CompraService";
 const OvinoFullInfo: React.FC = () => {
   const { state } = useLocation();
   const { id } = useParams();
+  const navigate = useNavigate();
   const ovinoInicial = state?.ovino as Ovino | undefined;
 
   const [ovino, setOvino] = useState<Ovino | null>(ovinoInicial ?? null);
@@ -49,6 +50,20 @@ const OvinoFullInfo: React.FC = () => {
     return <p>Carregando dados do ovino {id}...</p>;
   }
 
+  const handleDisable = async () => {
+    if (!ovino.id) return;
+    if (!window.confirm("Tem certeza que deseja desativar este ovino?")) return;
+
+    try {
+      await OvinoService.desativar(ovino.id);
+      toast.success("🐑 Ovino desativado com sucesso!");
+      navigate("/dashboard/ovinos");
+    } catch (err: any) {
+      console.error(err);
+      toast.error("❌ Erro ao desativar ovino.");
+    }
+  };
+
   const handleEdit = (field: keyof Ovino) => {
     setEditField(field);
     const value = (ovino as any)[field];
@@ -66,8 +81,7 @@ const OvinoFullInfo: React.FC = () => {
       let newValue: any = tempValue;
 
       if (["ovinoMae", "ovinoPai"].includes(editField)) {
-        newValue =
-          ovinos.find((o) => o.id === Number(tempValue)) ?? null;
+        newValue = ovinos.find((o) => o.id === Number(tempValue)) ?? null;
       } else if (editField === "parto") {
         newValue = partos.find((p) => p.id === Number(tempValue)) ?? null;
       } else if (editField === "compra") {
@@ -188,7 +202,11 @@ const OvinoFullInfo: React.FC = () => {
 
   return (
     <div className="ovinoFullInfo flex-column">
-      <OvinoCardFull ovino={ovino} onEdit={handleEdit} />
+      <OvinoCardFull
+        ovino={ovino}
+        onEdit={handleEdit}
+        onRemove={handleDisable}
+      />
 
       {editField && (
         <div className="edit-overlay">

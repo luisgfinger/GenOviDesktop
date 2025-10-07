@@ -81,3 +81,53 @@ export function useCriarMedicamento() {
 
   return { criarMedicamento, novoMedicamento, loading, error };
 }
+
+export function useEditarMedicamento() {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [medicamentoEditado, setMedicamentoEditado] = useState<MedicamentoResponseDTO | null>(null);
+
+  const editarMedicamento = async (id: number, dto: MedicamentoRequestDTO) => {
+    setLoading(true);
+    setError(null);
+
+    try {
+      const updated = await MedicamentoService.atualizar(id, dto);
+      setMedicamentoEditado(updated);
+      return updated;
+    } catch (err) {
+      console.error("Erro ao editar medicamento:", err);
+      setError("Não foi possível editar o medicamento.");
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return { editarMedicamento, medicamentoEditado, loading, error };
+}
+
+export function useRemoverMedicamento() {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState(false);
+
+  const removerMedicamento = async (id: number) => {
+    setLoading(true);
+    setError(null);
+    setSuccess(false);
+
+    try {
+      await MedicamentoService.remover(id);
+      setSuccess(true);
+    } catch (err) {
+      console.error("Erro ao remover medicamento:", err);
+      setError("Não foi possível remover o medicamento.");
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return { removerMedicamento, success, loading, error };
+}

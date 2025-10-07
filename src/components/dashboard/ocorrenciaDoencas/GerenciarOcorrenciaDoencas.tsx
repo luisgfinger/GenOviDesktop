@@ -93,7 +93,7 @@ const GerenciarOcorrenciaDoencas: React.FC = () => {
     <div className="ocorrencia-page">
       <div className="ocorrencia-header flex">
         <h2>Doentes</h2>
-        <Link to="/dashboard/ovinos/ocorrenciaDoencas/criar">
+        <Link to="/dashboard/ovinos/doencas/adoecimento">
           <Button type="button" variant="cardPrimary">
             Novo Adoecimento
           </Button>

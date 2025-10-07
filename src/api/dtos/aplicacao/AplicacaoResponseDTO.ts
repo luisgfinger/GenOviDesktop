@@ -4,6 +4,6 @@ import type { Medicamento } from "../../models/medicamento/MedicamentoModel";
 export interface AplicacaoResponseDTO {
   id: number;
   ovino: Ovino;
-  medicamento: Medicamento;
   dataAplicacao: string;
+  medicamento: Medicamento;
 }

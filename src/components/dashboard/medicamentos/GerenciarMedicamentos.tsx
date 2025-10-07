@@ -4,30 +4,36 @@ import PaginationMenu from "../../common/paginationMenu/PaginationMenu";
 import MedicamentoCard from "../../common/cards/medicamentoCard/MedicamentoCard";
 import OptionCard from "../../common/cards/optionCard/OptionCard";
 import Add from "../../../assets/icons/add.png";
+import { toast } from "react-toastify";
 
-import { useMedicamentos } from "../../../api/hooks/medicamento/UseMedicamentos";
-
-import type { Medicamento } from "../../../api/models/medicamento/MedicamentoModel";
+import {
+  useMedicamentos,
+  useRemoverMedicamento,
+} from "../../../api/hooks/medicamento/UseMedicamentos";
+import type { MedicamentoResponseDTO } from "../../../api/dtos/medicamento/MedicamentoResponseDTO";
+import MedicamentoDetalhes from "./MedicamentoDetalhes";
 
 interface GerenciarProps {
   searchQuery: string;
   isVacina: boolean;
 }
 
-const GerenciarMedicamentos: React.FC<GerenciarProps> = ({ searchQuery, isVacina }) => {
+const GerenciarMedicamentos: React.FC<GerenciarProps> = ({
+  searchQuery,
+  isVacina,
+}) => {
   const { medicamentos, loading: loadingMedicamentos } = useMedicamentos();
+  const { removerMedicamento } = useRemoverMedicamento();
 
   const [viewAll, setViewAll] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
+  const [selectedMedicamento, setSelectedMedicamento] =
+    useState<MedicamentoResponseDTO | null>(null);
+
   const itemsPerPage = 6;
 
-  const loading = loadingMedicamentos;
-
   const filteredMedicamentos = useMemo(() => {
-    let list = medicamentos;
-
-
-    list = list.filter((m) => m.isVacina === isVacina);
+    let list = medicamentos.filter((m) => m.isVacina === isVacina);
 
     if (searchQuery) {
       list = list.filter((m) =>
@@ -42,31 +48,50 @@ const GerenciarMedicamentos: React.FC<GerenciarProps> = ({ searchQuery, isVacina
     return list;
   }, [medicamentos, searchQuery, isVacina]);
 
-  const data = filteredMedicamentos;
-  const totalPages = Math.ceil(data.length / itemsPerPage);
-  const currentData = viewAll ? data : data.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
-  );
+  const totalPages = Math.ceil(filteredMedicamentos.length / itemsPerPage);
+  const currentData = viewAll
+    ? filteredMedicamentos
+    : filteredMedicamentos.slice(
+        (currentPage - 1) * itemsPerPage,
+        currentPage * itemsPerPage
+      );
 
-  if (loading) return <p>Carregando...</p>;
+  const handleEdit = (id: number) => {
+    const med = medicamentos.find((m) => m.id === id);
+    if (med) setSelectedMedicamento(med);
+  };
+
+  const handleRemove = async (id: number) => {
+    if (!window.confirm("Tem certeza que deseja remover este item?")) return;
+
+    try {
+      await removerMedicamento(id);
+      toast.success("🗑️ Removido com sucesso!");
+      window.location.reload();
+    } catch {
+      toast.error("❌ Erro ao remover o item.");
+    }
+  };
+
+  if (loadingMedicamentos) return <p>Carregando...</p>;
 
   return (
     <div className="gerenciar-container flex-column">
-      <h2>
-        {isVacina ? "Vacinas" : "Medicamentos"}
-      </h2>
+      <h2>{isVacina ? "Vacinas" : "Medicamentos"}</h2>
 
       <div className="gerenciar-container-inside">
-        {(currentData as Medicamento[]).map((medicamento) => (
+        {currentData.map((m) => (
           <MedicamentoCard
-            key={medicamento.id}
-            nome={medicamento.nome}
-            fabricante={medicamento.fabricante}
-            quantidadeDoses={medicamento.quantidadeDoses}
-            intervaloDoses={medicamento.intervaloDoses}
-            isVacina={medicamento.isVacina}
-            doencas={medicamento.doencas}
+            key={m.id}
+            id={m.id}
+            nome={m.nome}
+            fabricante={m.fabricante}
+            quantidadeDoses={m.quantidadeDoses}
+            intervaloDoses={m.intervaloDoses}
+            isVacina={m.isVacina}
+            doencas={m.doencas}
+            onEdit={handleEdit}
+            onRemove={handleRemove}
           />
         ))}
 
@@ -74,12 +99,14 @@ const GerenciarMedicamentos: React.FC<GerenciarProps> = ({ searchQuery, isVacina
           key="add-medicamento"
           images={[{ src: Add, alt: "add" }]}
           text={`Cadastrar ${isVacina ? "Vacina" : "Medicamento"}`}
-          href={`/dashboard/ovinos/${isVacina ? "vacinas" : "medicamentos"}/criar`}
-          style={{ width: "250px", height: "420px" }}
+          href={`/dashboard/ovinos/${
+            isVacina ? "vacinas" : "medicamentos"
+          }/criar`}
+          style={{ width: "250px", height: "380px" }}
         />
       </div>
 
-      {!viewAll && data.length > itemsPerPage && (
+      {!viewAll && filteredMedicamentos.length > itemsPerPage && (
         <PaginationMenu
           currentPage={currentPage}
           totalPages={totalPages}
@@ -96,6 +123,13 @@ const GerenciarMedicamentos: React.FC<GerenciarProps> = ({ searchQuery, isVacina
         >
           Ver menos
         </button>
+      )}
+
+      {selectedMedicamento && (
+        <MedicamentoDetalhes
+          medicamento={selectedMedicamento}
+          onClose={() => setSelectedMedicamento(null)}
+        />
       )}
     </div>
   );

@@ -1,37 +1,44 @@
 import React from "react";
 import "./MedicamentoCard.css";
-import Button from "../../buttons/Button";
+import ActionButtons from "../../buttons/ActionButtons";
 import type { Doenca } from "../../../../api/models/doenca/DoencaModel";
 
 interface MedicamentoCardProps {
+  id: number;
   nome: string;
   fabricante: string;
   quantidadeDoses: number;
   intervaloDoses: number;
   isVacina: boolean;
   doencas: Doenca[];
+  onEdit: (id: number) => void;
+  onRemove: (id: number) => void;
 }
 
 const MedicamentoCard: React.FC<MedicamentoCardProps> = ({
+  id,
   nome,
   fabricante,
   quantidadeDoses,
   intervaloDoses,
   isVacina,
   doencas,
+  onEdit,
+  onRemove,
 }) => {
   return (
     <ul className="medicamentoCard-container flex-column">
-      <li className="flex">
+      <li className="flex medicamentoCard-header">
         <div className="flex-column">
           <h3>{nome}</h3>
           <p className="fabricante">Fabricante: {fabricante}</p>
         </div>
-      </li>
 
+      
+      </li>
       <li className="middle-column flex-column">
         <span className="flex-column">
-          <h3>Informações:</h3>
+          <strong>Informações:</strong>
           <p>Doses: {quantidadeDoses}</p>
           <p>Intervalo: {intervaloDoses} dias</p>
           <p>Tipo: {isVacina ? "Vacina" : "Medicamento comum"}</p>
@@ -39,7 +46,7 @@ const MedicamentoCard: React.FC<MedicamentoCardProps> = ({
 
         {doencas?.length > 0 && (
           <span className="flex-column doencas-list">
-            <h3>Trata:</h3>
+            <strong>Trata:</strong>
             <ul>
               {doencas.map((d) => (
                 <li key={d.id}>{d.nome}</li>
@@ -50,8 +57,10 @@ const MedicamentoCard: React.FC<MedicamentoCardProps> = ({
       </li>
 
       <li className="medicamentoCard-buttons flex-column">
-        <Button variant="cardPrimary">Ver mais</Button>
-        <Button variant="cardSecondary">Histórico de uso</Button>
+       <ActionButtons
+          onEdit={() => onEdit(id)}
+          onRemove={() => onRemove(id)}
+        />
       </li>
     </ul>
   );

@@ -5,18 +5,28 @@ import type { Doenca } from "../../models/doenca/DoencaModel";
 const API_URL = "/user/doencas";
 
 export const DoencaService = {
+
   listarTodos: async (): Promise<DoencaResponseDTO[]> => {
-    const response = await Api.get<DoencaResponseDTO[]>(API_URL);
-    return response.data;
+    const { data } = await Api.get<DoencaResponseDTO[]>(API_URL);
+    return data;
   },
 
-  async salvar(doenca: Omit<Doenca, "id">): Promise<Doenca> {
-    const response = await Api.post(API_URL, doenca);
-    return response.data;
+  salvar: async (doenca: Omit<Doenca, "id">): Promise<Doenca> => {
+    const { data } = await Api.post<Doenca>(API_URL, doenca);
+    return data;
   },
 
-  async buscarPorId(id: number): Promise<DoencaResponseDTO> {
-    const response = await Api.get<DoencaResponseDTO>(`${API_URL}/${id}`);
-    return response.data;
+  buscarPorId: async (id: number): Promise<DoencaResponseDTO> => {
+    const { data } = await Api.get<DoencaResponseDTO>(`${API_URL}/${id}`);
+    return data;
+  },
+
+  editar: async (id: number, doenca: Partial<Doenca>): Promise<Doenca> => {
+    const { data } = await Api.put<Doenca>(`${API_URL}/${id}`, doenca);
+    return data;
+  },
+
+  remover: async (id: number): Promise<void> => {
+    await Api.delete(`${API_URL}/${id}`);
   },
 };

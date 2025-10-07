@@ -9,12 +9,14 @@ interface OvinoCardFullProps {
   ovino: Ovino;
   imagem?: string;
   onEdit?: (field: keyof Ovino) => void;
+  onRemove?: () => void; // ✅ nova prop
 }
 
 const OvinoCardFull: React.FC<OvinoCardFullProps> = ({
   ovino,
   imagem = OvinoDefaultImg,
   onEdit,
+  onRemove,
 }) => {
   const renderField = (
     label: string,
@@ -37,6 +39,13 @@ const OvinoCardFull: React.FC<OvinoCardFullProps> = ({
 
   return (
     <div className="ovinoCardFull-container flex-column">
+      {/* ✅ Botão de remover no canto superior direito */}
+      <ActionButtons
+        className="ovinoCardFull-remove-btn"
+        showEdit={false}
+        onRemove={onRemove}
+      />
+
       <div className="ovinoCardFull-header flex">
         <img src={imagem} alt={ovino.nome} />
         <div className="flex-column">
