@@ -229,7 +229,7 @@ const femeas = useMemo(
           <li className="flex-column">
             <label htmlFor="dataParto">Data do parto</label>
             <input
-              type="date"
+              type="datetime-local"
               id="dataParto"
               value={dataParto}
               onChange={(e) => setDataParto(e.target.value)}

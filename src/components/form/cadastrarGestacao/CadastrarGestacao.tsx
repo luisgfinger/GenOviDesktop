@@ -5,12 +5,11 @@ import { toast } from "react-toastify";
 
 import { useOvinos } from "../../../api/hooks/ovino/UseOvinos";
 import { useReproducoes } from "../../../api/hooks/reproducao/UseReproducoes";
-import { useCriarGestacao } from "../../../api/hooks/gestacao/UseGestacoes";
+import { useCriarGestacao, useGestacoes } from "../../../api/hooks/gestacao/UseGestacoes";
+import { usePartos } from "../../../api/hooks/parto/UsePartos";
 import { formatEnum } from "../../../utils/formatEnum";
 
 import { TypeSexo } from "../../../api/enums/typeSexo/TypeSexo";
-import { TypeStatus } from "../../../api/enums/typeStatus/TypeStatus";
-
 import type { GestacaoRequestDTO } from "../../../api/dtos/gestacao/GestacaoRequestDTO";
 import type { ReproducaoResponseDTO } from "../../../api/dtos/reproducao/ReproducaoResponseDTO";
 import { formatDate } from "../../../utils/formatDate";
@@ -29,19 +28,20 @@ function monthsBetween(iso?: string): number {
   return Math.max(0, months);
 }
 
-const MIN_MALE_MONTHS = 7;  
+const MIN_MALE_MONTHS = 7;
 const MIN_FEMALE_MONTHS = 8;
 
 const CadastrarGestacao: React.FC = () => {
   const { ovinos, loading: loadingOvinos, error: errorOvinos } = useOvinos();
   const { reproducoes, loading: loadingRepros, error: errorRepros } = useReproducoes();
   const { criarGestacao, loading: saving, error: errorSalvar } = useCriarGestacao();
+  const { gestacoes } = useGestacoes();
+  const { partos } = usePartos();
 
   const [reproducaoId, setReproducaoId] = useState<string>("");
   const [ovelhaMaeId, setOvelhaMaeId] = useState<string>("");
   const [ovelhaPaiId, setOvelhaPaiId] = useState<string>("");
-  const [dataGestacao, setDataGestacao] = useState<string>(""); 
-
+  const [dataGestacao, setDataGestacao] = useState<string>("");
   const [carneiroPaiNome, setCarneiroPaiNome] = useState<string>("");
   const [ovelhaMaeNome, setOvelhaMaeNome] = useState<string>("");
 
@@ -51,26 +51,35 @@ const CadastrarGestacao: React.FC = () => {
     return m;
   }, [reproducoes]);
 
-const machos = useMemo(
-  () =>
-    (ovinos ?? []).filter(
-      (o) =>
-        o.sexo === TypeSexo.MACHO &&
-        monthsBetween(o.dataNascimento) >= MIN_MALE_MONTHS
-    ),
-  [ovinos]
-);
+  const machos = useMemo(
+    () =>
+      (ovinos ?? []).filter(
+        (o) =>
+          o.sexo === TypeSexo.MACHO &&
+          monthsBetween(o.dataNascimento) >= MIN_MALE_MONTHS
+      ),
+    [ovinos]
+  );
 
-const femeas = useMemo(
-  () =>
-    (ovinos ?? []).filter(
-      (o) =>
-        o.sexo === TypeSexo.FEMEA &&
-        monthsBetween(o.dataNascimento) >= MIN_FEMALE_MONTHS
-    ),
-  [ovinos]
-);
+  const isOvelhaGestando = (ovelhaId: number): boolean => {
+    const gestacaoAtiva = (gestacoes ?? []).some((g) => {
+      const mae = g.ovelhaMae?.id;
+      const partoExiste = (partos ?? []).some((p) => p.gestacao?.id === g.id);
+      return mae === ovelhaId && !partoExiste;
+    });
+    return gestacaoAtiva;
+  };
 
+  const femeas = useMemo(
+    () =>
+      (ovinos ?? []).filter(
+        (o) =>
+          o.sexo === TypeSexo.FEMEA &&
+          monthsBetween(o.dataNascimento) >= MIN_FEMALE_MONTHS &&
+          !isOvelhaGestando(o.id)
+      ),
+    [ovinos, gestacoes, partos]
+  );
 
   const handleSelectReproducao = (id: string) => {
     setReproducaoId(id);
@@ -107,7 +116,6 @@ const femeas = useMemo(
     };
 
     try {
-      console.log("DTO enviado:", dto);
       await criarGestacao(dto);
       toast.success("Gestação cadastrada com sucesso!");
       setReproducaoId("");
@@ -126,7 +134,6 @@ const femeas = useMemo(
     <div className="cadastrar-gestacao-bg flex-column">
       <form className="cadastrarGestacao-container flex-column" onSubmit={handleSubmit}>
         <ul className="flex-column">
-      
           <li className="flex-column">
             <label htmlFor="reproducaoId">Reprodução (opcional)</label>
             {loadingRepros ? (
@@ -185,6 +192,7 @@ const femeas = useMemo(
               </select>
             )}
           </li>
+
           <li className="flex-column">
             <label htmlFor="dataGestacao">Data da Gestação</label>
             <input
@@ -195,6 +203,7 @@ const femeas = useMemo(
               required
             />
           </li>
+
           <div className="cadastrarGestacao-form-navigation">
             <Button type="submit" variant="cardPrimary" disabled={saving}>
               {saving ? "Salvando..." : "Cadastrar gestação"}

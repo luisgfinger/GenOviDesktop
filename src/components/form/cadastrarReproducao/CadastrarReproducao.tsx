@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from "react";
-import "./CadastrarReproducao.css"; 
+import "./CadastrarReproducao.css";
 import Button from "../../common/buttons/Button";
 import { toast } from "react-toastify";
 
@@ -10,6 +10,9 @@ import { formatEnum } from "../../../utils/formatEnum";
 
 import { useOvinos } from "../../../api/hooks/ovino/UseOvinos";
 import { useCriarReproducao } from "../../../api/hooks/reproducao/UseReproducoes";
+import { useGestacoes } from "../../../api/hooks/gestacao/UseGestacoes";
+import { usePartos } from "../../../api/hooks/parto/UsePartos";
+
 import type { ReproducaoRequestDTO } from "../../../api/dtos/reproducao/ReproducaoRequestDTO";
 import { formatDate } from "../../../utils/formatDate";
 
@@ -37,11 +40,9 @@ function normalize(s: string) {
 
 const CadastrarReproducao: React.FC<Props> = ({ minAgeMonths = 12 }) => {
   const { ovinos, loading: loadingOvinos, error: errorOvinos } = useOvinos();
-  const {
-    criarReproducao,
-    loading: saving,
-    error: errorSalvar,
-  } = useCriarReproducao();
+  const { criarReproducao, loading: saving, error: errorSalvar } = useCriarReproducao();
+  const { gestacoes } = useGestacoes();
+  const { partos } = usePartos();
 
   const [carneiroId, setCarneiroId] = useState<string>("");
   const [femeasIds, setFemeasIds] = useState<string[]>([]);
@@ -50,6 +51,16 @@ const CadastrarReproducao: React.FC<Props> = ({ minAgeMonths = 12 }) => {
   const [observacoes, setObservacoes] = useState<string>("");
   const [query, setQuery] = useState<string>("");
 
+  // 🔹 Retorna true se a ovelha estiver em uma gestação sem parto vinculado
+  const isOvelhaGestando = (ovelhaId: number): boolean => {
+    return (gestacoes ?? []).some((g) => {
+      const maeId = g.ovelhaMae?.id;
+      const partoVinculado = (partos ?? []).some((p) => p.gestacao?.id === g.id);
+      return maeId === ovelhaId && !partoVinculado;
+    });
+  };
+
+  // 🔹 Filtra adultos ativos
   const adultosAtivos = useMemo(
     () =>
       (ovinos ?? []).filter(
@@ -60,19 +71,27 @@ const CadastrarReproducao: React.FC<Props> = ({ minAgeMonths = 12 }) => {
     [ovinos, minAgeMonths]
   );
 
+  // 🔹 Machos adultos ativos
   const machosAdultos = useMemo(
     () => adultosAtivos.filter((o) => o.sexo === TypeSexo.MACHO),
     [adultosAtivos]
   );
 
+  // 🔹 Fêmeas adultas ativas e não gestantes
   const femeasAdultas = useMemo(
     () =>
-      adultosAtivos
-        .filter((o) => o.sexo === TypeSexo.FEMEA && String(o.id) !== carneiroId)
+      (adultosAtivos ?? [])
+        .filter(
+          (o) =>
+            o.sexo === TypeSexo.FEMEA &&
+            String(o.id) !== carneiroId &&
+            !isOvelhaGestando(o.id)
+        )
         .sort((a, b) => a.nome.localeCompare(b.nome, "pt-BR")),
-    [adultosAtivos, carneiroId]
+    [adultosAtivos, carneiroId, gestacoes, partos]
   );
 
+  // 🔹 Filtro por nome, FBB, RFID etc.
   const filteredFemeas = useMemo(() => {
     const q = normalize(query.trim());
     if (!q) return femeasAdultas;
@@ -82,16 +101,11 @@ const CadastrarReproducao: React.FC<Props> = ({ minAgeMonths = 12 }) => {
       const rfid = String(o.rfid ?? "");
       const raca = normalize(formatEnum(o.raca));
       const data = normalize(formatDate(o.dataNascimento ?? "-"));
-      return (
-        nome.includes(q) ||
-        fbb.includes(q) ||
-        rfid.includes(q) ||
-        raca.includes(q) ||
-        data.includes(q)
-      );
+      return nome.includes(q) || fbb.includes(q) || rfid.includes(q) || raca.includes(q) || data.includes(q);
     });
   }, [query, femeasAdultas]);
 
+  // 🔹 Controle de seleção
   const handleToggleFemea = (id: string) => {
     setFemeasIds((prev) =>
       prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
@@ -105,18 +119,12 @@ const CadastrarReproducao: React.FC<Props> = ({ minAgeMonths = 12 }) => {
 
   const handleClearSelection = () => setFemeasIds([]);
 
+  // 🔹 Envio do formulário
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (
-      !carneiroId ||
-      femeasIds.length === 0 ||
-      !typeReproducao ||
-      !dataReproducao
-    ) {
-      toast.warn(
-        "Preencha macho, pelo menos uma fêmea, tipo e data da reprodução."
-      );
+    if (!carneiroId || femeasIds.length === 0 || !typeReproducao || !dataReproducao) {
+      toast.warn("Preencha macho, pelo menos uma fêmea, tipo e data da reprodução.");
       return;
     }
 
@@ -129,9 +137,7 @@ const CadastrarReproducao: React.FC<Props> = ({ minAgeMonths = 12 }) => {
     }));
 
     try {
-      const results = await Promise.allSettled(
-        lotes.map((dto) => criarReproducao(dto))
-      );
+      const results = await Promise.allSettled(lotes.map((dto) => criarReproducao(dto)));
       const sucessos = results.filter((r) => r.status === "fulfilled").length;
       const falhas = results.length - sucessos;
 
@@ -153,11 +159,9 @@ const CadastrarReproducao: React.FC<Props> = ({ minAgeMonths = 12 }) => {
 
   return (
     <div className="cadastrar-reproducao-bg flex-column">
-      <form
-        className="cadastrarReproducao-container flex-column"
-        onSubmit={handleSubmit}
-      >
+      <form className="cadastrarReproducao-container flex-column" onSubmit={handleSubmit}>
         <ul className="flex-column">
+          {/* MACHO */}
           <li className="flex-column">
             <label htmlFor="carneiroId">Macho</label>
             {loadingOvinos ? (
@@ -165,16 +169,11 @@ const CadastrarReproducao: React.FC<Props> = ({ minAgeMonths = 12 }) => {
             ) : errorOvinos ? (
               <p style={{ color: "red" }}>{errorOvinos}</p>
             ) : (
-              <select
-                id="carneiroId"
-                value={carneiroId}
-                onChange={(e) => setCarneiroId(e.target.value)}
-              >
+              <select id="carneiroId" value={carneiroId} onChange={(e) => setCarneiroId(e.target.value)}>
                 <option value="">Selecione o macho adulto...</option>
                 {machosAdultos.map((o) => (
                   <option key={o.id} value={o.id}>
-                    {o.nome} • {formatEnum(o.raca)} •{" "}
-                    {formatDate(o.dataNascimento?? "-")}
+                    {o.nome} • {formatEnum(o.raca)} • {formatDate(o.dataNascimento ?? "-")}
                   </option>
                 ))}
               </select>
@@ -184,6 +183,7 @@ const CadastrarReproducao: React.FC<Props> = ({ minAgeMonths = 12 }) => {
             </small>
           </li>
 
+          {/* FÊMEAS */}
           <li className="flex-column">
             <label htmlFor="femeasSearch">Fêmeas</label>
             <div className="reproducao-toolbar flex-column">
@@ -257,16 +257,10 @@ const CadastrarReproducao: React.FC<Props> = ({ minAgeMonths = 12 }) => {
                           checked={checked}
                           onChange={() => handleToggleFemea(idStr)}
                         />
-                        <label
-                          htmlFor={`femea-${o.id}`}
-                          className="reproducao-list-item__label"
-                        >
-                          <div className="reproducao-list-item__name">
-                            {o.nome}
-                          </div>
+                        <label htmlFor={`femea-${o.id}`} className="reproducao-list-item__label">
+                          <div className="reproducao-list-item__name">{o.nome}</div>
                           <div className="reproducao-list-item__meta">
-                            FBB: {o.fbb ?? "—"} • RFID: {o.rfid ?? "—"} •{" "}
-                            {formatEnum(o.raca)} •{" "}
+                            FBB: {o.fbb ?? "—"} • RFID: {o.rfid ?? "—"} • {formatEnum(o.raca)} •{" "}
                             {formatDate(o.dataNascimento ?? "-")}
                           </div>
                         </label>
@@ -281,17 +275,19 @@ const CadastrarReproducao: React.FC<Props> = ({ minAgeMonths = 12 }) => {
               <span>Selecionadas: {femeasIds.length}</span>
               <span>Filtradas: {filteredFemeas.length}</span>
               <span>Adultas ativas: {femeasAdultas.length}</span>
+              <span>
+                Gestando: {(ovinos ?? []).filter((o) => o.sexo === TypeSexo.FEMEA && isOvelhaGestando(o.id)).length}
+              </span>
             </div>
           </li>
 
+          {/* Tipo, data e observações */}
           <li className="flex-column">
             <label htmlFor="typeReproducao">Tipo de Reprodução</label>
             <select
               id="typeReproducao"
               value={typeReproducao}
-              onChange={(e) =>
-                setTypeReproducao(e.target.value as TypeReproducao)
-              }
+              onChange={(e) => setTypeReproducao(e.target.value as TypeReproducao)}
             >
               <option value="">Selecione...</option>
               {Object.values(TypeReproducao).map((t) => (
@@ -311,6 +307,7 @@ const CadastrarReproducao: React.FC<Props> = ({ minAgeMonths = 12 }) => {
               onChange={(e) => setDataReproducao(e.target.value)}
             />
           </li>
+
           <li className="flex-column">
             <label htmlFor="observacoes">Observações</label>
             <textarea
@@ -321,6 +318,7 @@ const CadastrarReproducao: React.FC<Props> = ({ minAgeMonths = 12 }) => {
               maxLength={255}
             />
           </li>
+
           <div className="cadastrarReproducao-form-navigation">
             <Button type="submit" variant="cardPrimary" disabled={saving}>
               {saving ? "Salvando..." : "Cadastrar reproduções"}

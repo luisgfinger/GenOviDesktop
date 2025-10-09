@@ -76,10 +76,10 @@ const GerenciarMedicamentos: React.FC<GerenciarProps> = ({
   if (loadingMedicamentos) return <p>Carregando...</p>;
 
   return (
-    <div className="gerenciar-container flex-column">
+    <div className="gerenciarMedicamentos-container flex-column">
       <h2>{isVacina ? "Vacinas" : "Medicamentos"}</h2>
 
-      <div className="gerenciar-container-inside">
+      <div className="gerenciarMedicamentos-container-inside">
         {currentData.map((m) => (
           <MedicamentoCard
             key={m.id}

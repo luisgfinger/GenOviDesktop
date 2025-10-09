@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import "./CadastrarOvino.css";
 import Button from "../../common/buttons/Button";
 import { toast } from "react-toastify";
@@ -72,6 +72,7 @@ const CadastrarOvino: React.FC<CadastrarOvinoProps> = ({
   const { ovinos, loading: loadingOvinos, error: errorOvinos } = useOvinos();
   const { salvar, loading: saving, error: errorSalvar } = useSalvarOvino();
   const { partos, loading: loadingPartos, error: errorPartos } = usePartos();
+
   const machos = useMemo(
     () =>
       (ovinos ?? []).filter(
@@ -92,6 +93,27 @@ const CadastrarOvino: React.FC<CadastrarOvinoProps> = ({
       ),
     [ovinos]
   );
+
+  const racasFiltradas = useMemo(() => {
+    const pai = ovinos?.find((o) => o.id === Number(idCarneiroPai));
+    const mae = ovinos?.find((o) => o.id === Number(idOvelhaMae));
+
+    if (pai?.raca && mae?.raca) {
+      return pai.raca === mae.raca ? [pai.raca] : [pai.raca, mae.raca];
+    }
+
+    if (pai?.raca) return [pai.raca];
+    if (mae?.raca) return [mae.raca];
+
+    return Object.values(TypeRaca);
+  }, [ovinos, idCarneiroPai, idOvelhaMae]);
+
+  useEffect(() => {
+  if (raca && !racasFiltradas.includes(raca)) {
+    setRaca("");
+  }
+}, [racasFiltradas, raca]);
+
 
   const handleSelectParto = async (partoId: string) => {
     setIdParto(partoId);
@@ -312,7 +334,7 @@ const CadastrarOvino: React.FC<CadastrarOvinoProps> = ({
                 onChange={(e) => setRaca(e.target.value as TypeRaca)}
               >
                 <option value="">Selecione...</option>
-                {Object.values(TypeRaca).map((r) => (
+                {racasFiltradas.map((r) => (
                   <option key={r} value={r}>
                     {formatEnum(r)}
                   </option>
@@ -368,6 +390,7 @@ const CadastrarOvino: React.FC<CadastrarOvinoProps> = ({
             </div>
           </ul>
         )}
+
         {step === 3 && (
           <ul className="flex-column">
             <li className="flex-column">

@@ -62,20 +62,20 @@ const GerenciarDoencas: React.FC<GerenciarDoencasProps> = ({ searchQuery }) => {
 
     try {
       await removerDoenca(id);
-      toast.success("🗑️ Doença removida com sucesso!");
+      toast.success("Doença removida com sucesso!");
       window.location.reload();
     } catch {
-      toast.error("❌ Erro ao remover a doença.");
+      toast.error("Erro ao remover a doença.");
     }
   };
 
   if (loadingDoencas) return <p>Carregando...</p>;
 
   return (
-    <div className="gerenciar-container flex-column">
+    <div className="gerenciarDoencas-container flex-column">
       <h2>Doenças</h2>
 
-      <div className="gerenciar-container-inside">
+      <div className="gerenciarDoencas-container-inside">
         {currentData.map((d) => (
           <DoencaCard
             key={d.id}

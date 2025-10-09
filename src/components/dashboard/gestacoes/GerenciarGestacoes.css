@@ -35,7 +35,7 @@
   padding: 12px;
   display: grid;
   grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
-  gap: 12px;
+  gap: 26px;
   align-items: center;
   border: 1px solid #f1f1f1;
 }
@@ -70,3 +70,8 @@
   align-items: center;
   justify-content: center;
 }
+
+.gestacoes-actions{
+  gap: 28px;
+  justify-content: flex-end;
+  }

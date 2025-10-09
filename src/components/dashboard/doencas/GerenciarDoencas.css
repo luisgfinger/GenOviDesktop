@@ -1,4 +1,4 @@
-.gerenciar-container {
+.gerenciarDoencas-container {
   padding-top: 25px;
   justify-content: center;
   align-items: center;
@@ -6,7 +6,7 @@
   padding-bottom: 30px;
 }
 
-.gerenciar-container-inside {
+.gerenciarDoencas-container-inside {
   display: grid;
   grid-template-columns: repeat(3, max-content);
   gap: 26px;

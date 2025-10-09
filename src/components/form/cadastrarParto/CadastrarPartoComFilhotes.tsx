@@ -3,6 +3,7 @@ import CadastrarParto from "./CadastrarParto";
 import CadastrarOvino from "../cadastrarOvino/CadastrarOvino";
 import { toast } from "react-toastify";
 import "./CadastrarPartoComFilhotes.css";
+import { useNavigate } from "react-router-dom";
 
 const CadastrarPartoComFilhotes: React.FC = () => {
   const [partoId, setPartoId] = useState<number | null>(null);
@@ -27,11 +28,14 @@ const CadastrarPartoComFilhotes: React.FC = () => {
 
   const handleFilhoteSuccess = () => setRestantes((n) => n - 1);
 
+  const navigate = useNavigate();
+
   useEffect(() => {
     if (partoId && restantes === 0) {
       toast.success(`Todos os filhotes do parto ${partoId} foram cadastrados!`);
+      navigate("/dashboard/ovinos/gerenciar");
     }
-  }, [restantes, partoId]);
+  }, [restantes, partoId, navigate]);
 
   if (!partoId) {
     return <CadastrarParto onSuccess={handlePartoSuccess} />;

@@ -6,15 +6,15 @@ import "./FilterBar.css";
 
 type TypeOption = { value: string; label: string };
 
-interface FilterBarProps {
+interface FilterBarProps<TStatus extends string = string> {
   q: string;
   setQ: (value: string) => void;
 
   tipo?: string;
   setTipo?: (value: string) => void;
 
-  status?: string;
-  setStatus?: (value: string) => void;
+  status?: TStatus;
+  setStatus?: React.Dispatch<React.SetStateAction<TStatus>>;
 
   dateFrom: string;
   setDateFrom: (value: string) => void;
@@ -37,7 +37,7 @@ interface FilterBarProps {
   allOptionValue?: string;
 }
 
-const FilterBar: React.FC<FilterBarProps> = ({
+const FilterBar = <TStatus extends string = string>({
   q,
   setQ,
   tipo,
@@ -53,12 +53,12 @@ const FilterBar: React.FC<FilterBarProps> = ({
   setViewAll,
   placeholder = "Buscar...",
   typeOptions,
-  statusOptions,
+  statusOptions = [],
   typeLabel = "Tipo",
   statusLabel = "Status",
   allOptionLabel = "Todos",
   allOptionValue = "TODOS",
-}) => {
+}: FilterBarProps<TStatus>) => {
   const normalizedTypeOptions: TypeOption[] =
     typeOptions && typeOptions.length > 0
       ? typeOptions.map((opt) =>
@@ -125,7 +125,7 @@ const FilterBar: React.FC<FilterBarProps> = ({
             className="filter-select"
             value={status ?? allOptionValue}
             onChange={(e) => {
-              setStatus(e.target.value);
+              setStatus(e.target.value as TStatus);
               setPage(1);
               setViewAll(false);
             }}

@@ -6,6 +6,7 @@ import Button from "../../common/buttons/Button";
 import PaginationMenu from "../../common/paginationMenu/PaginationMenu";
 import { useGestacoes } from "../../../api/hooks/gestacao/UseGestacoes";
 import { useOvinos } from "../../../api/hooks/ovino/UseOvinos";
+import { usePartos } from "../../../api/hooks/parto/UsePartos";
 import type { GestacaoResponseDTO } from "../../../api/dtos/gestacao/GestacaoResponseDTO";
 import FilterBar from "../../common/filter-bar/FilterBar";
 import ActionButtons from "../../common/buttons/ActionButtons";
@@ -22,6 +23,7 @@ function normalize(s?: string) {
 type GestacaoUI = GestacaoResponseDTO & {
   ovelhaPai?: { id: number; nome?: string; fbb?: string; rfid?: number };
   ovelhaMae?: { id: number; nome?: string; fbb?: string; rfid?: number };
+  statusGestacao?: "EM_ANDAMENTO" | "CONCLUIDA";
 };
 
 const PAGE_SIZE = 5;
@@ -29,14 +31,19 @@ const PAGE_SIZE = 5;
 const GerenciarGestacoes: React.FC = () => {
   const { gestacoes, loading, error } = useGestacoes();
   const { ovinos } = useOvinos();
+  const { partos } = usePartos();
 
   const [q, setQ] = useState("");
   const [dateFrom, setDateFrom] = useState("");
   const [dateTo, setDateTo] = useState("");
+  const [status, setStatus] = useState<"TODOS" | "EM_ANDAMENTO" | "CONCLUIDA">(
+    "TODOS"
+  );
   const [page, setPage] = useState(1);
   const [viewAll, setViewAll] = useState(false);
+  const [selectedGestacao, setSelectedGestacao] =
+    useState<GestacaoUI | null>(null);
 
-  const [selectedGestacao, setSelectedGestacao] = useState<GestacaoUI | null>(null);
 
   const gestacoesHydrated: GestacaoUI[] = useMemo(() => {
     return (gestacoes ?? []).map((g) => {
@@ -50,9 +57,16 @@ const GerenciarGestacoes: React.FC = () => {
           ? (ovinos.find((o) => o.id === g.ovelhaMae?.id) ?? g.ovelhaMae)
           : g.ovelhaMae;
 
-      return { ...g, ovelhaPai, ovelhaMae };
+      const concluida = partos?.some((p) => p.gestacao?.id === g.id) ?? false;
+
+      return {
+        ...g,
+        ovelhaPai,
+        ovelhaMae,
+        statusGestacao: concluida ? "CONCLUIDA" : "EM_ANDAMENTO",
+      };
     });
-  }, [gestacoes, ovinos]);
+  }, [gestacoes, ovinos, partos]);
 
   const filtered: GestacaoUI[] = useMemo(() => {
     const query = normalize(q.trim());
@@ -67,6 +81,8 @@ const GerenciarGestacoes: React.FC = () => {
           if (df && d < df) return false;
           if (dt && d > dt) return false;
         }
+
+        if (status !== "TODOS" && g.statusGestacao !== status) return false;
 
         if (!query) return true;
         const campos = [
@@ -86,7 +102,8 @@ const GerenciarGestacoes: React.FC = () => {
         const db = new Date(b.dataGestacao ?? "").getTime();
         return (db || 0) - (da || 0);
       });
-  }, [gestacoesHydrated, q, dateFrom, dateTo]);
+  }, [gestacoesHydrated, q, dateFrom, dateTo, status]);
+
 
   const totalPages = viewAll
     ? 1
@@ -97,10 +114,12 @@ const GerenciarGestacoes: React.FC = () => {
     ? filtered
     : filtered.slice(startIdx, startIdx + PAGE_SIZE);
 
+
   const clearFilters = () => {
     setQ("");
     setDateFrom("");
     setDateTo("");
+    setStatus("TODOS");
     setPage(1);
     setViewAll(false);
   };
@@ -110,6 +129,7 @@ const GerenciarGestacoes: React.FC = () => {
 
   return (
     <div className="gestacoes-page">
+     
       <div className="gestacoes-header flex">
         <h2>Gestações</h2>
         <Link to="/dashboard/ovinos/gestacoes/criar">
@@ -130,22 +150,29 @@ const GerenciarGestacoes: React.FC = () => {
         setPage={setPage}
         setViewAll={setViewAll}
         placeholder="Buscar por pai/mãe, FBB, RFID…"
+        status={status}
+        setStatus={setStatus}
+        statusLabel="Status"
+        statusOptions={[
+          { value: "EM_ANDAMENTO", label: "Em andamento" },
+          { value: "CONCLUIDA", label: "Concluída" },
+        ]}
       />
 
+     
       <div className="gestacoes-counter">
         Mostrando <strong>{pageItems.length}</strong> de{" "}
         <strong>{filtered.length}</strong> resultado(s).
       </div>
 
+   
       {pageItems.length === 0 ? (
         <div className="gestacoes-empty">Nenhuma gestação encontrada.</div>
       ) : (
         <div className="gestacoes-list">
           {pageItems.map((g) => (
-            <div
-              key={g.id}
-              className="gestacoes-card"
-            >
+            <div key={g.id} className="gestacoes-card">
+              
               <div>
                 <div className="gestacoes-col-title">Ovelha (mãe)</div>
                 <div className="gestacoes-col-main">
@@ -156,6 +183,8 @@ const GerenciarGestacoes: React.FC = () => {
                   {g.ovelhaMae?.rfid ?? "—"}
                 </div>
               </div>
+
+          
               <div>
                 <div className="gestacoes-col-title">Carneiro (pai)</div>
                 <div className="gestacoes-col-main">
@@ -166,31 +195,26 @@ const GerenciarGestacoes: React.FC = () => {
                   {g.ovelhaPai?.rfid ?? "—"}
                 </div>
               </div>
+
+        
               <div>
-                <div className="gestacoes-col-title">Data</div>
+                <div className="gestacoes-col-title">Início</div>
                 <div className="gestacoes-meta">
                   {formatDate(g.dataGestacao, true)}
                 </div>
               </div>
-              <div>
-                <div className="gestacoes-meta">
-                  <span>
-                    <Button
-                      variant="cardSecondary"
-                      onClick={() => setSelectedGestacao(g)}
-                    >
-                      Ver mais
-                    </Button>
-                  </span>
-                </div>
-              </div>
-              <div>
-                <div className="gestacoes-meta">
-                  <ActionButtons
-                    onEdit={() => setSelectedGestacao(g)}
-                    showRemove={false}
-                  />
-                </div>
+              <div className="gestacoes-actions flex">
+                <Button
+                  variant="cardSecondary"
+                  onClick={() => setSelectedGestacao(g)}
+                >
+                  Ver mais
+                </Button>
+
+                <ActionButtons
+                  onEdit={() => setSelectedGestacao(g)}
+                  showRemove={false}
+                />
               </div>
             </div>
           ))}
@@ -202,7 +226,7 @@ const GerenciarGestacoes: React.FC = () => {
           <PaginationMenu
             currentPage={currentPage}
             totalPages={totalPages}
-            onPageChange={(p) => setPage(p)}
+            onPageChange={setPage}
             showViewAll={filtered.length > PAGE_SIZE}
             onViewAll={() => {
               setViewAll(true);
