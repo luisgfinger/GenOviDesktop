@@ -1,5 +1,6 @@
 import React from "react";
 import OptionCard from "../../common/cards/optionCard/OptionCard";
+
 import Add from "../../../assets/icons/add.png";
 import Manage from "../../../assets/icons/manage.png";
 import Amamentacao from "../../../assets/icons/amamentacao.png";
@@ -23,71 +24,44 @@ const DashboardMenu: React.FC<DashboardMenuProps> = ({ location }) => {
       href: "/dashboard/ovinos/cadastrar",
     },
     {
-      images: [{ src: Manage, alt: "add" }],
+      images: [{ src: Manage, alt: "manage" }],
       text: "Gerenciar Ovinos",
       href: "/dashboard/ovinos/gerenciar",
     },
   ];
 
   const ovinosCardOptions2 = [
-    {
-      images: [{ src: Vacina, alt: "vacina" }],
-      text: "Vacinas",
-      href: "/",
-    },
-    {
-      images: [{ src: Medicamento, alt: "medicamento" }],
-      text: "Medicamentos",
-      href: "/",
-    },
-    {
-      images: [{ src: Doenca, alt: "doença" }],
-      text: "Doenças",
-      href: "/",
-    },
-     {
-      images: [{ src: Reproducao, alt: "reproducao" }],
-      text: "Reproduções",
-      href: "/",
-    },
-    {
-      images: [{ src: Gestacao, alt: "gestacao" }],
-      text: "Gestações",
-      href: "/",
-    },
-    {
-      images: [{ src: Amamentacao, alt: "amamentacao" }],
-      text: "Partos",
-      href: "/",
-    },
+    { images: [{ src: Vacina, alt: "vacina" }], text: "Vacinas", href: "/", childrenCount: 4 },
+    { images: [{ src: Medicamento, alt: "medicamento" }], text: "Medicamentos", href: "/", childrenCount: 4 },
+    { images: [{ src: Doenca, alt: "doença" }], text: "Doenças", href: "/", childrenCount: 3 },
+    { images: [{ src: Reproducao, alt: "reproducao" }], text: "Reproduções", href: "/", childrenCount: 2 },
+    { images: [{ src: Gestacao, alt: "gestacao" }], text: "Gestações", href: "/", childrenCount: 2 },
+    { images: [{ src: Amamentacao, alt: "amamentacao" }], text: "Partos", href: "/", childrenCount: 2 },
   ];
 
   const ovinoChildrenOptions = [
     { text: "Registrar vacinação", href: "/dashboard/ovinos/aplicacoes/cadastrar/vacina" },
-    { text: "Gerenciar vacinanões", href: "/dashboard/ovinos/vacinas/vacinacoes"},
+    { text: "Gerenciar vacinanões", href: "/dashboard/ovinos/vacinas/vacinacoes" },
     { text: "Cadastrar vacina", href: "/dashboard/ovinos/vacinas/criar" },
     { text: "Gerenciar vacinas", href: "/dashboard/ovinos/vacinas/gerenciar" },
-    
+
     { text: "Registrar aplicação", href: "/dashboard/ovinos/aplicacoes/cadastrar/medicamento" },
-    {text: "Gerenciar aplicações", href: "/dashboard/ovinos/medicamentos/medicacoes"},
+    { text: "Gerenciar aplicações", href: "/dashboard/ovinos/medicamentos/medicacoes" },
     { text: "Cadastrar medicamento", href: "/dashboard/ovinos/medicamentos/criar" },
     { text: "Gerenciar medicamentos", href: "/dashboard/ovinos/medicamentos/gerenciar" },
 
-    {text: "Registrar adoecimento", href: "/dashboard/ovinos/doencas/adoecimento"},
-    {text: "Animais doentes", href: "/dashboard/ovinos/doencas/doentes"},
-    {text: "Gerenciar doenças", href: "/dashboard/ovinos/doencas/gerenciar"},
+    { text: "Registrar adoecimento", href: "/dashboard/ovinos/doencas/adoecimento" },
+    { text: "Animais doentes", href: "/dashboard/ovinos/doencas/doentes" },
+    { text: "Gerenciar doenças", href: "/dashboard/ovinos/doencas/gerenciar" },
 
-    {text: "Registrar reprodução", href: "/dashboard/ovinos/reproducoes/criar"},
-    {text: "Gerenciar reproduções", href: "/dashboard/ovinos/reproducoes/gerenciar"},
-    {text: "Mais opções", href: "#"},
+    { text: "Registrar reprodução", href: "/dashboard/ovinos/reproducoes/criar" },
+    { text: "Gerenciar reproduções", href: "/dashboard/ovinos/reproducoes/gerenciar" },
 
-    {text: "Registrar gestação", href: "/dashboard/ovinos/gestacoes/criar"},
-    {text: "Gerenciar gestações", href: "/dashboard/ovinos/gestacoes/gerenciar"},
-    {text: "Mais opções", href: "#"},
+    { text: "Registrar gestação", href: "/dashboard/ovinos/gestacoes/criar" },
+    { text: "Gerenciar gestações", href: "/dashboard/ovinos/gestacoes/gerenciar" },
 
-    {text: "Registrar parto", href: "/dashboard/ovinos/partos/criar"},
-    {text: "Gerenciar partos", href: "/dashboard/ovinos/partos/gerenciar"},
-    {text: "Mais opções", href: "#"},
+    { text: "Registrar parto", href: "/dashboard/ovinos/partos/criar" },
+    { text: "Gerenciar partos", href: "/dashboard/ovinos/partos/gerenciar" },
   ];
 
   const funcionariosCardOptions = [
@@ -97,17 +71,20 @@ const DashboardMenu: React.FC<DashboardMenuProps> = ({ location }) => {
       href: "/dashboard/funcionarios/cadastrar",
     },
     {
-      images: [{ src: Manage, alt: "add" }],
+      images: [{ src: Manage, alt: "manage" }],
       text: "Gerenciar Funcionario",
       href: "/dashboard/funcionarios/gerenciar",
     },
   ];
 
+  let start = 0;
+
   return (
     <ul className="dashboardMenu-content flex-column">
       <li>
-        <h3>{location == "ovino" ? "Ovinos" : "Funcionarios"}</h3>
+        <h3>{location === "ovino" ? "Ovinos" : "Funcionários"}</h3>
       </li>
+
       <li className="dashboardMenu-content-optionsLine dashboardMenu-content-optionsLine-line1 flex">
         {location === "ovino"
           ? ovinosCardOptions.map((option, index) => (
@@ -127,17 +104,18 @@ const DashboardMenu: React.FC<DashboardMenuProps> = ({ location }) => {
               />
             ))}
       </li>
+
       {location === "ovino" && (
         <>
           <li>
-            <h3>Saúde</h3>
+            <h3>Saúde e Reprodução</h3>
           </li>
+
           <li className="dashboardMenu-content-optionsLine flex">
             {ovinosCardOptions2.map((option, index) => {
-              const childrenForCard = ovinoChildrenOptions.slice(
-                index * 4,
-                index * 4 + 4
-              );
+              const end = start + option.childrenCount;
+              const childrenForCard = ovinoChildrenOptions.slice(start, end);
+              start = end;
 
               return (
                 <OptionCard

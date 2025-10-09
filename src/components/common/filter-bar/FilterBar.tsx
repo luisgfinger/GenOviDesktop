@@ -13,6 +13,9 @@ interface FilterBarProps {
   tipo?: string;
   setTipo?: (value: string) => void;
 
+  status?: string;
+  setStatus?: (value: string) => void;
+
   dateFrom: string;
   setDateFrom: (value: string) => void;
   dateTo: string;
@@ -25,8 +28,10 @@ interface FilterBarProps {
   placeholder?: string;
 
   typeOptions?: Array<TypeOption | string>;
+  statusOptions?: Array<TypeOption | string>;
 
   typeLabel?: string;
+  statusLabel?: string;
 
   allOptionLabel?: string;
   allOptionValue?: string;
@@ -37,6 +42,8 @@ const FilterBar: React.FC<FilterBarProps> = ({
   setQ,
   tipo,
   setTipo,
+  status,
+  setStatus,
   dateFrom,
   setDateFrom,
   dateTo,
@@ -46,11 +53,13 @@ const FilterBar: React.FC<FilterBarProps> = ({
   setViewAll,
   placeholder = "Buscar...",
   typeOptions,
+  statusOptions,
   typeLabel = "Tipo",
+  statusLabel = "Status",
   allOptionLabel = "Todos",
   allOptionValue = "TODOS",
 }) => {
-  const normalizedOptions: TypeOption[] =
+  const normalizedTypeOptions: TypeOption[] =
     typeOptions && typeOptions.length > 0
       ? typeOptions.map((opt) =>
           typeof opt === "string" ? { value: opt, label: formatEnum(opt) } : opt
@@ -59,6 +68,13 @@ const FilterBar: React.FC<FilterBarProps> = ({
           value: t,
           label: formatEnum(t),
         }));
+
+  const normalizedStatusOptions: TypeOption[] =
+    statusOptions && statusOptions.length > 0
+      ? statusOptions.map((opt) =>
+          typeof opt === "string" ? { value: opt, label: formatEnum(opt) } : opt
+        )
+      : [];
 
   return (
     <div className="filters flex">
@@ -77,6 +93,7 @@ const FilterBar: React.FC<FilterBarProps> = ({
           }}
         />
       </div>
+
       {setTipo && (
         <div className="filter-group flex-column">
           <label htmlFor="tipo">{typeLabel}</label>
@@ -91,7 +108,30 @@ const FilterBar: React.FC<FilterBarProps> = ({
             }}
           >
             <option value={allOptionValue}>{allOptionLabel}</option>
-            {normalizedOptions.map((opt) => (
+            {normalizedTypeOptions.map((opt) => (
+              <option key={opt.value} value={opt.value}>
+                {opt.label}
+              </option>
+            ))}
+          </select>
+        </div>
+      )}
+
+      {setStatus && (
+        <div className="filter-group flex-column">
+          <label htmlFor="status">{statusLabel}</label>
+          <select
+            id="status"
+            className="filter-select"
+            value={status ?? allOptionValue}
+            onChange={(e) => {
+              setStatus(e.target.value);
+              setPage(1);
+              setViewAll(false);
+            }}
+          >
+            <option value={allOptionValue}>{allOptionLabel}</option>
+            {normalizedStatusOptions.map((opt) => (
               <option key={opt.value} value={opt.value}>
                 {opt.label}
               </option>

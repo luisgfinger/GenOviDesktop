@@ -1,11 +1,9 @@
-import React, { useMemo, useState } from "react";
-import "./PartoDetalhes.css";
-import ActionButtons from "../../common/buttons/ActionButtons";
-import Button from "../../common/buttons/Button";
+import React, { useMemo } from "react";
+import DetalhesBase, { type CampoConfig } from "../../common/detalhesBase/DetalhesBase";
 import type { PartoResponseDTO } from "../../../api/dtos/parto/PartoResponseDTO";
 import { PartoService } from "../../../api/services/parto/PartoService";
 import { useOvinos } from "../../../api/hooks/ovino/UseOvinos";
-import type { Ovino } from "../../../api/models/ovino/OvinoModel";
+import { useGestacoes } from "../../../api/hooks/gestacao/UseGestacoes";
 import { toast } from "react-toastify";
 import { TypeSexo } from "../../../api/enums/typeSexo/TypeSexo";
 
@@ -39,14 +37,8 @@ interface PartoDetalhesProps {
 }
 
 const PartoDetalhes: React.FC<PartoDetalhesProps> = ({ parto, onClose }) => {
-  const { ovinos, loading: loadingOvinos, error } = useOvinos();
-
-  const [editMode, setEditMode] = useState<
-    Partial<Record<keyof PartoResponseDTO, boolean>>
-  >({});
-  const [updated, setUpdated] = useState<PartoResponseDTO>(parto);
-  const [hasChanges, setHasChanges] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const { ovinos, loading: loadingOvinos } = useOvinos();
+  const { gestacoes, loading: loadingGestacoes } = useGestacoes();
 
   const machos = useMemo(
     () =>
@@ -68,181 +60,129 @@ const PartoDetalhes: React.FC<PartoDetalhesProps> = ({ parto, onClose }) => {
     [ovinos]
   );
 
-  const handleEditField = (field: keyof PartoResponseDTO) => {
-    setEditMode((prev) => ({ ...prev, [field]: !prev[field] }));
-  };
+  const campos: CampoConfig<PartoResponseDTO>[] = [
+    {
+      label: "Data do Parto",
+      key: "dataParto",
+      renderView: (valor) => formatISODateTime(valor),
+      renderEdit: (valor, onChange) => (
+        <input
+          type="datetime-local"
+          value={valor ? new Date(valor).toISOString().slice(0, 16) : ""}
+          onChange={(e) => onChange(e.target.value)}
+        />
+      ),
+    },
+    {
+      label: "Pai (Carneiro)",
+      key: "ovelhaPai",
+      renderView: (valor) => valor?.nome ?? "—",
+      renderEdit: (_, onChange) =>
+        loadingOvinos ? (
+          <span>Carregando...</span>
+        ) : (
+          <select
+            onChange={(e) => {
+              const selected = machos.find(
+                (m) => m.id === Number(e.target.value)
+              );
+              onChange(selected);
+            }}
+            defaultValue={parto.ovelhaPai?.id ?? ""}
+          >
+            <option value="">Selecione</option>
+            {machos.map((m) => (
+              <option key={m.id} value={m.id}>
+                {m.nome || `#${m.id}`} — RFID: {m.rfid ?? "—"}
+              </option>
+            ))}
+          </select>
+        ),
+    },
+    {
+      label: "Mãe (Ovelha)",
+      key: "ovelhaMae",
+      renderView: (valor) => valor?.nome ?? "—",
+      renderEdit: (_, onChange) =>
+        loadingOvinos ? (
+          <span>Carregando...</span>
+        ) : (
+          <select
+            onChange={(e) => {
+              const selected = femeas.find(
+                (f) => f.id === Number(e.target.value)
+              );
+              onChange(selected);
+            }}
+            defaultValue={parto.ovelhaMae?.id ?? ""}
+          >
+            <option value="">Selecione</option>
+            {femeas.map((f) => (
+              <option key={f.id} value={f.id}>
+                {f.nome || `#${f.id}`} — RFID: {f.rfid ?? "—"}
+              </option>
+            ))}
+          </select>
+        ),
+    },
+    {
+      label: "Gestação vinculada",
+      key: "gestacao",
+      renderView: (valor) =>
+        valor?.id
+          ? `#${valor.id} — ${formatISODateTime(valor.dataGestacao)}`
+          : "—",
+      renderEdit: (_, onChange) =>
+        loadingGestacoes ? (
+          <span>Carregando gestações...</span>
+        ) : (
+          <select
+            onChange={(e) => {
+              const selected = gestacoes.find(
+                (g) => g.id === Number(e.target.value)
+              );
+              onChange(selected);
+            }}
+            defaultValue={parto.gestacao?.id ?? ""}
+          >
+            <option value="">Selecione</option>
+            {gestacoes.map((g) => (
+              <option key={g.id} value={g.id}>
+                {`#${g.id}`} — {formatISODateTime(g.dataGestacao)}
+              </option>
+            ))}
+          </select>
+        ),
+    },
+  ];
 
-  const handleChange = (field: keyof PartoResponseDTO, value: any) => {
-    setUpdated((prev) => ({ ...prev, [field]: value }));
-    setHasChanges(true);
-  };
-
-  const handleSave = async () => {
-    if (!updated.id) return;
-    try {
-      setLoading(true);
-      const dto = {
-        ovelhaMaeId: updated.ovelhaMae?.id,
-        ovelhaPaiId: updated.ovelhaPai?.id,
-        dataParto: updated.dataParto ?? "",
-        gestacaoId: updated.gestacao?.id ?? undefined,
-      };
-      console.log(dto);
-      console.log(updated.id);
-
-      await PartoService.editar(updated.id, dto);
-      toast.success("Alterações salvas com sucesso!");
-      setHasChanges(false);
-      setEditMode({});
-    } catch (err) {
-      console.error(err);
-      toast.error("Erro ao salvar alterações.");
-    } finally {
-      setLoading(false);
-    }
+  const handleSave = async (atualizado: PartoResponseDTO) => {
+    if (!atualizado.id) return;
+    await PartoService.editar(atualizado.id, {
+      ovelhaMaeId: atualizado.ovelhaMae?.id,
+      ovelhaPaiId: atualizado.ovelhaPai?.id,
+      dataParto: atualizado.dataParto ?? "",
+      gestacaoId: atualizado.gestacao?.id ?? undefined,
+    });
+    toast.success("Alterações salvas com sucesso!");
   };
 
   const handleRemove = async () => {
-    if (!updated.id) return;
-    if (!window.confirm("Tem certeza que deseja remover este parto?")) return;
-
-    try {
-      setLoading(true);
-      await PartoService.remover(updated.id);
-      toast.success("Parto removido com sucesso!");
-      onClose();
-    } catch (err) {
-      console.error(err);
-      toast.error("Erro ao remover parto.");
-    } finally {
-      setLoading(false);
-    }
+    if (!parto.id) return;
+    await PartoService.remover(parto.id);
+    toast.success("Parto removido com sucesso!");
+    onClose();
   };
 
   return (
-    <div className="parto-detalhes-overlay">
-      <div className="parto-detalhes-card">
-        <ActionButtons
-          className="remove-btn"
-          showEdit={false}
-          onRemove={handleRemove}
-        />
-
-        <h2>Detalhes do Parto</h2>
-
-        {error && <p style={{ color: "red" }}>{error}</p>}
-
-        <div className="parto-info">
-          <div className="parto-row">
-            <strong>Data do Parto:</strong>
-            {editMode.dataParto ? (
-              <input
-                type="datetime-local"
-                value={
-                  updated.dataParto
-                    ? new Date(updated.dataParto).toISOString().slice(0, 16)
-                    : ""
-                }
-                onChange={(e) => handleChange("dataParto", e.target.value)}
-              />
-            ) : (
-              <span>{formatISODateTime(updated.dataParto)}</span>
-            )}
-            <ActionButtons
-              onEdit={() => handleEditField("dataParto")}
-              showRemove={false}
-            />
-          </div>
-
-          <div className="parto-row">
-            <strong>Carneiro (Pai):</strong>
-            {editMode.ovelhaPai ? (
-              loadingOvinos ? (
-                <span>Carregando...</span>
-              ) : (
-                <select
-                  value={updated.ovelhaPai?.id ?? ""}
-                  onChange={(e) => {
-                    const selected = machos?.find(
-                      (o) => o.id === Number(e.target.value)
-                    );
-                    handleChange("ovelhaPai", selected as Ovino);
-                  }}
-                >
-                  <option value="">Selecione</option>
-                  {machos?.map((m) => (
-                    <option key={m.id} value={m.id}>
-                      {m.nome || `#${m.id}`} — RFID: {m.rfid ?? "—"}
-                    </option>
-                  ))}
-                </select>
-              )
-            ) : (
-              <span>{updated.ovelhaPai?.nome ?? "—"}</span>
-            )}
-            <ActionButtons
-              onEdit={() => handleEditField("ovelhaPai")}
-              showRemove={false}
-            />
-          </div>
-
-          <div className="parto-row">
-            <strong>Ovelha (Mãe):</strong>
-            {editMode.ovelhaMae ? (
-              loadingOvinos ? (
-                <span>Carregando...</span>
-              ) : (
-                <select
-                  value={updated.ovelhaMae?.id ?? ""}
-                  onChange={(e) => {
-                    const selected = femeas?.find(
-                      (o) => o.id === Number(e.target.value)
-                    );
-                    handleChange("ovelhaMae", selected as Ovino);
-                  }}
-                >
-                  <option value="">Selecione</option>
-                  {femeas?.map((f) => (
-                    <option key={f.id} value={f.id}>
-                      {f.nome || `#${f.id}`} — RFID: {f.rfid ?? "—"}
-                    </option>
-                  ))}
-                </select>
-              )
-            ) : (
-              <span>{updated.ovelhaMae?.nome ?? "—"}</span>
-            )}
-            <ActionButtons
-              onEdit={() => handleEditField("ovelhaMae")}
-              showRemove={false}
-            />
-          </div>
-
-          <div className="parto-row">
-            <strong>Gestação vinculada:</strong>
-            <span>
-              {updated.gestacao?.id
-                ? `#${updated.gestacao.id} — ${formatISODateTime(
-                    updated.gestacao.dataGestacao
-                  )}`
-                : "—"}
-            </span>
-          </div>
-        </div>
-
-        <div className="parto-footer">
-          {hasChanges ? (
-            <Button variant="cardPrimary" onClick={handleSave} disabled={loading}>
-              {loading ? "Salvando..." : "Salvar alterações"}
-            </Button>
-          ) : (
-            <Button variant="cardSecondary" onClick={onClose} disabled={loading}>
-              {loading ? "Carregando..." : "Fechar"}
-            </Button>
-          )}
-        </div>
-      </div>
-    </div>
+    <DetalhesBase
+      titulo="Detalhes do Parto"
+      item={parto}
+      campos={campos}
+      onSave={handleSave}
+      onRemove={handleRemove}
+      onClose={onClose}
+    />
   );
 };
 

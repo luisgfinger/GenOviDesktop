@@ -1,9 +1,7 @@
-import React, { useState } from "react";
-import "./DoencaDetalhes.css";
-import ActionButtons from "../../common/buttons/ActionButtons";
-import Button from "../../common/buttons/Button";
-import { DoencaService } from "../../../api/services/doenca/DoencaService";
+import React from "react";
+import DetalhesBase, { type CampoConfig } from "../../common/detalhesBase/DetalhesBase";
 import type { DoencaResponseDTO } from "../../../api/dtos/doenca/DoencaResponseDTO";
+import { DoencaService } from "../../../api/services/doenca/DoencaService";
 import { toast } from "react-toastify";
 
 interface DoencaDetalhesProps {
@@ -12,128 +10,66 @@ interface DoencaDetalhesProps {
 }
 
 const DoencaDetalhes: React.FC<DoencaDetalhesProps> = ({ doenca, onClose }) => {
-  const [editMode, setEditMode] = useState<
-    Partial<Record<keyof DoencaResponseDTO, boolean>>
-  >({});
-  const [updated, setUpdated] = useState<DoencaResponseDTO>(doenca);
-  const [hasChanges, setHasChanges] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const campos: CampoConfig<DoencaResponseDTO>[] = [
+    {
+      label: "Nome da Doença",
+      key: "nome",
+      renderView: (valor) => valor ?? "—",
+      renderEdit: (valor, onChange) => (
+        <input
+          type="text"
+          value={valor ?? ""}
+          onChange={(e) => onChange(e.target.value)}
+          placeholder="Digite o nome da doença"
+        />
+      ),
+    },
+    {
+      label: "Descrição",
+      key: "descricao",
+      renderView: (valor) => (
+        <span className="text-breaker">{valor ?? "—"}</span>
+      ),
+      renderEdit: (valor, onChange) => (
+        <textarea
+          value={valor ?? ""}
+          onChange={(e) => onChange(e.target.value)}
+          rows={4}
+          placeholder="Descreva os sintomas, causas, etc."
+          maxLength={255}
+        />
+      ),
+    },
+  ];
 
-  const handleEditField = (field: keyof DoencaResponseDTO) => {
-    setEditMode((prev) => ({ ...prev, [field]: !prev[field] }));
-  };
+  const handleSave = async (atualizado: DoencaResponseDTO) => {
+    if (!atualizado.id) return;
+    const dto = {
+      nome: atualizado.nome,
+      descricao: atualizado.descricao ?? "",
+    };
 
-  const handleChange = (field: keyof DoencaResponseDTO, value: any) => {
-    setUpdated((prev) => ({ ...prev, [field]: value }));
-    setHasChanges(true);
-  };
-
-  const handleSave = async () => {
-    if (!updated.id) return;
-    try {
-      setLoading(true);
-
-      const dto = {
-        nome: updated.nome,
-        descricao: updated.descricao ?? "",
-      };
-
-      await DoencaService.editar(updated.id, dto);
-      toast.success("💾 Alterações salvas com sucesso!");
-      setHasChanges(false);
-      setEditMode({});
-    } catch (err) {
-      console.error(err);
-      toast.error("❌ Erro ao salvar alterações.");
-    } finally {
-      setLoading(false);
-    }
+    await DoencaService.editar(atualizado.id, dto);
+    toast.success("💾 Alterações salvas com sucesso!");
   };
 
   const handleRemove = async () => {
-    if (!updated.id) return;
+    if (!doenca.id) return;
     if (!window.confirm("Tem certeza que deseja remover esta doença?")) return;
-
-    try {
-      setLoading(true);
-      await DoencaService.remover(updated.id);
-      toast.success("🗑️ Doença removida com sucesso!");
-      onClose();
-    } catch (err) {
-      console.error(err);
-      toast.error("❌ Erro ao remover a doença.");
-    } finally {
-      setLoading(false);
-    }
+    await DoencaService.remover(doenca.id);
+    toast.success("🗑️ Doença removida com sucesso!");
+    onClose();
   };
 
   return (
-    <div className="doenca-detalhes-overlay">
-      <div className="doenca-detalhes-card">
-        <ActionButtons
-          className="remove-btn"
-          showEdit={false}
-          onRemove={handleRemove}
-        />
-
-        <h2>Detalhes da Doença</h2>
-
-        <div className="doenca-info">
-          <div className="doenca-row">
-            <strong>Nome:</strong>
-            {editMode.nome ? (
-              <input
-                type="text"
-                value={updated.nome}
-                onChange={(e) => handleChange("nome", e.target.value)}
-              />
-            ) : (
-              <span>{updated.nome}</span>
-            )}
-            <ActionButtons
-              onEdit={() => handleEditField("nome")}
-              showRemove={false}
-            />
-          </div>
-
-          <div className="doenca-row">
-            <strong>Descrição:</strong>
-            {editMode.descricao ? (
-              <textarea
-                value={updated.descricao ?? ""}
-                onChange={(e) => handleChange("descricao", e.target.value)}
-              />
-            ) : (
-              <span>{updated.descricao ?? "—"}</span>
-            )}
-            <ActionButtons
-              onEdit={() => handleEditField("descricao")}
-              showRemove={false}
-            />
-          </div>
-        </div>
-
-        <div className="doenca-footer">
-          {hasChanges ? (
-            <Button
-              variant="cardPrimary"
-              onClick={handleSave}
-              disabled={loading}
-            >
-              {loading ? "Salvando..." : "Salvar Alterações"}
-            </Button>
-          ) : (
-            <Button
-              variant="cardSecondary"
-              onClick={onClose}
-              disabled={loading}
-            >
-              {loading ? "Carregando..." : "Fechar"}
-            </Button>
-          )}
-        </div>
-      </div>
-    </div>
+    <DetalhesBase
+      titulo="Detalhes da Doença"
+      item={doenca}
+      campos={campos}
+      onSave={handleSave}
+      onRemove={handleRemove}
+      onClose={onClose}
+    />
   );
 };
 

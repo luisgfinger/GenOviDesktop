@@ -77,6 +77,7 @@ const CadastrarOvino: React.FC<CadastrarOvinoProps> = ({
       (ovinos ?? []).filter(
         (o) =>
           o.sexo === TypeSexo.MACHO &&
+          o.status == TypeStatus.ATIVO &&
           monthsBetween(o.dataNascimento) >= MIN_MALE_MONTHS
       ),
     [ovinos]
@@ -86,6 +87,7 @@ const CadastrarOvino: React.FC<CadastrarOvinoProps> = ({
       (ovinos ?? []).filter(
         (o) =>
           o.sexo === TypeSexo.FEMEA &&
+          o.status == TypeStatus.ATIVO &&
           monthsBetween(o.dataNascimento) >= MIN_FEMALE_MONTHS
       ),
     [ovinos]

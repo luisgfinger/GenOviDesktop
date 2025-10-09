@@ -23,17 +23,16 @@ import CadastrarAplicacao from "../../components/form/cadastrarAplicacao/Cadastr
 import GerenciarAplicacoes from "../../components/dashboard/aplicacoes/GerenciarAplicacoes";
 
 const Dashboard: React.FC = () => {
-  const [searchQuery, setSearchQuery] = useState("");
 
   return (
     <div className="dashboard-container flex">
       <div className="dashboard-inside flex-column">
-        <PageTitle onSearch={setSearchQuery} />
+        <PageTitle/>
         <Routes>
           <Route path="ovinos" element={<DashboardMenu location="ovino"/>} />
           <Route
             path="ovinos/gerenciar"
-            element={<Gerenciar searchQuery={searchQuery} type="ovino"/>}
+            element={<Gerenciar type="ovino"/>}
           />
            <Route
             path="ovinos/cadastrar"
@@ -45,7 +44,7 @@ const Dashboard: React.FC = () => {
           />
           <Route
             path="funcionarios/gerenciar"
-            element={<Gerenciar searchQuery={searchQuery} type="funcionario"/>}
+            element={<Gerenciar type="funcionario"/>}
           />
            <Route
             path="funcionarios/cadastrar"
@@ -59,15 +58,15 @@ const Dashboard: React.FC = () => {
           <Route path="ovinos/partos/criar" element={<CadastrarPartoComFilhotes/>}/>
           <Route path="ovinos/partos/gerenciar" element={<GerenciarPartos/>}/>
           <Route path="ovinos/doencas/criar" element={<CadastrarDoenca />}/>
-          <Route path="ovinos/doencas/gerenciar" element={<GerenciarDoencas searchQuery={searchQuery}/>}/>
+          <Route path="ovinos/doencas/gerenciar" element={<GerenciarDoencas />}/>
           <Route path="ovinos/doencas/adoecimento" element={<CadastrarOcorrenciaDoenca />}/>
           <Route path="ovinos/doencas/doentes" element={<GerenciarOcorrenciaDoencas />}/>
           <Route path="ovinos/medicamentos/criar" element={<CadastrarMedicamento isVacina={false}/>}/>
-          <Route path="ovinos/medicamentos/gerenciar" element={<GerenciarMedicamentos searchQuery={searchQuery} isVacina={false}/>}/>
+          <Route path="ovinos/medicamentos/gerenciar" element={<GerenciarMedicamentos isVacina={false}/>}/>
           <Route path="ovinos/aplicacoes/cadastrar/medicamento" element={<CadastrarAplicacao isVacina={false}/>}/>
           <Route path="ovinos/aplicacoes/cadastrar/vacina" element={<CadastrarAplicacao isVacina={true}/>}/>
           <Route path="ovinos/vacinas/criar" element={<CadastrarMedicamento isVacina={true}/>}/>
-          <Route path="ovinos/vacinas/gerenciar" element={<GerenciarMedicamentos searchQuery={searchQuery} isVacina={true}/>}/>
+          <Route path="ovinos/vacinas/gerenciar" element={<GerenciarMedicamentos isVacina={true}/>}/>
           <Route path="ovinos/vacinas/vacinacoes" element={<GerenciarAplicacoes isVacina={true}/>}/>
           <Route path="ovinos/medicamentos/medicacoes" element={<GerenciarAplicacoes isVacina={false}/>}/>
         </Routes>

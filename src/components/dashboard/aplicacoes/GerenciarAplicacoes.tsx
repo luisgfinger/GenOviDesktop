@@ -33,7 +33,9 @@ interface GerenciarAplicacoesProps {
   isVacina: boolean;
 }
 
-const GerenciarAplicacoes: React.FC<GerenciarAplicacoesProps> = ({ isVacina }) => {
+const GerenciarAplicacoes: React.FC<GerenciarAplicacoesProps> = ({
+  isVacina,
+}) => {
   const { aplicacoes, loading, error } = useAplicacoes();
 
   const [q, setQ] = useState("");
@@ -43,13 +45,16 @@ const GerenciarAplicacoes: React.FC<GerenciarAplicacoesProps> = ({ isVacina }) =
   const [viewAll, setViewAll] = useState(false);
   const [selected, setSelected] = useState<AplicacaoResponseDTO | null>(null);
 
-  const items = useMemo<AplicacaoResponseDTO[]>(() => aplicacoes ?? [], [aplicacoes]);
+  const items = useMemo<AplicacaoResponseDTO[]>(
+    () => aplicacoes ?? [],
+    [aplicacoes]
+  );
 
   const filteredByType = useMemo(
     () => items.filter((a) => a.medicamento?.isVacina === isVacina),
     [items, isVacina]
   );
-  
+
   const filtered: AplicacaoResponseDTO[] = useMemo(() => {
     const query = normalize(q.trim());
     const df = dateFrom ? new Date(`${dateFrom}T00:00:00`) : null;
@@ -83,10 +88,14 @@ const GerenciarAplicacoes: React.FC<GerenciarAplicacoesProps> = ({ isVacina }) =
       });
   }, [filteredByType, q, dateFrom, dateTo]);
 
-  const totalPages = viewAll ? 1 : Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+  const totalPages = viewAll
+    ? 1
+    : Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
   const currentPage = viewAll ? 1 : Math.min(page, totalPages);
   const startIdx = (currentPage - 1) * PAGE_SIZE;
-  const pageItems = viewAll ? filtered : filtered.slice(startIdx, startIdx + PAGE_SIZE);
+  const pageItems = viewAll
+    ? filtered
+    : filtered.slice(startIdx, startIdx + PAGE_SIZE);
 
   const clearFilters = () => {
     setQ("");
@@ -96,7 +105,8 @@ const GerenciarAplicacoes: React.FC<GerenciarAplicacoesProps> = ({ isVacina }) =
     setViewAll(false);
   };
 
-  if (loading) return <p>Carregando {isVacina ? "vacinas…" : "medicamentos…"} </p>;
+  if (loading)
+    return <p>Carregando {isVacina ? "vacinas…" : "medicamentos…"} </p>;
   if (error) return <p style={{ color: "red" }}>{error}</p>;
 
   return (
@@ -162,7 +172,8 @@ const GerenciarAplicacoes: React.FC<GerenciarAplicacoesProps> = ({ isVacina }) =
                   </span>
                   <br />
                   <span>
-                    <strong>Fabricante:</strong> {a.medicamento?.fabricante ?? "—"}
+                    <strong>Fabricante:</strong>{" "}
+                    {a.medicamento?.fabricante ?? "—"}
                   </span>
                 </div>
               </div>
@@ -170,7 +181,10 @@ const GerenciarAplicacoes: React.FC<GerenciarAplicacoesProps> = ({ isVacina }) =
                 <Button variant="cardSecondary" onClick={() => setSelected(a)}>
                   Ver mais
                 </Button>
-                <ActionButtons onEdit={() => setSelected(a)} showRemove={false} />
+                <ActionButtons
+                  onEdit={() => setSelected(a)}
+                  showRemove={false}
+                />
               </div>
             </div>
           ))}
@@ -194,7 +208,11 @@ const GerenciarAplicacoes: React.FC<GerenciarAplicacoesProps> = ({ isVacina }) =
 
       {viewAll && filtered.length > PAGE_SIZE && (
         <div className="aplicacao-pagination">
-          <Button type="button" variant="cardSecondary" onClick={() => setViewAll(false)}>
+          <Button
+            type="button"
+            variant="cardSecondary"
+            onClick={() => setViewAll(false)}
+          >
             Voltar à paginação
           </Button>
         </div>
@@ -202,6 +220,7 @@ const GerenciarAplicacoes: React.FC<GerenciarAplicacoesProps> = ({ isVacina }) =
 
       {selected && (
         <AplicacaoDetalhes
+          isVacina={selected.medicamento.isVacina}
           aplicacao={selected}
           onClose={() => setSelected(null)}
         />
