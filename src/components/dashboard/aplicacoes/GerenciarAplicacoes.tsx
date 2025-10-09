@@ -10,15 +10,7 @@ import AplicacaoDetalhes from "./AplicacaoDetalhes";
 
 import { useAplicacoes } from "../../../api/hooks/aplicacao/UseAplicacoes";
 import type { AplicacaoResponseDTO } from "../../../api/dtos/aplicacao/AplicacaoResponseDTO";
-
-function formatISODateTime(iso?: string) {
-  if (!iso) return "—";
-  const d = new Date(iso);
-  if (Number.isNaN(d.getTime())) return "—";
-  const dia = d.toLocaleDateString();
-  const hora = d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
-  return `${dia} ${hora}`;
-}
+import { formatDate } from "../../../utils/formatDate";
 
 function normalize(s?: string) {
   return (s ?? "")
@@ -76,7 +68,7 @@ const GerenciarAplicacoes: React.FC<GerenciarAplicacoesProps> = ({
           a.medicamento?.nome ?? "",
           a.medicamento?.fabricante ?? "",
           String(a.ovino?.rfid ?? ""),
-          formatISODateTime(a.dataAplicacao),
+          formatDate(a.dataAplicacao, true),
         ].map((x) => normalize(x));
 
         return campos.some((c) => c.includes(query));
@@ -163,7 +155,7 @@ const GerenciarAplicacoes: React.FC<GerenciarAplicacoesProps> = ({
                 </div>
                 <div className="aplicacao-meta">
                   <span>
-                    <strong>Data:</strong> {formatISODateTime(a.dataAplicacao)}
+                    <strong>Data:</strong> {formatDate(a.dataAplicacao, true)}
                   </span>
                   <br />
                   <span>

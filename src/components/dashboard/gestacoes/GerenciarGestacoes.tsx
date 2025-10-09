@@ -10,15 +10,7 @@ import type { GestacaoResponseDTO } from "../../../api/dtos/gestacao/GestacaoRes
 import FilterBar from "../../common/filter-bar/FilterBar";
 import ActionButtons from "../../common/buttons/ActionButtons";
 import GestacaoDetalhes from "./GestacaoDetalhes";
-
-function formatISODateTime(iso?: string) {
-  if (!iso) return "—";
-  const d = new Date(iso);
-  if (Number.isNaN(d.getTime())) return "—";
-  const dia = d.toLocaleDateString();
-  const hora = d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
-  return `${dia} ${hora}`;
-}
+import { formatDate } from "../../../utils/formatDate";
 
 function normalize(s?: string) {
   return (s ?? "")
@@ -84,7 +76,7 @@ const GerenciarGestacoes: React.FC = () => {
           g.ovelhaMae?.fbb ?? "",
           String(g.ovelhaPai?.rfid ?? ""),
           String(g.ovelhaMae?.rfid ?? ""),
-          formatISODateTime(g.dataGestacao),
+          formatDate(g.dataGestacao, true),
         ].map((x) => normalize(x));
 
         return campos.some((c) => c.includes(query));
@@ -177,7 +169,7 @@ const GerenciarGestacoes: React.FC = () => {
               <div>
                 <div className="gestacoes-col-title">Data</div>
                 <div className="gestacoes-meta">
-                  {formatISODateTime(g.dataGestacao)}
+                  {formatDate(g.dataGestacao, true)}
                 </div>
               </div>
               <div>

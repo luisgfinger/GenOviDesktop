@@ -8,15 +8,7 @@ import FilterBar from "../../common/filter-bar/FilterBar";
 
 import { useOcorrenciasDoenca } from "../../../api/hooks/ocorrenciaDoencas/UseOcorrenciaDoencas";
 import type { OcorrenciaDoencaResponseDTO } from "../../../api/dtos/ocorrendiaDoenca/OcorrenciaDoencaResponseDTO";
-
-function formatISODateTime(iso?: string) {
-  if (!iso) return "—";
-  const d = new Date(iso);
-  if (Number.isNaN(d.getTime())) return "—";
-  const dia = d.toLocaleDateString();
-  const hora = d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
-  return `${dia} ${hora}`;
-}
+import { formatDate } from "../../../utils/formatDate";
 
 function normalize(s?: string) {
   return (s ?? "")
@@ -59,8 +51,8 @@ const GerenciarOcorrenciaDoencas: React.FC = () => {
           p.doenca.nome ?? "",
           String(p.ovino.rfid ?? ""),
           p.ovino.fbb ?? "",
-          formatISODateTime(p.dataInicio),
-          formatISODateTime(p.dataInicio),
+          formatDate(p.dataInicio, true),
+          formatDate(p.dataInicio, true),
         ].map((x) => normalize(x));
 
         return campos.some((c) => c.includes(query));
@@ -137,7 +129,7 @@ const GerenciarOcorrenciaDoencas: React.FC = () => {
                   <br />
                   <span>
                     <strong>Data Início:</strong>{" "}
-                    {formatISODateTime(g.dataInicio) ?? "Não informado"}
+                    {formatDate(g.dataInicio, true) ?? "Não informado"}
                   </span>
                   <br />
                   <span>

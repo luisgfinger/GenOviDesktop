@@ -11,6 +11,7 @@ import { formatEnum } from "../../../utils/formatEnum";
 import { TypeSexo } from "../../../api/enums/typeSexo/TypeSexo";
 import type { PartoRequestDTO } from "../../../api/dtos/parto/PartoRequestDTO";
 import type { GestacaoResponseDTO } from "../../../api/dtos/gestacao/GestacaoResponseDTO";
+import { formatDate } from "../../../utils/formatDate";
 
 function monthsBetween(iso?: string): number {
   if (!iso) return 0;
@@ -28,13 +29,6 @@ function monthsBetween(iso?: string): number {
 
 const MIN_MALE_MONTHS = 7;  
 const MIN_FEMALE_MONTHS = 8;
-
-
-function formatISODate(iso?: string) {
-  if (!iso) return "—";
-  const d = new Date(iso);
-  return Number.isNaN(d.getTime()) ? "—" : d.toLocaleDateString();
-}
 
 interface CadastrarPartoProps {
   onSuccess?: (
@@ -174,7 +168,7 @@ const femeas = useMemo(
                   <option key={r.id} value={String(r.id)}>
                     {r.ovelhaPai?.nome || `#${r.ovelhaPai?.id}`} ×{" "}
                     {r.ovelhaMae?.nome || `#${r.ovelhaMae?.id}`} •{" "}
-                    {formatISODate(r.dataGestacao)}
+                    {formatDate(r.dataGestacao)}
                   </option>
                 ))}
               </select>
@@ -200,7 +194,7 @@ const femeas = useMemo(
                 {machos.map((o) => (
                   <option key={o.id} value={String(o.id)}>
                     {o.nome} • {formatEnum(o.raca)} •{" "}
-                    {formatISODate(o.dataNascimento)}
+                    {formatDate(o.dataNascimento ?? "-")}
                   </option>
                 ))}
               </select>
@@ -226,7 +220,7 @@ const femeas = useMemo(
                 {femeas.map((o) => (
                   <option key={o.id} value={String(o.id)}>
                     {o.nome} • {formatEnum(o.raca)} •{" "}
-                    {formatISODate(o.dataNascimento)}
+                    {formatDate(o.dataNascimento ?? "-")}
                   </option>
                 ))}
               </select>

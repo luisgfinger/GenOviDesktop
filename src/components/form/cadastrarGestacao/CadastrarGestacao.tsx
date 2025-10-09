@@ -13,6 +13,7 @@ import { TypeStatus } from "../../../api/enums/typeStatus/TypeStatus";
 
 import type { GestacaoRequestDTO } from "../../../api/dtos/gestacao/GestacaoRequestDTO";
 import type { ReproducaoResponseDTO } from "../../../api/dtos/reproducao/ReproducaoResponseDTO";
+import { formatDate } from "../../../utils/formatDate";
 
 function monthsBetween(iso?: string): number {
   if (!iso) return 0;
@@ -30,12 +31,6 @@ function monthsBetween(iso?: string): number {
 
 const MIN_MALE_MONTHS = 7;  
 const MIN_FEMALE_MONTHS = 8;
-
-function formatISODate(iso?: string) {
-  if (!iso) return "—";
-  const d = new Date(iso);
-  return Number.isNaN(d.getTime()) ? "—" : d.toLocaleDateString();
-}
 
 const CadastrarGestacao: React.FC = () => {
   const { ovinos, loading: loadingOvinos, error: errorOvinos } = useOvinos();
@@ -144,7 +139,7 @@ const femeas = useMemo(
                 {(reproducoes ?? []).map((r) => (
                   <option key={r.id} value={String(r.id)}>
                     {formatEnum(r.typeReproducao)} • {r.carneiroPai?.nome || `#${r.carneiroPai?.id}`} ×{" "}
-                    {r.ovelhaMae?.nome || `#${r.ovelhaMae?.id}`} • {formatISODate(r.dataReproducao)}
+                    {r.ovelhaMae?.nome || `#${r.ovelhaMae?.id}`} • {formatDate(r.dataReproducao)}
                   </option>
                 ))}
               </select>
@@ -164,7 +159,7 @@ const femeas = useMemo(
                 <option value="">Selecione o carneiro...</option>
                 {machos.map((o) => (
                   <option key={o.id} value={String(o.id)}>
-                    {o.nome} • {formatEnum(o.raca)} • {formatISODate(o.dataNascimento)}
+                    {o.nome} • {formatEnum(o.raca)} • {formatDate(o.dataNascimento ?? "-")}
                   </option>
                 ))}
               </select>
@@ -184,7 +179,7 @@ const femeas = useMemo(
                 <option value="">Selecione a ovelha...</option>
                 {femeas.map((o) => (
                   <option key={o.id} value={String(o.id)}>
-                    {o.nome} • {formatEnum(o.raca)} • {formatISODate(o.dataNascimento)}
+                    {o.nome} • {formatEnum(o.raca)} • {formatDate(o.dataNascimento ?? "-")}
                   </option>
                 ))}
               </select>

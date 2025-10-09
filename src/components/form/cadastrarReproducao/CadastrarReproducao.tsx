@@ -11,16 +11,11 @@ import { formatEnum } from "../../../utils/formatEnum";
 import { useOvinos } from "../../../api/hooks/ovino/UseOvinos";
 import { useCriarReproducao } from "../../../api/hooks/reproducao/UseReproducoes";
 import type { ReproducaoRequestDTO } from "../../../api/dtos/reproducao/ReproducaoRequestDTO";
+import { formatDate } from "../../../utils/formatDate";
 
 type Props = {
   minAgeMonths?: number;
 };
-
-function formatISODate(iso?: string) {
-  if (!iso) return "—";
-  const d = new Date(iso);
-  return Number.isNaN(d.getTime()) ? "—" : d.toLocaleDateString();
-}
 
 function diffMonthsFromNow(iso?: string): number {
   if (!iso) return 0;
@@ -86,7 +81,7 @@ const CadastrarReproducao: React.FC<Props> = ({ minAgeMonths = 12 }) => {
       const fbb = normalize(o.fbb ?? "");
       const rfid = String(o.rfid ?? "");
       const raca = normalize(formatEnum(o.raca));
-      const data = normalize(formatISODate(o.dataNascimento));
+      const data = normalize(formatDate(o.dataNascimento ?? "-"));
       return (
         nome.includes(q) ||
         fbb.includes(q) ||
@@ -179,7 +174,7 @@ const CadastrarReproducao: React.FC<Props> = ({ minAgeMonths = 12 }) => {
                 {machosAdultos.map((o) => (
                   <option key={o.id} value={o.id}>
                     {o.nome} • {formatEnum(o.raca)} •{" "}
-                    {formatISODate(o.dataNascimento)}
+                    {formatDate(o.dataNascimento?? "-")}
                   </option>
                 ))}
               </select>
@@ -272,7 +267,7 @@ const CadastrarReproducao: React.FC<Props> = ({ minAgeMonths = 12 }) => {
                           <div className="reproducao-list-item__meta">
                             FBB: {o.fbb ?? "—"} • RFID: {o.rfid ?? "—"} •{" "}
                             {formatEnum(o.raca)} •{" "}
-                            {formatISODate(o.dataNascimento)}
+                            {formatDate(o.dataNascimento ?? "-")}
                           </div>
                         </label>
                       </li>

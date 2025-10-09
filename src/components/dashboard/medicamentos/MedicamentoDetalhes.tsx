@@ -1,10 +1,11 @@
-import React, { useState } from "react";
-import "./MedicamentoDetalhes.css";
-import ActionButtons from "../../common/buttons/ActionButtons";
-import Button from "../../common/buttons/Button";
+import React, { useEffect, useState } from "react";
+import { toast } from "react-toastify";
+import DetalhesBase, { type CampoConfig } from "../../common/detalhesBase/DetalhesBase";
 import { MedicamentoService } from "../../../api/services/medicamento/MedicamentoService";
 import type { MedicamentoResponseDTO } from "../../../api/dtos/medicamento/MedicamentoResponseDTO";
-import { toast } from "react-toastify";
+import { DoencaService } from "../../../api/services/doenca/DoencaService";
+import Button from "../../common/buttons/Button";
+import "./MedicamentoDetalhes.css";
 
 interface MedicamentoDetalhesProps {
   medicamento: MedicamentoResponseDTO;
@@ -15,206 +16,268 @@ const MedicamentoDetalhes: React.FC<MedicamentoDetalhesProps> = ({
   medicamento,
   onClose,
 }) => {
-  const [editMode, setEditMode] = useState<
-    Partial<Record<keyof MedicamentoResponseDTO, boolean>>
-  >({});
-  const [updated, setUpdated] = useState<MedicamentoResponseDTO>(medicamento);
-  const [hasChanges, setHasChanges] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const [doencas, setDoencas] = useState<any[]>([]);
+  const [loadingDoenc, setLoadingDoenc] = useState(false);
+  const [errorDoenc, setErrorDoenc] = useState<string | null>(null);
+  const [query, setQuery] = useState("");
+  const [doencaIds, setDoencaIds] = useState<string[]>(
+    medicamento.doencas?.map((d) => String(d.id)) ?? []
+  );
 
-  const handleEditField = (field: keyof MedicamentoResponseDTO) => {
-    setEditMode((prev) => ({ ...prev, [field]: !prev[field] }));
-  };
-
-  const handleChange = (field: keyof MedicamentoResponseDTO, value: any) => {
-    setUpdated((prev) => ({ ...prev, [field]: value }));
-    setHasChanges(true);
-  };
-
- const handleSave = async () => {
-  if (!updated.id) return;
-  try {
-    setLoading(true);
-
-    const dto = {
-      nome: updated.nome,
-      fabricante: updated.fabricante,
-      quantidadeDoses: updated.quantidadeDoses,
-      intervaloDoses: updated.intervaloDoses,
-      isVacina: updated.isVacina,
-      doencasIds: updated.doencas?.map((d) => d.id) ?? [],
+  useEffect(() => {
+    const fetchDoencas = async () => {
+      try {
+        setLoadingDoenc(true);
+        const data = await DoencaService.listarTodos();
+        setDoencas(data);
+      } catch (err) {
+        console.error(err);
+        setErrorDoenc("Erro ao carregar doenças.");
+      } finally {
+        setLoadingDoenc(false);
+      }
     };
-
-    await MedicamentoService.atualizar(updated.id, dto);
-    toast.success("💾 Alterações salvas com sucesso!");
-    setHasChanges(false);
-    setEditMode({});
-  } catch (err) {
-    console.error(err);
-    toast.error("❌ Erro ao salvar alterações.");
-  } finally {
-    setLoading(false);
-  }
-};
+    fetchDoencas();
+  }, []);
 
 
-  const handleRemove = async () => {
-    if (!updated.id) return;
-    if (!window.confirm("Tem certeza que deseja remover este medicamento?")) return;
+  const filteredDoencas = doencas.filter(
+    (d) =>
+      d.nome.toLowerCase().includes(query.toLowerCase()) ||
+      d.descricao?.toLowerCase().includes(query.toLowerCase())
+  );
 
+  const handleToggleDoenca = (id: string) => {
+    setDoencaIds((prev) =>
+      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
+    );
+  };
+
+  const handleSelectAllFiltered = () => {
+    setDoencaIds(Array.from(new Set([...doencaIds, ...filteredDoencas.map((d) => String(d.id))])));
+  };
+
+  const handleClearSelection = () => {
+    setDoencaIds([]);
+  };
+
+  const campos: CampoConfig<MedicamentoResponseDTO>[] = [
+    { label: "Nome", key: "nome" },
+    { label: "Fabricante", key: "fabricante" },
+    {
+      label: "Quantidade de Doses",
+      key: "quantidadeDoses",
+      renderEdit: (valor, onChange) => (
+        <input
+          type="number"
+          min={1}
+          value={valor ?? ""}
+          onChange={(e) => onChange(Number(e.target.value))}
+        />
+      ),
+    },
+    {
+      label: "Intervalo entre Doses (dias)",
+      key: "intervaloDoses",
+      renderEdit: (valor, onChange) => (
+        <input
+          type="number"
+          min={0}
+          value={valor ?? ""}
+          onChange={(e) => onChange(Number(e.target.value))}
+        />
+      ),
+    },
+    {
+      label: "Tipo",
+      key: "isVacina",
+      renderView: (valor) => (valor ? "Vacina" : "Medicamento Comum"),
+      renderEdit: (valor, onChange) => (
+        <select
+          value={valor ? "true" : "false"}
+          onChange={(e) => onChange(e.target.value === "true")}
+        >
+          <option value="false">Medicamento Comum</option>
+          <option value="true">Vacina</option>
+        </select>
+      ),
+    },
+    {
+      label: "Doenças Tratadas",
+      key: "doencas",
+      renderView: (valor) =>
+        valor && valor.length > 0 ? (
+          <ul>
+            {valor.map((d: any) => (
+              <li key={d.id}>{d.nome}</li>
+            ))}
+          </ul>
+        ) : (
+          "—"
+        ),
+
+      renderEdit: (valor, onChange) => (
+        <li className="medicamento-doencas2 flex-column">
+          {loadingDoenc ? (
+            <p>Carregando doenças...</p>
+          ) : errorDoenc ? (
+            <p style={{ color: "red" }}>{errorDoenc}</p>
+          ) : (
+            <>
+              <div className="medicamento-toolbar2 flex-column">
+                <label htmlFor="doencasSearch">Doenças tratadas</label>
+                <input
+                  id="doencasSearch"
+                  type="text"
+                  placeholder="Buscar por nome ou descrição…"
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                />
+                <span className="flex">
+                  <Button
+                    type="button"
+                    variant="cardSecondary"
+                    onClick={() => {
+                      handleSelectAllFiltered();
+                      const novasSelecionadas = doencas.filter((x) =>
+                        [...doencaIds, ...filteredDoencas.map((d) => String(d.id))].includes(String(x.id))
+                      );
+                      onChange(novasSelecionadas);
+                    }}
+                    disabled={filteredDoencas.length === 0}
+                  >
+                    Selecionar todas
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="cardSecondary"
+                    onClick={() => {
+                      handleClearSelection();
+                      onChange([]);
+                    }}
+                    disabled={doencaIds.length === 0}
+                  >
+                    Limpar
+                  </Button>
+                </span>
+              </div>
+
+              {doencaIds.length > 0 && (
+                <div className="medicamento-chipbar2">
+                  {doencaIds.map((id) => {
+                    const d = doencas.find((x) => String(x.id) === id);
+                    if (!d) return null;
+                    return (
+                      <span key={id} className="chip2">
+                        {d.nome}
+                        <button
+                          type="button"
+                          className="chip__close2"
+                          onClick={() => {
+                            handleToggleDoenca(id);
+                            const novasSelecionadas = doencas.filter((x) =>
+                              doencaIds.filter((v) => v !== id).includes(String(x.id))
+                            );
+                            onChange(novasSelecionadas);
+                          }}
+                          aria-label={`Remover ${d.nome}`}
+                          title="Remover"
+                        >
+                          ×
+                        </button>
+                      </span>
+                    );
+                  })}
+                </div>
+              )}
+
+              <div className="medicamento-list2">
+                {filteredDoencas.length === 0 ? (
+                  <p>Nenhuma doença encontrada.</p>
+                ) : (
+                  <ul>
+                    {filteredDoencas.map((d) => {
+                      const idStr = String(d.id);
+                      const checked = doencaIds.includes(idStr);
+                      return (
+                        <li key={d.id} className="medicamento-list-item2">
+                          <input
+                            type="checkbox"
+                            id={`doenca-${d.id}`}
+                            checked={checked}
+                            onChange={() => {
+                              handleToggleDoenca(idStr);
+                              const novasSelecionadas = doencas.filter((x) =>
+                                (checked
+                                  ? doencaIds.filter((v) => v !== idStr)
+                                  : [...doencaIds, idStr]
+                                ).includes(String(x.id))
+                              );
+                              onChange(novasSelecionadas);
+                            }}
+                          />
+                          <label
+                            htmlFor={`doenca-${d.id}`}
+                            className="medicamento-list-item__label2"
+                          >
+                            <div className="medicamento-list-item__name2">
+                              {d.nome}
+                            </div>
+                          </label>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                )}
+              </div>
+
+              <div className="medicamento-count2">
+                <span>Selecionadas: {doencaIds.length}</span>
+                <span>Filtradas: {filteredDoencas.length}</span>
+                <span>Total cadastradas: {doencas.length}</span>
+              </div>
+            </>
+          )}
+        </li>
+      ),
+    },
+  ];
+
+  const handleSave = async (atualizado: MedicamentoResponseDTO) => {
+    if (!atualizado.id) return;
     try {
-      setLoading(true);
-      await MedicamentoService.remover(updated.id);
-      toast.success("🗑️ Medicamento removido com sucesso!");
-      onClose();
+      const dto = {
+        nome: atualizado.nome,
+        fabricante: atualizado.fabricante,
+        quantidadeDoses: atualizado.quantidadeDoses,
+        intervaloDoses: atualizado.intervaloDoses,
+        isVacina: atualizado.isVacina,
+        doencasIds: doencaIds.map(Number),
+      };
+
+      await MedicamentoService.atualizar(atualizado.id, dto);
+      toast.success("Alterações salvas com sucesso!");
     } catch (err) {
       console.error(err);
-      toast.error("Erro ao remover medicamento.");
-    } finally {
-      setLoading(false);
+      toast.error("Erro ao salvar alterações.");
+      throw err;
     }
   };
 
+  const handleRemove = async () => {
+    if (!medicamento.id) return;
+    await MedicamentoService.remover(medicamento.id);
+  };
+
   return (
-    <div className="medicamento-detalhes-overlay">
-      <div className="medicamento-detalhes-card">
-        <ActionButtons
-          className="remove-btn"
-          showEdit={false}
-          onRemove={handleRemove}
-        />
-
-        <h2>Detalhes do Medicamento</h2>
-
-        <div className="medicamento-info">
-          <div className="medicamento-row">
-            <strong>Nome:</strong>
-            {editMode.nome ? (
-              <input
-                type="text"
-                value={updated.nome}
-                onChange={(e) => handleChange("nome", e.target.value)}
-              />
-            ) : (
-              <span>{updated.nome}</span>
-            )}
-            <ActionButtons
-              onEdit={() => handleEditField("nome")}
-              showRemove={false}
-            />
-          </div>
-
-          <div className="medicamento-row">
-            <strong>Fabricante:</strong>
-            {editMode.fabricante ? (
-              <input
-                type="text"
-                value={updated.fabricante}
-                onChange={(e) => handleChange("fabricante", e.target.value)}
-              />
-            ) : (
-              <span>{updated.fabricante}</span>
-            )}
-            <ActionButtons
-              onEdit={() => handleEditField("fabricante")}
-              showRemove={false}
-            />
-          </div>
-
-          <div className="medicamento-row">
-            <strong>Quantidade de Doses:</strong>
-            {editMode.quantidadeDoses ? (
-              <input
-                type="number"
-                min={1}
-                value={updated.quantidadeDoses}
-                onChange={(e) =>
-                  handleChange("quantidadeDoses", Number(e.target.value))
-                }
-              />
-            ) : (
-              <span>{updated.quantidadeDoses}</span>
-            )}
-            <ActionButtons
-              onEdit={() => handleEditField("quantidadeDoses")}
-              showRemove={false}
-            />
-          </div>
-
-          <div className="medicamento-row">
-            <strong>Intervalo entre Doses (dias):</strong>
-            {editMode.intervaloDoses ? (
-              <input
-                type="number"
-                min={0}
-                value={updated.intervaloDoses}
-                onChange={(e) =>
-                  handleChange("intervaloDoses", Number(e.target.value))
-                }
-              />
-            ) : (
-              <span>{updated.intervaloDoses}</span>
-            )}
-            <ActionButtons
-              onEdit={() => handleEditField("intervaloDoses")}
-              showRemove={false}
-            />
-          </div>
-
-          <div className="medicamento-row">
-            <strong>Tipo:</strong>
-            {editMode.isVacina ? (
-              <select
-                value={updated.isVacina ? "true" : "false"}
-                onChange={(e) =>
-                  handleChange("isVacina", e.target.value === "true")
-                }
-              >
-                <option value="false">Medicamento Comum</option>
-                <option value="true">Vacina</option>
-              </select>
-            ) : (
-              <span>{updated.isVacina ? "Vacina" : "Medicamento Comum"}</span>
-            )}
-            <ActionButtons
-              onEdit={() => handleEditField("isVacina")}
-              showRemove={false}
-            />
-          </div>
-
-          {updated.doencas?.length > 0 && (
-            <div className="medicamento-row">
-              <strong>Trata:</strong>
-              <ul>
-                {updated.doencas.map((d) => (
-                  <li key={d.id}>{d.nome}</li>
-                ))}
-              </ul>
-            </div>
-          )}
-        </div>
-
-        <div className="medicamento-footer">
-          {hasChanges ? (
-            <Button
-              variant="cardPrimary"
-              onClick={handleSave}
-              disabled={loading}
-            >
-              {loading ? "Salvando..." : "Salvar Alterações"}
-            </Button>
-          ) : (
-            <Button
-              variant="cardSecondary"
-              onClick={onClose}
-              disabled={loading}
-            >
-              {loading ? "Carregando..." : "Fechar"}
-            </Button>
-          )}
-        </div>
-      </div>
-    </div>
+    <DetalhesBase
+      titulo="Detalhes do Medicamento"
+      item={medicamento}
+      campos={campos}
+      onSave={handleSave}
+      onRemove={handleRemove}
+      onClose={onClose}
+    />
   );
 };
 

@@ -12,15 +12,8 @@ import { formatEnum } from "../../../utils/formatEnum";
 import FilterBar from "../../common/filter-bar/FilterBar";
 import ActionButtons from "../../common/buttons/ActionButtons";
 import ReproducaoDetalhes from "./ReproducoesDetalhes";
+import { formatDate } from "../../../utils/formatDate";
 
-function formatISODateTime(iso?: string) {
-  if (!iso) return "—";
-  const d = new Date(iso);
-  if (Number.isNaN(d.getTime())) return "—";
-  const dia = d.toLocaleDateString();
-  const hora = d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
-  return `${dia} ${hora}`;
-}
 
 function normalize(s?: string) {
   return (s ?? "")
@@ -92,7 +85,7 @@ const GerenciarReproducoes: React.FC = () => {
           r.ovelhaMae?.nome ?? "",
           r.ovelhaMae?.fbb ?? "",
           String(r.ovelhaMae?.rfid ?? ""),
-          formatISODateTime(r.dataReproducao),
+          formatDate(r.dataReproducao, true),
         ].map((x) => normalize(x));
 
         return campos.some((c) => c.includes(query));
@@ -163,7 +156,7 @@ const GerenciarReproducoes: React.FC = () => {
           {pageItems.map((r) => (
             <div key={r.id} className="repros-card">
               <div>
-                <div className="repros-col-title">Carneiro (pai)</div>
+                <div className="repros-col-title">Carneiro (Macho)</div>
                 <div className="repros-col-main">
                   {r.carneiroPai?.nome ?? "—"}
                 </div>
@@ -173,7 +166,7 @@ const GerenciarReproducoes: React.FC = () => {
                 </div>
               </div>
               <div>
-                <div className="repros-col-title">Ovelha (mãe)</div>
+                <div className="repros-col-title">Ovelha (Fêmea)</div>
                 <div className="repros-col-main">
                   {r.ovelhaMae?.nome ?? "—"}
                 </div>
@@ -191,7 +184,7 @@ const GerenciarReproducoes: React.FC = () => {
                   </span>
                   <br />
                   <span>
-                    <strong>Data:</strong> {formatISODateTime(r.dataReproducao)}
+                    <strong>Data:</strong> {formatDate(r.dataReproducao, true)}
                   </span>
                 </div>
               </div>

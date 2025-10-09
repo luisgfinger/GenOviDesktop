@@ -29,7 +29,7 @@ const CadastrarPartoComFilhotes: React.FC = () => {
 
   useEffect(() => {
     if (partoId && restantes === 0) {
-      toast.success(`✅ Todos os filhotes do parto ${partoId} foram cadastrados!`);
+      toast.success(`Todos os filhotes do parto ${partoId} foram cadastrados!`);
     }
   }, [restantes, partoId]);
 

@@ -10,12 +10,8 @@ import { formatEnum } from "../../../utils/formatEnum";
 import type { OcorrenciaDoencaRequestDTO } from "../../../api/dtos/ocorrendiaDoenca/OcorrenciaDoencaRequestDTO";
 import type { DoencaResponseDTO } from "../../../api/dtos/doenca/DoencaResponseDTO";
 import { useDoencas } from "../../../api/hooks/doenca/UseDoencas";
+import { formatDate } from "../../../utils/formatDate";
 
-function formatISODate(iso?: string) {
-  if (!iso) return "—";
-  const d = new Date(iso);
-  return Number.isNaN(d.getTime()) ? "—" : d.toLocaleDateString();
-}
 
 const CadastrarOcorrenciaDoenca: React.FC = () => {
   const { ovinos, loading: loadingOvinos, error: errorOvinos } = useOvinos();
@@ -121,7 +117,7 @@ const CadastrarOcorrenciaDoenca: React.FC = () => {
                 {ovinos.map((o) => (
                   <option key={o.id} value={String(o.id)}>
                     {o.nome} • {formatEnum(o.raca)} •{" "}
-                    {formatISODate(o.dataNascimento)}
+                    {o.dataNascimento ? formatDate(o.dataNascimento): "-"}
                   </option>
                 ))}
               </select>
@@ -129,7 +125,7 @@ const CadastrarOcorrenciaDoenca: React.FC = () => {
           <li className="flex-column">
             <label htmlFor="dataInicio">Data de início</label>
             <input
-              type="date"
+              type="datetime-local"
               id="dataInicio"
               value={dataInicio}
               onChange={(e) => setDataInicio(e.target.value)}

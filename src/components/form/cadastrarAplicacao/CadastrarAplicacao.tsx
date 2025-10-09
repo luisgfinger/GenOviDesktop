@@ -9,12 +9,7 @@ import { useCriarAplicacao } from "../../../api/hooks/aplicacao/UseAplicacoes";
 
 import type { AplicacaoRequestDTO } from "../../../api/dtos/aplicacao/AplicacaoRequestDTO";
 import { formatEnum } from "../../../utils/formatEnum";
-
-function formatISODate(iso?: string) {
-  if (!iso) return "—";
-  const d = new Date(iso);
-  return Number.isNaN(d.getTime()) ? "—" : d.toLocaleDateString();
-}
+import { formatDate } from "../../../utils/formatDate";
 
 interface CadastrarAplicacaoProps {
   isVacina: boolean;
@@ -96,7 +91,7 @@ const CadastrarAplicacao: React.FC<CadastrarAplicacaoProps> = ({
                 {ovinos.map((o) => (
                   <option key={o.id} value={String(o.id)}>
                     {o.nome} • {formatEnum(o.raca)} •{" "}
-                    {formatISODate(o.dataNascimento)}
+                    {o.dataNascimento ? formatDate(o.dataNascimento)  : "-"}
                   </option>
                 ))}
               </select>
@@ -137,7 +132,7 @@ const CadastrarAplicacao: React.FC<CadastrarAplicacaoProps> = ({
           <li className="flex-column">
             <label htmlFor="data">Data da aplicação</label>
             <input
-              type="date"
+              type="datetime-local"
               id="data"
               value={data}
               onChange={(e) => setData(e.target.value)}

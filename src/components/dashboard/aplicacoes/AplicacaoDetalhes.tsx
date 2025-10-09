@@ -12,12 +12,7 @@ import {
 import type { AplicacaoResponseDTO } from "../../../api/dtos/aplicacao/AplicacaoResponseDTO";
 import type { Ovino } from "../../../api/models/ovino/OvinoModel";
 import type { MedicamentoResponseDTO } from "../../../api/dtos/medicamento/MedicamentoResponseDTO";
-
-function formatAplicacaoDate(date?: any) {
-  if (!date) return "—";
-  const d = new Date(date.includes("T") ? date : `${date}T00:00:00`);
-  return !Number.isNaN(d.getTime()) ? d.toLocaleDateString() : "—";
-}
+import { formatDate } from "../../../utils/formatDate";
 
 interface AplicacaoDetalhesProps {
   aplicacao: AplicacaoResponseDTO;
@@ -98,7 +93,7 @@ const AplicacaoDetalhes: React.FC<AplicacaoDetalhesProps> = ({
       {
         label: "Data da Aplicação",
         key: "dataAplicacao",
-        renderView: (valor) => formatAplicacaoDate(valor),
+        renderView: (valor) => formatDate(valor, true),
         renderEdit: (valor, onChange) => (
           <input
             type="datetime-local"

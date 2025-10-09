@@ -10,15 +10,8 @@ import type { PartoResponseDTO } from "../../../api/dtos/parto/PartoResponseDTO"
 import FilterBar from "../../common/filter-bar/FilterBar";
 import ActionButtons from "../../common/buttons/ActionButtons";
 import PartoDetalhes from "./PartoDetalhes";
+import { formatDate } from "../../../utils/formatDate";
 
-function formatISODateTime(iso?: string) {
-  if (!iso) return "—";
-  const d = new Date(iso);
-  if (Number.isNaN(d.getTime())) return "—";
-  const dia = d.toLocaleDateString();
-  const hora = d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
-  return `${dia} ${hora}`;
-}
 
 function normalize(s?: string) {
   return (s ?? "")
@@ -84,7 +77,7 @@ const GerenciarPartos: React.FC = () => {
           p.ovelhaMae?.fbb ?? "",
           String(p.ovelhaPai?.rfid ?? ""),
           String(p.ovelhaMae?.rfid ?? ""),
-          formatISODateTime(p.dataParto),
+          formatDate(p.dataParto, true),
         ].map((x) => normalize(x));
 
         return campos.some((c) => c.includes(query));
@@ -176,7 +169,7 @@ const GerenciarPartos: React.FC = () => {
 
               <div>
                 <div className="partos-col-title">Data do Parto</div>
-                <div className="partos-meta">{formatISODateTime(p.dataParto)}</div>
+                <div className="partos-meta">{formatDate(p.dataParto, true)}</div>
               </div>
 
               <div>

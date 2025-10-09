@@ -1,68 +1,125 @@
-.medicamento-detalhes-overlay {
-  position: fixed;
-  inset: 0;
-  background-color: rgba(0, 0, 0, 0.55);
-  display: flex;
-  justify-content: center;
+.medicamento-doencas2 {
+  background-color: var(--secondary-color);
   align-items: center;
-  z-index: 999;
-  backdrop-filter: blur(2px);
-}
-
-.medicamento-detalhes-card {
-  background-color: var(--white-color);
-  padding: 24px;
-  border-radius: 12px;
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25);
-  width: 600px;
-  max-height: 80vh;
-  overflow-y: auto;
-  position: relative;
-  color: var(--full-black-color);
-}
-
-.medicamento-detalhes-card h2 {
-  font-size: 22px;
-  margin-bottom: 16px;
-  color: var(--full-black-color);
-}
-
-.medicamento-info {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-
-.medicamento-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+  padding: 16px;
+  height: auto;
+  border-radius: 10px;
   gap: 10px;
-  flex-wrap: wrap;
+}
+.medicamento-doencas2 button {
+  background-color: var(--white-color);
+}
+.medicamento-doencas2 button:hover {
+  background-color: var(--primary-color);
+}
+.medicamento-doencas2 input,
+.medicamento-doencas2 textarea,
+.medicamento-doencas2 select {
+  background-color: var(--white-color);
 }
 
-.medicamento-row strong {
-  width: 45%;
+.medicamento-doencas2 input{
+    width: 290px;
 }
 
-.medicamento-row input,
-.medicamento-row select {
-  flex: 1;
-  min-width: 180px;
-  padding: 6px 8px;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-  font-size: 15px;
+.medicamento-toolbar2 {
+  width: 80%;
+  gap: 10px;
 }
-
-.medicamento-row ul {
-  margin: 6px 0 0 20px;
-  list-style: disc;
-}
-
-.medicamento-footer {
-  display: flex;
-  justify-content: flex-end;
-  margin-top: 24px;
+.medicamento-toolbar2 > span {
   gap: 8px;
+}
+.medicamento-chipbar2 {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  width: 80%px;
+  max-width: 100%;
+  margin-top: 10px;
+}
+
+.chip2 {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 20px;
+  background-color: var(--white-color);
+  border: 1px solid #dcdcdc;
+  color: var(--full-black-color);
+  font-size: 13px;
+  line-height: 1.4;
+  transition:
+    background-color 0.2s,
+    border-color 0.2s;
+  margin-bottom: 12px;
+}
+.chip2:hover {
+  background-color: #f2f2f2;
+  border-color: #ccc;
+}
+.chip__close2 {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-size: 16px;
+  line-height: 1;
+  color: #666;
+  transition: color 0.2s;
+}
+.chip__close2:hover {
+  color: #000;
+}
+.medicamento-list2 {
+  width: 80%;
+  max-width: 100%;
+  max-height: 320px;
+  overflow: auto;
+  border: 1px solid #eee;
+  border-radius: 8px;
+  padding: 8px;
+  background-color: var(--white-color);
+}
+.medicamento-list2 ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.medicamento-list-item2 {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 4px;
+  border-bottom: 1px solid #f1f1f1;
+}
+.medicamento-list-item2 > input {
+  width: 16px;
+  height: 16px;
+}
+.medicamento-list-item2:last-child {
+  border-bottom: none;
+}
+.medicamento-list-item2:hover {
+  background: #fafafa;
+}
+.medicamento-list-item__label2 {
+  cursor: pointer;
+  flex: 1;
+}
+.medicamento-list-item__name2 {
+  color: var(--full-black-color);
+  font-size: 16px;
+}
+.medicamento-list-item__meta2 {
+  font-size: 12px;
+  opacity: 0.8;
+}
+.medicamento-count2 {
+  width: 80%;
+  max-width: 100%;
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  opacity: 0.8;
+  margin-top: 6px;
 }
