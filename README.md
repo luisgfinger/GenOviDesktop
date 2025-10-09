@@ -2,7 +2,7 @@
 
 Aplicação frontend em React + TypeScript para gerenciamento de rebanho ovino: cadastro e listagem de ovinos, gestações, partos, reproduções, medicamentos, compras, e demais recursos do domínio.
 
-Este README foi escrito com foco em desenvolvedores (nível pleno): contém visão geral, comandos práticos, decisões arquiteturais e orientações para contribuição e troubleshooting.
+Este README foi escrito com foco em desenvolvedores: contém visão geral, comandos práticos, decisões arquiteturais e orientações para contribuição e troubleshooting.
 
 ---
 
