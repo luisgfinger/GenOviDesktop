@@ -1,7 +1,6 @@
 import React from "react";
 import "./DoencaCard.css";
 import ActionButtons from "../../buttons/ActionButtons";
-import type { Doenca } from "../../../../api/models/doenca/DoencaModel";
 
 interface DoencaCardProps {
   id: number;

@@ -4,7 +4,6 @@ import type { PartoResponseDTO } from "../../../api/dtos/parto/PartoResponseDTO"
 import { PartoService } from "../../../api/services/parto/PartoService";
 import { useOvinos } from "../../../api/hooks/ovino/UseOvinos";
 import { useGestacoes } from "../../../api/hooks/gestacao/UseGestacoes";
-import { toast } from "react-toastify";
 import { TypeSexo } from "../../../api/enums/typeSexo/TypeSexo";
 
 function monthsBetween(iso?: string): number {
@@ -75,7 +74,7 @@ const PartoDetalhes: React.FC<PartoDetalhesProps> = ({ parto, onClose }) => {
     },
     {
       label: "Pai (Carneiro)",
-      key: "ovelhaPai",
+      key: "ovinoPai",
       renderView: (valor) => valor?.nome ?? "—",
       renderEdit: (_, onChange) =>
         loadingOvinos ? (
@@ -88,7 +87,7 @@ const PartoDetalhes: React.FC<PartoDetalhesProps> = ({ parto, onClose }) => {
               );
               onChange(selected);
             }}
-            defaultValue={parto.ovelhaPai?.id ?? ""}
+            defaultValue={parto.ovinoPai?.id ?? ""}
           >
             <option value="">Selecione</option>
             {machos.map((m) => (
@@ -101,7 +100,7 @@ const PartoDetalhes: React.FC<PartoDetalhesProps> = ({ parto, onClose }) => {
     },
     {
       label: "Mãe (Ovelha)",
-      key: "ovelhaMae",
+      key: "ovinoMae",
       renderView: (valor) => valor?.nome ?? "—",
       renderEdit: (_, onChange) =>
         loadingOvinos ? (
@@ -114,7 +113,7 @@ const PartoDetalhes: React.FC<PartoDetalhesProps> = ({ parto, onClose }) => {
               );
               onChange(selected);
             }}
-            defaultValue={parto.ovelhaMae?.id ?? ""}
+            defaultValue={parto.ovinoMae?.id ?? ""}
           >
             <option value="">Selecione</option>
             {femeas.map((f) => (
@@ -159,18 +158,16 @@ const PartoDetalhes: React.FC<PartoDetalhesProps> = ({ parto, onClose }) => {
   const handleSave = async (atualizado: PartoResponseDTO) => {
     if (!atualizado.id) return;
     await PartoService.editar(atualizado.id, {
-      ovelhaMaeId: atualizado.ovelhaMae?.id,
-      ovelhaPaiId: atualizado.ovelhaPai?.id,
+      ovelhaMaeId: atualizado.ovinoMae.id,
+      ovelhaPaiId: atualizado.ovinoPai?.id,
       dataParto: atualizado.dataParto ?? "",
       gestacaoId: atualizado.gestacao?.id ?? undefined,
     });
-    toast.success("Alterações salvas com sucesso!");
   };
 
   const handleRemove = async () => {
     if (!parto.id) return;
     await PartoService.remover(parto.id);
-    toast.success("Parto removido com sucesso!");
     onClose();
   };
 

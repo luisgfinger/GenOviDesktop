@@ -5,7 +5,6 @@ import { ReproducaoService } from "../../../api/services/reproducao/ReproducaoSe
 import { useOvinos } from "../../../api/hooks/ovino/UseOvinos";
 import { TypeReproducao } from "../../../api/enums/typeReproducao/TypeReproducao";
 import { formatEnum } from "../../../utils/formatEnum";
-import { toast } from "react-toastify";
 import type { Ovino } from "../../../api/models/ovino/OvinoModel";
 import { TypeSexo } from "../../../api/enums/typeSexo/TypeSexo";
 
@@ -139,14 +138,11 @@ const ReproducaoDetalhes: React.FC<ReproducaoDetalhesProps> = ({
       dataReproducao: atualizado.dataReproducao ?? "",
       observacoes: atualizado.observacoes ?? "",
     });
-
-    toast.success("Alterações salvas com sucesso!");
   };
 
   const handleRemove = async () => {
     if (!reproducao.id) return;
     await ReproducaoService.remover(reproducao.id);
-    toast.success("Reprodução removida com sucesso!");
   };
 
   return (

@@ -12,8 +12,8 @@ export const partoMapper = {
   fromResponse: (data: any): PartoResponseDTO => ({
     id: data.id,
     gestacao: data.gestacaoId,
-    ovelhaMae: data.ovelhaMae,
-    ovelhaPai: data.ovelhaPai,
+    ovinoMae: data.ovelhaMae,
+    ovinoPai: data.ovelhaPai,
     dataParto: data.dataParto,
   }),
 };

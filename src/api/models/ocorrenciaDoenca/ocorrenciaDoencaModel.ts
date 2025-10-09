@@ -7,5 +7,5 @@ export interface OcorrenciaDoenca {
   doenca: Doenca;
   dataInicio: string;
   dataFinal?: string;
-  curada: boolean;
+  curado: boolean;
 }

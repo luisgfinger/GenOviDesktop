@@ -63,7 +63,6 @@ const GerenciarDoencas: React.FC<GerenciarDoencasProps> = ({ searchQuery }) => {
     try {
       await removerDoenca(id);
       toast.success("Doença removida com sucesso!");
-      window.location.reload();
     } catch {
       toast.error("Erro ao remover a doença.");
     }
@@ -92,7 +91,7 @@ const GerenciarDoencas: React.FC<GerenciarDoencasProps> = ({ searchQuery }) => {
           images={[{ src: Add, alt: "add" }]}
           text="Cadastrar Doença"
           href="/dashboard/ovinos/doencas/criar"
-          style={{ width: "250px", height: "250px" }}
+          style={{ width: "300px", height: "250px" }}
         />
       </div>
 

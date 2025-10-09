@@ -2,7 +2,6 @@ import React from "react";
 import DetalhesBase, { type CampoConfig } from "../../common/detalhesBase/DetalhesBase";
 import type { DoencaResponseDTO } from "../../../api/dtos/doenca/DoencaResponseDTO";
 import { DoencaService } from "../../../api/services/doenca/DoencaService";
-import { toast } from "react-toastify";
 
 interface DoencaDetalhesProps {
   doenca: DoencaResponseDTO;
@@ -50,14 +49,11 @@ const DoencaDetalhes: React.FC<DoencaDetalhesProps> = ({ doenca, onClose }) => {
     };
 
     await DoencaService.editar(atualizado.id, dto);
-    toast.success("💾 Alterações salvas com sucesso!");
   };
 
   const handleRemove = async () => {
     if (!doenca.id) return;
-    if (!window.confirm("Tem certeza que deseja remover esta doença?")) return;
     await DoencaService.remover(doenca.id);
-    toast.success("🗑️ Doença removida com sucesso!");
     onClose();
   };
 

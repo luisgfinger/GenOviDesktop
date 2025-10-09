@@ -7,5 +7,5 @@ export interface OcorrenciaDoencaResponseDTO {
   doenca: Doenca;
   dataInicio: string;
   dataFinal?: string;
-  curada: boolean;
+  curado: boolean;
 }

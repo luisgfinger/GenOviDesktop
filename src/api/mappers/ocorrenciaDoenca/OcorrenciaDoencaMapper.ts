@@ -7,7 +7,7 @@ export const ocorrenciaDoencaMapper = {
     doencaId: dto.doencaId,
     dataInicio: dto.dataInicio,
     dataFinal: dto.dataFinal,
-    curada: dto.curada,
+    curado: dto.curado,
   }),
 
   fromResponse: (data: any): OcorrenciaDoencaResponseDTO => ({
@@ -16,6 +16,6 @@ export const ocorrenciaDoencaMapper = {
     doenca: data.doenca,
     dataInicio: data.dataInicio,
     dataFinal: data.dataFinal,
-    curada: data.curada,
+    curado: data.curado,
   }),
 };

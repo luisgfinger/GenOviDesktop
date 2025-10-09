@@ -42,14 +42,14 @@ const GerenciarPartos: React.FC = () => {
   const partosHydrated: PartoUI[] = useMemo(() => {
     return (partos ?? []).map((p) => {
       const ovelhaPai =
-        p.ovelhaPai?.id && ovinos
-          ? (ovinos.find((o) => o.id === p.ovelhaPai?.id) ?? p.ovelhaPai)
-          : p.ovelhaPai;
+        p.ovinoPai?.id && ovinos
+          ? (ovinos.find((o) => o.id === p.ovinoPai?.id) ?? p.ovinoPai)
+          : p.ovinoPai;
 
       const ovelhaMae =
-        p.ovelhaMae?.id && ovinos
-          ? (ovinos.find((o) => o.id === p.ovelhaMae?.id) ?? p.ovelhaMae)
-          : p.ovelhaMae;
+        p.ovinoMae?.id && ovinos
+          ? (ovinos.find((o) => o.id === p.ovinoMae.id) ?? p.ovinoMae)
+          : p.ovinoMae;
 
       return { ...p, ovelhaPai, ovelhaMae };
     });

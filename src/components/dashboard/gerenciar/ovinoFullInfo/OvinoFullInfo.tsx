@@ -56,11 +56,11 @@ const OvinoFullInfo: React.FC = () => {
 
     try {
       await OvinoService.desativar(ovino.id);
-      toast.success("🐑 Ovino desativado com sucesso!");
+      toast.success("Ovino desativado com sucesso!");
       navigate("/dashboard/ovinos");
     } catch (err: any) {
       console.error(err);
-      toast.error("❌ Erro ao desativar ovino.");
+      toast.error("Erro ao desativar ovino.");
     }
   };
 

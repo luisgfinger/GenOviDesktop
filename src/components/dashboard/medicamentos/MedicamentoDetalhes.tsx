@@ -256,10 +256,8 @@ const MedicamentoDetalhes: React.FC<MedicamentoDetalhesProps> = ({
       };
 
       await MedicamentoService.atualizar(atualizado.id, dto);
-      toast.success("Alterações salvas com sucesso!");
     } catch (err) {
       console.error(err);
-      toast.error("Erro ao salvar alterações.");
       throw err;
     }
   };

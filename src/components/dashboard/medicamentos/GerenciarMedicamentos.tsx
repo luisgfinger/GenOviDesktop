@@ -66,10 +66,9 @@ const GerenciarMedicamentos: React.FC<GerenciarProps> = ({
 
     try {
       await removerMedicamento(id);
-      toast.success("🗑️ Removido com sucesso!");
-      window.location.reload();
+      toast.success("Removido com sucesso!");
     } catch {
-      toast.error("❌ Erro ao remover o item.");
+      toast.error("Erro ao remover o item.");
     }
   };
 

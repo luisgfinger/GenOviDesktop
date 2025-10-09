@@ -194,9 +194,9 @@ const CadastrarGestacao: React.FC = () => {
           </li>
 
           <li className="flex-column">
-            <label htmlFor="dataGestacao">Data da Gestação</label>
+            <label htmlFor="dataGestacao">Data de início</label>
             <input
-              type="date"
+              type="datetime-local"
               id="dataGestacao"
               value={dataGestacao}
               onChange={(e) => setDataGestacao(e.target.value)}
