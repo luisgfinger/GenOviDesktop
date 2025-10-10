@@ -131,11 +131,11 @@ const CadastrarOvino: React.FC<CadastrarOvinoProps> = ({
       if (parto.dataParto) {
         setDataNasc(parto.dataParto.substring(0, 16));
       }
-      if (parto.ovelhaMae) {
-        setIdOvelhaMae(String(parto.ovelhaMae.id));
+      if (parto.ovinoMae) {
+        setIdOvelhaMae(String(parto.ovinoMae.id));
       }
-      if (parto.ovelhaPai) {
-        setIdCarneiroPai(String(parto.ovelhaPai.id));
+      if (parto.ovinoPai) {
+        setIdCarneiroPai(String(parto.ovinoPai.id));
       }
     } catch (err) {
       console.error(err);
@@ -242,8 +242,8 @@ const CadastrarOvino: React.FC<CadastrarOvinoProps> = ({
                   {partos.map((parto) => (
                     <option key={parto.id} value={parto.id}>
                       {parto.dataParto?.split("T")[0]} - Mãe:{" "}
-                      {parto.ovelhaMae?.nome ?? "?"} | Pai:{" "}
-                      {parto.ovelhaPai?.nome ?? "?"}
+                      {parto.ovinoMae?.nome ?? "?"} | Pai:{" "}
+                      {parto.ovinoPai?.nome ?? "?"}
                     </option>
                   ))}
                 </select>
