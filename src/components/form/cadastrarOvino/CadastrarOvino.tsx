@@ -13,9 +13,9 @@ import { useCompras } from "../../../api/hooks/compra/UseCompras";
 import { useOvinos } from "../../../api/hooks/ovino/UseOvinos";
 import { useSalvarOvino } from "../../../api/hooks/ovino/UseOvinos";
 import { usePartos } from "../../../api/hooks/parto/UsePartos";
+import { PartoService } from "../../../api/services/parto/PartoService";
 
 import type { OvinoRequestDTO } from "../../../api/dtos/ovino/OvinoRequestDTO";
-import { PartoService } from "../../../api/services/parto/PartoService";
 
 function monthsBetween(iso?: string): number {
   if (!iso) return 0;
@@ -38,6 +38,7 @@ interface CadastrarOvinoProps {
   partoId?: number;
   maeId?: number;
   paiId?: number;
+  compraId?: number;
   dataNascimento?: string;
   onSuccess?: () => void;
 }
@@ -46,6 +47,7 @@ const CadastrarOvino: React.FC<CadastrarOvinoProps> = ({
   partoId,
   maeId,
   paiId,
+  compraId,
   dataNascimento,
   onSuccess,
 }) => {
@@ -66,7 +68,7 @@ const CadastrarOvino: React.FC<CadastrarOvinoProps> = ({
   const [status, setStatus] = useState<TypeStatus>(TypeStatus.ATIVO);
   const [imagem, setImagem] = useState<File | null>(null);
   const [idParto, setIdParto] = useState(partoId ? String(partoId) : "");
-  const [idCompra, setIdCompra] = useState("");
+  const [idCompra, setIdCompra] = useState(compraId ? String(compraId) : "");
 
   const { compras, loading, error } = useCompras();
   const { ovinos, loading: loadingOvinos, error: errorOvinos } = useOvinos();
@@ -78,17 +80,18 @@ const CadastrarOvino: React.FC<CadastrarOvinoProps> = ({
       (ovinos ?? []).filter(
         (o) =>
           o.sexo === TypeSexo.MACHO &&
-          o.status == TypeStatus.ATIVO &&
+          o.status === TypeStatus.ATIVO &&
           monthsBetween(o.dataNascimento) >= MIN_MALE_MONTHS
       ),
     [ovinos]
   );
+
   const femeas = useMemo(
     () =>
       (ovinos ?? []).filter(
         (o) =>
           o.sexo === TypeSexo.FEMEA &&
-          o.status == TypeStatus.ATIVO &&
+          o.status === TypeStatus.ATIVO &&
           monthsBetween(o.dataNascimento) >= MIN_FEMALE_MONTHS
       ),
     [ovinos]
@@ -109,11 +112,10 @@ const CadastrarOvino: React.FC<CadastrarOvinoProps> = ({
   }, [ovinos, idCarneiroPai, idOvelhaMae]);
 
   useEffect(() => {
-  if (raca && !racasFiltradas.includes(raca)) {
-    setRaca("");
-  }
-}, [racasFiltradas, raca]);
-
+    if (raca && !racasFiltradas.includes(raca)) {
+      setRaca("");
+    }
+  }, [racasFiltradas, raca]);
 
   const handleSelectParto = async (partoId: string) => {
     setIdParto(partoId);
@@ -146,7 +148,7 @@ const CadastrarOvino: React.FC<CadastrarOvinoProps> = ({
   const handleNext = () => {
     if (step === 1 && !idParto && !idCompra && !dataNasc) {
       toast.warn(
-        "Preencha Data de Nascimento ou selecione o Parto para continuar"
+        "Preencha Data de Nascimento ou selecione Parto/Compra para continuar."
       );
       return;
     }
@@ -184,8 +186,8 @@ const CadastrarOvino: React.FC<CadastrarOvinoProps> = ({
         status,
         maeId: idOvelhaMae ? Number(idOvelhaMae) : undefined,
         paiId: idCarneiroPai ? Number(idCarneiroPai) : undefined,
-        compra: idCompra ? Number(idCompra) : undefined,
-        parto: idParto ? Number(idParto) : undefined,
+        compra: compraId ? compraId : idCompra ? Number(idCompra) : undefined,
+        parto: partoId ? partoId : idParto ? Number(idParto) : undefined,
         fotoOvino: imagem?.name,
       };
 
@@ -202,7 +204,7 @@ const CadastrarOvino: React.FC<CadastrarOvinoProps> = ({
       setSexo("");
       setStatus(TypeStatus.ATIVO);
       setImagem(null);
-      setIdCompra("");
+      if (!compraId) setIdCompra("");
       setStep(1);
     } catch (err) {
       console.error(err);
@@ -261,7 +263,7 @@ const CadastrarOvino: React.FC<CadastrarOvinoProps> = ({
                   id="idCompra"
                   value={idCompra}
                   onChange={(e) => setIdCompra(e.target.value)}
-                  disabled={!!idParto}
+                  disabled={!!idParto || !!compraId}
                 >
                   <option value="">Selecione uma compra...</option>
                   {compras.map((compra) => (
@@ -324,6 +326,7 @@ const CadastrarOvino: React.FC<CadastrarOvinoProps> = ({
             </Button>
           </ul>
         )}
+
         {step === 2 && (
           <ul className="flex-column">
             <li className="flex-column">
@@ -444,6 +447,7 @@ const CadastrarOvino: React.FC<CadastrarOvinoProps> = ({
             </div>
           </ul>
         )}
+
         {step === 4 && (
           <ul className="flex-column">
             <li className="flex-column">

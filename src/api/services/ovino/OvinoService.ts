@@ -7,6 +7,7 @@ import { responseToModel } from "../../mappers/ovino/OvinoMapper";
 export const OvinoService = {
   listarTodos: async (): Promise<Ovino[]> => {
     const { data } = await Api.get<OvinoResponseDTO[]>("/user/ovinos");
+    console.log(data);
     return data.map(responseToModel);
   },
 

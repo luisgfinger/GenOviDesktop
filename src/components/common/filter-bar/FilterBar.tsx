@@ -16,10 +16,10 @@ interface FilterBarProps<TStatus extends string = string> {
   status?: TStatus;
   setStatus?: React.Dispatch<React.SetStateAction<TStatus>>;
 
-  dateFrom: string;
-  setDateFrom: (value: string) => void;
-  dateTo: string;
-  setDateTo: (value: string) => void;
+  dateFrom?: string;
+  setDateFrom?: (value: string) => void;
+  dateTo?: string;
+  setDateTo?: (value: string) => void;
 
   clearFilters: () => void;
   setPage: (page: number) => void;
@@ -140,35 +140,39 @@ const FilterBar = <TStatus extends string = string>({
         </div>
       )}
 
-      <div className="filter-group flex-column">
-        <label htmlFor="de">De</label>
-        <input
-          id="de"
-          className="filter-date"
-          type="date"
-          value={dateFrom}
-          onChange={(e) => {
-            setDateFrom(e.target.value);
-            setPage(1);
-            setViewAll(false);
-          }}
-        />
-      </div>
+      {setDateFrom && (
+        <div className="filter-group flex-column">
+          <label htmlFor="de">De</label>
+          <input
+            id="de"
+            className="filter-date"
+            type="date"
+            value={dateFrom ?? ""}
+            onChange={(e) => {
+              setDateFrom(e.target.value);
+              setPage(1);
+              setViewAll(false);
+            }}
+          />
+        </div>
+      )}
 
-      <div className="filter-group flex-column">
-        <label htmlFor="ate">Até</label>
-        <input
-          id="ate"
-          className="filter-date"
-          type="date"
-          value={dateTo}
-          onChange={(e) => {
-            setDateTo(e.target.value);
-            setPage(1);
-            setViewAll(false);
-          }}
-        />
-      </div>
+      {setDateTo && (
+        <div className="filter-group flex-column">
+          <label htmlFor="ate">Até</label>
+          <input
+            id="ate"
+            className="filter-date"
+            type="date"
+            value={dateTo ?? ""}
+            onChange={(e) => {
+              setDateTo(e.target.value);
+              setPage(1);
+              setViewAll(false);
+            }}
+          />
+        </div>
+      )}
 
       <Button type="button" variant="cardSecondary" onClick={clearFilters}>
         Limpar filtros

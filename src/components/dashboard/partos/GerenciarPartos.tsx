@@ -33,7 +33,7 @@ const GerenciarPartos: React.FC = () => {
 
   const [q, setQ] = useState("");
   const [dateFrom, setDateFrom] = useState("");
-  const [dateTo, setDateTo] = useState("");
+  const [dateTo, setDateTo] = useState(""); 
   const [page, setPage] = useState(1);
   const [viewAll, setViewAll] = useState(false);
 

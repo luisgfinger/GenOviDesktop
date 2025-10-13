@@ -1,0 +1,85 @@
+.registro-page {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 90%;
+  align-self: center;
+  margin-top: 30px;
+  margin-bottom: 30px;
+}
+
+.registro-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.registro-header h2 {
+  margin: 0;
+  color: var(--full-black-color);
+}
+
+.registro-counter {
+  font-size: 14px;
+  opacity: 0.85;
+}
+
+.registro-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.registro-card {
+  background: var(--white-color);
+  border-radius: 10px;
+  padding: 12px;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+  gap: 12px;
+  align-items: center;
+  border: 1px solid #f1f1f1;
+  transition: all 0.2s ease;
+}
+
+.registro-col-title {
+  font-size: 18px;
+  opacity: 0.7;
+  margin-bottom: 2px;
+}
+
+.registro-col-main {
+  font-weight: 600;
+  color: var(--full-black-color);
+}
+
+.registro-meta {
+  font-size: 16px;
+  opacity: 0.8;
+  max-width: 520px;
+}
+
+.registro-actions {
+  display: flex;
+  align-items: flex-end;
+  gap: 16px;
+}
+
+.registro-empty {
+  padding: 16px;
+  background: var(--white-color);
+  border-radius: 8px;
+  border: 1px solid #f1f1f1;
+  text-align: center;
+}
+
+.registro-pagination {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  justify-content: center;
+}
+
+.registro-page-info {
+  font-size: 14px;
+}

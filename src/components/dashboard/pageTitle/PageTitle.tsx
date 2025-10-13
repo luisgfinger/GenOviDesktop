@@ -57,14 +57,19 @@ const PageTitle: React.FC = () => {
         return "Vacinações";
       case "/dashboard/ovinos/medicamentos/medicacoes":
         return "Medicações";
+      case "/dashboard/ovinos/compra/criar":
+        return "Registrar Compra";
+      case "/dashboard/ovinos/compra/gerenciar":
+        return "Gerenciar Compras";
+      case "/dashboard/registros":
+        return "Registros";
       default:
         return "Dashboard";
     }
   }, [location.pathname]);
 
   return (
-    <div
-      className= "pageTitle-dashboard flex">
+    <div className="pageTitle-dashboard flex">
       <ul className="flex">
         <li className="pageTitle-line flex">
           <img src={Ovelha} alt="ovelha" />

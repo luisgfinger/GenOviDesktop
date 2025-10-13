@@ -12,49 +12,66 @@ import {
 } from "../../../api/hooks/medicamento/UseMedicamentos";
 import type { MedicamentoResponseDTO } from "../../../api/dtos/medicamento/MedicamentoResponseDTO";
 import MedicamentoDetalhes from "./MedicamentoDetalhes";
+import FilterBar from "../../common/filter-bar/FilterBar";
 
-interface GerenciarProps {
-  searchQuery: string;
+interface GerenciarMedicamentosProps {
   isVacina: boolean;
 }
 
-const GerenciarMedicamentos: React.FC<GerenciarProps> = ({
-  searchQuery,
+const GerenciarMedicamentos: React.FC<GerenciarMedicamentosProps> = ({
   isVacina,
 }) => {
   const { medicamentos, loading: loadingMedicamentos } = useMedicamentos();
   const { removerMedicamento } = useRemoverMedicamento();
 
+  const [q, setQ] = useState("");
+  const [page, setPage] = useState(1);
   const [viewAll, setViewAll] = useState(false);
-  const [currentPage, setCurrentPage] = useState(1);
   const [selectedMedicamento, setSelectedMedicamento] =
     useState<MedicamentoResponseDTO | null>(null);
 
   const itemsPerPage = 6;
 
+  const normalize = (s?: string) =>
+    (s ?? "")
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .toLowerCase();
+
   const filteredMedicamentos = useMemo(() => {
+    const query = normalize(q.trim());
+
     let list = medicamentos.filter((m) => m.isVacina === isVacina);
 
-    if (searchQuery) {
-      list = list.filter((m) =>
-        [m.id.toString(), m.nome, m.fabricante]
-          .filter(Boolean)
-          .some((field) =>
-            field!.toLowerCase().includes(searchQuery.toLowerCase())
-          )
-      );
+    if (query) {
+      list = list.filter((m) => {
+        const campos = [
+          m.id?.toString() ?? "",
+          m.nome ?? "",
+          m.fabricante ?? "",
+        ].map((x) => normalize(x));
+
+        return campos.some((c) => c.includes(query));
+      });
     }
 
-    return list;
-  }, [medicamentos, searchQuery, isVacina]);
+    return list.sort((a, b) => a.nome.localeCompare(b.nome));
+  }, [medicamentos, q, isVacina]);
 
   const totalPages = Math.ceil(filteredMedicamentos.length / itemsPerPage);
+  const currentPage = viewAll ? 1 : Math.min(page, totalPages);
   const currentData = viewAll
     ? filteredMedicamentos
     : filteredMedicamentos.slice(
         (currentPage - 1) * itemsPerPage,
         currentPage * itemsPerPage
       );
+
+  const clearFilters = () => {
+    setQ("");
+    setPage(1);
+    setViewAll(false);
+  };
 
   const handleEdit = (id: number) => {
     const med = medicamentos.find((m) => m.id === id);
@@ -77,6 +94,15 @@ const GerenciarMedicamentos: React.FC<GerenciarProps> = ({
   return (
     <div className="gerenciarMedicamentos-container flex-column">
       <h2>{isVacina ? "Vacinas" : "Medicamentos"}</h2>
+
+      <FilterBar
+        q={q}
+        setQ={setQ}
+        clearFilters={clearFilters}
+        setPage={setPage}
+        setViewAll={setViewAll}
+        placeholder={`Buscar por nome, fabricante ou ID...`}
+      />
 
       <div className="gerenciarMedicamentos-container-inside">
         {currentData.map((m) => (
@@ -109,9 +135,9 @@ const GerenciarMedicamentos: React.FC<GerenciarProps> = ({
         <PaginationMenu
           currentPage={currentPage}
           totalPages={totalPages}
-          onPageChange={setCurrentPage}
+          onPageChange={setPage}
           showViewAll
-          onViewAll={() => setViewAll(!viewAll)}
+          onViewAll={() => setViewAll(true)}
         />
       )}
 

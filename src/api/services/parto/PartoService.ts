@@ -18,8 +18,6 @@ function normalizeOvino(raw: any): Ovino | {} {
 export class PartoService {
   static async listar(): Promise<PartoResponseDTO[]> {
     const { data } = await Api.get<any[]>("/user/partos");
-    console.log(data);
-
     return data.map((p: any): PartoResponseDTO => {
       const gest = p.gestacao
         ? ({

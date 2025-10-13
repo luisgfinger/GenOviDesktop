@@ -2,7 +2,6 @@ import { Routes, Route } from "react-router-dom";
 import PageTitle from "../../components/dashboard/pageTitle/PageTitle";
 import "./Dashboard.css"
 import Gerenciar from "../../components/dashboard/gerenciar/Gerenciar";
-import { useState } from "react";
 import DashboardMenu from "../../components/dashboard/dashboardMenu/DashboardMenu";
 import CadastrarFuncionario from "../../components/form/cadastrarFuncionario/CadastrarFuncionario";
 import CadastrarOvino from "../../components/form/cadastrarOvino/CadastrarOvino";
@@ -21,6 +20,9 @@ import CadastrarMedicamento from "../../components/form/cadastrarMedicamento/Cad
 import GerenciarMedicamentos from "../../components/dashboard/medicamentos/GerenciarMedicamentos";
 import CadastrarAplicacao from "../../components/form/cadastrarAplicacao/CadastrarAplicacao";
 import GerenciarAplicacoes from "../../components/dashboard/aplicacoes/GerenciarAplicacoes";
+import GerenciarRegistros from "../../components/dashboard/registros/GerenciarRegistros";
+import CadastrarCompraComOvinos from "../../components/form/cadastrarCompra/CadastrarCompraComOvinos";
+import GerenciarCompras from "../../components/dashboard/compra/GerenciarCompras";
 
 const Dashboard: React.FC = () => {
 
@@ -69,6 +71,9 @@ const Dashboard: React.FC = () => {
           <Route path="ovinos/vacinas/gerenciar" element={<GerenciarMedicamentos isVacina={true}/>}/>
           <Route path="ovinos/vacinas/vacinacoes" element={<GerenciarAplicacoes isVacina={true}/>}/>
           <Route path="ovinos/medicamentos/medicacoes" element={<GerenciarAplicacoes isVacina={false}/>}/>
+          <Route path="/registros" element={<GerenciarRegistros/>}/>
+          <Route path="ovinos/compra/criar" element={<CadastrarCompraComOvinos/>}/>
+          <Route path="ovinos/compra/gerenciar" element={<GerenciarCompras/>}/>
         </Routes>
       </div>
     </div>

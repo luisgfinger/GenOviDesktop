@@ -9,6 +9,7 @@ import Medicamento from "../../../assets/icons/medicamentos.png";
 import Doenca from "../../../assets/icons/doencas.png";
 import Gestacao from "../../../assets/icons/gestacao.png";
 import Reproducao from "../../../assets/icons/reproducao.png";
+import Compra from "../../../assets/icons/buy.png";
 
 import "./DashboardMenu.css";
 
@@ -127,6 +128,21 @@ const DashboardMenu: React.FC<DashboardMenuProps> = ({ location }) => {
                 />
               );
             })}
+          </li>
+          <li>
+            <h3>Entrada e Saída</h3>
+          </li>
+
+          <li className="dashboardMenu-content-optionsLine flex">
+            <OptionCard
+              images={[{ src: Compra, alt: "compra" }]}
+              text="Compra"
+              href="/dashboard/ovinos/compra/gerenciar"
+              childrenOptions={[
+                { text: "Registrar compra", href: "/dashboard/ovinos/compra/criar" },
+                { text: "Gerenciar compras", href: "/dashboard/ovinos/compra/gerenciar" },
+              ]}
+            />
           </li>
         </>
       )}
