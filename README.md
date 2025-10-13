@@ -139,5 +139,3 @@ Decisão importante: por questões práticas, há normalizadores em `PartoServic
 Se precisar de contexto ou histórico de decisões, abra uma issue ou mande uma mensagem no canal do time.
 
 ---
-
-Quer que eu gere também `CONTRIBUTING.md`, templates de issue/PR, e um `docs/` com diagrama ER simples? Posso gerar tudo isso automaticamente.
