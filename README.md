@@ -136,6 +136,4 @@ Decisão importante: por questões práticas, há normalizadores em `PartoServic
 
 ## Contato
 
-Se precisar de contexto ou histórico de decisões, abra uma issue ou mande uma mensagem no canal do time.
-
----
+Se precisar de contexto ou histórico de decisões, abra uma issue ou mande uma mensagem.
