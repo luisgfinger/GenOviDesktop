@@ -49,7 +49,15 @@ const OvinoCardFull: React.FC<OvinoCardFullProps> = ({
         <img src={imagem} alt={ovino.nome} />
         <div className="flex-column">
           <h2>{ovino.nome}</h2>
-          <p>{formatEnum(ovino.sexo)}</p>
+          <div className="ovinoCardFull-field flex">
+            <p>{formatEnum(ovino.sexo)}</p>
+            <ActionButtons
+              showRemove={false}
+              onEdit={() => onEdit?.("sexo")}
+              className="ovinoCardFull-edit-btn"
+              size={20}
+            />
+          </div>
         </div>
       </div>
 

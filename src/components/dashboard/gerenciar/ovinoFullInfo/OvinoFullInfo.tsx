@@ -68,7 +68,9 @@ const OvinoFullInfo: React.FC = () => {
     setEditField(field);
     const value = (ovino as any)[field];
     setTempValue(
-      typeof value === "object" && value !== null ? value.id ?? "" : value ?? ""
+      typeof value === "object" && value !== null
+        ? (value.id ?? "")
+        : (value ?? "")
     );
   };
 
@@ -110,10 +112,25 @@ const OvinoFullInfo: React.FC = () => {
 
   const renderInput = () => {
     if (!editField) return null;
+    if (editField === "sexo") {
+      return (
+        <select
+          value={tempValue}
+          onChange={(e) => setTempValue(e.target.value)}
+        >
+          <option value="">Selecione</option>
+          <option value="MACHO">Macho</option>
+          <option value="FEMEA">Fêmea</option>
+        </select>
+      );
+    }
 
     if (editField === "raca") {
       return (
-        <select value={tempValue} onChange={(e) => setTempValue(e.target.value)}>
+        <select
+          value={tempValue}
+          onChange={(e) => setTempValue(e.target.value)}
+        >
           <option value="">Selecione</option>
           {Object.values(TypeRaca).map((r) => (
             <option key={r} value={r}>
@@ -125,7 +142,10 @@ const OvinoFullInfo: React.FC = () => {
     }
     if (editField === "status") {
       return (
-        <select value={tempValue} onChange={(e) => setTempValue(e.target.value)}>
+        <select
+          value={tempValue}
+          onChange={(e) => setTempValue(e.target.value)}
+        >
           <option value="">Selecione</option>
           {Object.values(TypeStatus).map((s) => (
             <option key={s} value={s}>
@@ -137,7 +157,10 @@ const OvinoFullInfo: React.FC = () => {
     }
     if (editField === "typeGrauPureza") {
       return (
-        <select value={tempValue} onChange={(e) => setTempValue(e.target.value)}>
+        <select
+          value={tempValue}
+          onChange={(e) => setTempValue(e.target.value)}
+        >
           <option value="">Selecione</option>
           {Object.values(TypeGrauPureza).map((g) => (
             <option key={g} value={g}>
@@ -153,7 +176,10 @@ const OvinoFullInfo: React.FC = () => {
         editField === "ovinoMae" ? o.sexo === "FEMEA" : o.sexo === "MACHO"
       );
       return (
-        <select value={tempValue} onChange={(e) => setTempValue(e.target.value)}>
+        <select
+          value={tempValue}
+          onChange={(e) => setTempValue(e.target.value)}
+        >
           <option value="">Selecione</option>
           {options.map((o) => (
             <option key={o.id} value={o.id}>
@@ -166,7 +192,10 @@ const OvinoFullInfo: React.FC = () => {
 
     if (editField === "parto") {
       return (
-        <select value={tempValue} onChange={(e) => setTempValue(e.target.value)}>
+        <select
+          value={tempValue}
+          onChange={(e) => setTempValue(e.target.value)}
+        >
           <option value="">Selecione</option>
           {partos.map((p) => (
             <option key={p.id} value={p.id}>
@@ -179,7 +208,10 @@ const OvinoFullInfo: React.FC = () => {
 
     if (editField === "compra") {
       return (
-        <select value={tempValue} onChange={(e) => setTempValue(e.target.value)}>
+        <select
+          value={tempValue}
+          onChange={(e) => setTempValue(e.target.value)}
+        >
           <option value="">Selecione</option>
           {compras.map((c) => (
             <option key={c.id} value={c.id}>
