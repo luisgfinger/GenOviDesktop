@@ -5,7 +5,6 @@ import { ReproducaoService } from "../../../api/services/reproducao/ReproducaoSe
 import { useOvinos } from "../../../api/hooks/ovino/UseOvinos";
 import { TypeReproducao } from "../../../api/enums/typeReproducao/TypeReproducao";
 import { formatEnum } from "../../../utils/formatEnum";
-import type { Ovino } from "../../../api/models/ovino/OvinoModel";
 import { TypeSexo } from "../../../api/enums/typeSexo/TypeSexo";
 
 interface ReproducaoDetalhesProps {
@@ -23,17 +22,26 @@ const ReproducaoDetalhes: React.FC<ReproducaoDetalhesProps> = ({
     () => (ovinos ?? []).filter((o) => o.sexo === TypeSexo.MACHO),
     [ovinos]
   );
+
   const femeas = useMemo(
     () => (ovinos ?? []).filter((o) => o.sexo === TypeSexo.FEMEA),
     [ovinos]
+  );
+
+  const carneiro = useMemo(
+    () => ovinos.find((o) => o.id === (reproducao.carneiro ?? 0)),
+    [ovinos, reproducao.carneiro]
+  );
+  const ovelha = useMemo(
+    () => ovinos.find((o) => o.id === (reproducao.ovelha ?? 0)),
+    [ovinos, reproducao.ovelha]
   );
 
   const campos: CampoConfig<ReproducaoResponseDTO>[] = [
     {
       label: "Tipo de Reprodução",
       key: "typeReproducao",
-      renderView: (valor) =>
-        valor ? formatEnum(valor as TypeReproducao) : "—",
+      renderView: (valor) => (valor ? formatEnum(valor as TypeReproducao) : "—"),
       renderEdit: (valor, onChange) => (
         <select value={valor ?? ""} onChange={(e) => onChange(e.target.value)}>
           <option value="">Selecione</option>
@@ -59,21 +67,16 @@ const ReproducaoDetalhes: React.FC<ReproducaoDetalhesProps> = ({
       ),
     },
     {
-      label: "Pai",
-      key: "carneiroPai",
-      renderView: (valor) => valor?.nome ?? "—",
+      label: "Pai (Carneiro)",
+      key: "carneiro",
+      renderView: () => carneiro?.nome ?? "—",
       renderEdit: (_, onChange) =>
         loadingOvinos ? (
           <span>Carregando...</span>
         ) : (
           <select
-            onChange={(e) => {
-              const selected = machos.find(
-                (m) => m.id === Number(e.target.value)
-              );
-              onChange(selected as Ovino);
-            }}
-            defaultValue={reproducao.carneiroPai?.id ?? ""}
+            onChange={(e) => onChange(Number(e.target.value))}
+            defaultValue={reproducao.carneiro ?? ""}
           >
             <option value="">Selecione</option>
             {machos.map((m) => (
@@ -85,21 +88,16 @@ const ReproducaoDetalhes: React.FC<ReproducaoDetalhesProps> = ({
         ),
     },
     {
-      label: "Mãe",
-      key: "ovelhaMae",
-      renderView: (valor) => valor?.nome ?? "—",
+      label: "Mãe (Ovelha)",
+      key: "ovelha",
+      renderView: () => ovelha?.nome ?? "—",
       renderEdit: (_, onChange) =>
         loadingOvinos ? (
           <span>Carregando...</span>
         ) : (
           <select
-            onChange={(e) => {
-              const selected = femeas.find(
-                (f) => f.id === Number(e.target.value)
-              );
-              onChange(selected as Ovino);
-            }}
-            defaultValue={reproducao.ovelhaMae?.id ?? ""}
+            onChange={(e) => onChange(Number(e.target.value))}
+            defaultValue={reproducao.ovelha ?? ""}
           >
             <option value="">Selecione</option>
             {femeas.map((f) => (
@@ -132,8 +130,8 @@ const ReproducaoDetalhes: React.FC<ReproducaoDetalhesProps> = ({
     if (!atualizado.id) return;
 
     await ReproducaoService.editar(atualizado.id, {
-      carneiroId: atualizado.carneiroPai?.id ?? null,
-      ovelhaId: atualizado.ovelhaMae?.id ?? null,
+      carneiroId: atualizado.carneiro ?? null,
+      ovelhaId: atualizado.ovelha ?? null,
       typeReproducao: atualizado.typeReproducao ?? "",
       dataReproducao: atualizado.dataReproducao ?? "",
       observacoes: atualizado.observacoes ?? "",

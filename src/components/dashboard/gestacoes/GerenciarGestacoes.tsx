@@ -179,7 +179,7 @@ const GerenciarGestacoes: React.FC = () => {
                   {g.ovelhaMae?.nome ?? "—"}
                 </div>
                 <div className="gestacoes-meta">
-                  FBB: {g.ovelhaMae?.fbb ?? "—"} • RFID:{" "}
+                  RFID:{" "}
                   {g.ovelhaMae?.rfid ?? "—"}
                 </div>
               </div>
@@ -191,7 +191,7 @@ const GerenciarGestacoes: React.FC = () => {
                   {g.ovelhaPai?.nome ?? "—"}
                 </div>
                 <div className="gestacoes-meta">
-                  FBB: {g.ovelhaPai?.fbb ?? "—"} • RFID:{" "}
+                  RFID:{" "}
                   {g.ovelhaPai?.rfid ?? "—"}
                 </div>
               </div>

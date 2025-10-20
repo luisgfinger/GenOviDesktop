@@ -1,45 +1,48 @@
 import Api from "../Api";
 import type { ReproducaoRequestDTO } from "../../dtos/reproducao/ReproducaoRequestDTO";
 import type { ReproducaoResponseDTO } from "../../dtos/reproducao/ReproducaoResponseDTO";
-import type { Ovino } from "../../models/ovino/OvinoModel";
 
 export class ReproducaoService {
 
+
   static async listar(): Promise<ReproducaoResponseDTO[]> {
-    const { data } = await Api.get<any[]>("/user/reproducoes");
+    const { data } = await Api.get<ReproducaoResponseDTO[]>("/user/reproducoes");
+
     return data.map((r: any): ReproducaoResponseDTO => ({
       id: r.id,
-      carneiroPai: (r.carneiroPai ?? r.carneiroId ?? r.pai ?? r.macho ?? {}) as Ovino,
-      ovelhaMae: (r.ovelhaMae ?? r.ovelhaId ?? r.mae ?? r.femea ?? {}) as Ovino,
+      carneiro: r.carneiroId ?? r.carneiroPai ?? null,
+      ovelha: r.ovelhaId ?? r.ovelhaMae ?? null,
       typeReproducao: r.typeReproducao,
       dataReproducao: r.dataReproducao,
-      observacoes: r.observacoes,
+      observacoes: r.observacoes ?? null,
     }));
   }
+
 
   static async buscarPorId(id: number): Promise<ReproducaoResponseDTO> {
     const { data } = await Api.get<any>(`/user/reproducoes/${id}`);
 
     return {
       id: data.id,
-      carneiroPai: (data.carneiroPai ?? data.carneiroId ?? {}) as Ovino,
-      ovelhaMae: (data.ovelhaMae ?? data.ovelhaId ?? {}) as Ovino,
+      carneiro: data.carneiroId ?? data.carneiroPai ?? null,
+      ovelha: data.ovelhaId ?? data.ovelhaMae ?? null,
       typeReproducao: data.typeReproducao,
       dataReproducao: data.dataReproducao,
-      observacoes: data.observacoes,
+      observacoes: data.observacoes ?? null,
     };
   }
+
 
   static async criar(dto: ReproducaoRequestDTO): Promise<ReproducaoResponseDTO> {
     const { data } = await Api.post<any>("/user/reproducoes", dto);
 
     return {
       id: data.id,
-      carneiroPai: (data.carneiroPai ?? data.carneiroId ?? {}) as Ovino,
-      ovelhaMae: (data.ovelhaMae ?? data.ovelhaId ?? {}) as Ovino,
+      carneiro: data.carneiroId ?? data.carneiroPai ?? null,
+      ovelha: data.ovelhaId ?? data.ovelhaMae ?? null,
       typeReproducao: data.typeReproducao,
       dataReproducao: data.dataReproducao,
-      observacoes: data.observacoes,
+      observacoes: data.observacoes ?? null,
     };
   }
 
@@ -48,11 +51,11 @@ export class ReproducaoService {
 
     return {
       id: data.id,
-      carneiroPai: (data.carneiroPai ?? data.carneiroId ?? {}) as Ovino,
-      ovelhaMae: (data.ovelhaMae ?? data.ovelhaId ?? {}) as Ovino,
+      carneiro: data.carneiroId ?? data.carneiroPai ?? null,
+      ovelha: data.ovelhaId ?? data.ovelhaMae ?? null,
       typeReproducao: data.typeReproducao,
       dataReproducao: data.dataReproducao,
-      observacoes: data.observacoes,
+      observacoes: data.observacoes ?? null,
     };
   }
 

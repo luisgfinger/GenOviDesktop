@@ -77,18 +77,6 @@ const CadastrarCompra: React.FC<CadastrarCompraProps> = ({ onSuccess }) => {
           </li>
 
           <li className="flex-column">
-            <label htmlFor="vendedorId">Vendedor (opcional)</label>
-            <input
-              id="vendedorId"
-              type="number"
-              min={1}
-              value={vendedorId}
-              onChange={(e) => setVendedorId(e.target.value)}
-              placeholder="ID do vendedor"
-            />
-          </li>
-
-          <li className="flex-column">
             <label htmlFor="qtdOvinos">Quantidade de ovinos comprados</label>
             <input
               id="qtdOvinos"

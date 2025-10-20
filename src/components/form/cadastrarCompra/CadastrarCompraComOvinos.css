@@ -18,6 +18,10 @@
   box-shadow: 0 8px 22px rgba(0, 0, 0, 0.06);
 }
 
+.cadastrarCompra-container h3{
+  background-color: none;
+}
+
 .cadastrarCompra-container ul {
   gap: 28px;
   align-items: center;

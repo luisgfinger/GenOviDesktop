@@ -8,11 +8,11 @@ import { useReproducoes } from "../../../api/hooks/reproducao/UseReproducoes";
 import { useCriarGestacao, useGestacoes } from "../../../api/hooks/gestacao/UseGestacoes";
 import { usePartos } from "../../../api/hooks/parto/UsePartos";
 import { formatEnum } from "../../../utils/formatEnum";
+import { formatDate } from "../../../utils/formatDate";
 
 import { TypeSexo } from "../../../api/enums/typeSexo/TypeSexo";
 import type { GestacaoRequestDTO } from "../../../api/dtos/gestacao/GestacaoRequestDTO";
 import type { ReproducaoResponseDTO } from "../../../api/dtos/reproducao/ReproducaoResponseDTO";
-import { formatDate } from "../../../utils/formatDate";
 
 function monthsBetween(iso?: string): number {
   if (!iso) return 0;
@@ -42,13 +42,11 @@ const CadastrarGestacao: React.FC = () => {
   const [ovelhaMaeId, setOvelhaMaeId] = useState<string>("");
   const [ovelhaPaiId, setOvelhaPaiId] = useState<string>("");
   const [dataGestacao, setDataGestacao] = useState<string>("");
-  const [carneiroPaiNome, setCarneiroPaiNome] = useState<string>("");
-  const [ovelhaMaeNome, setOvelhaMaeNome] = useState<string>("");
 
   const reproducoesById = useMemo(() => {
-    const m = new Map<string, ReproducaoResponseDTO>();
-    (reproducoes ?? []).forEach((r) => m.set(String(r.id), r));
-    return m;
+    const map = new Map<string, ReproducaoResponseDTO>();
+    (reproducoes ?? []).forEach((r) => map.set(String(r.id), r));
+    return map;
   }, [reproducoes]);
 
   const machos = useMemo(
@@ -61,43 +59,44 @@ const CadastrarGestacao: React.FC = () => {
     [ovinos]
   );
 
-  const isOvelhaGestando = (ovelhaId: number): boolean => {
-    const gestacaoAtiva = (gestacoes ?? []).some((g) => {
-      const mae = g.ovelhaMae?.id;
-      const partoExiste = (partos ?? []).some((p) => p.gestacao?.id === g.id);
-      return mae === ovelhaId && !partoExiste;
-    });
-    return gestacaoAtiva;
-  };
+  const femeas = useMemo(() => {
+    const isOvelhaGestando = (ovelhaId: number): boolean => {
+      const gestacaoAtiva = (gestacoes ?? []).some((g) => {
+        const mae = g.ovelhaMae?.id;
+        const partoExiste = (partos ?? []).some((p) => p.gestacao?.id === g.id);
+        return mae === ovelhaId && !partoExiste;
+      });
+      return gestacaoAtiva;
+    };
 
-  const femeas = useMemo(
-    () =>
-      (ovinos ?? []).filter(
-        (o) =>
-          o.sexo === TypeSexo.FEMEA &&
-          monthsBetween(o.dataNascimento) >= MIN_FEMALE_MONTHS &&
-          !isOvelhaGestando(o.id)
-      ),
-    [ovinos, gestacoes, partos]
-  );
+    return (ovinos ?? []).filter(
+      (o) =>
+        o.sexo === TypeSexo.FEMEA &&
+        monthsBetween(o.dataNascimento) >= MIN_FEMALE_MONTHS &&
+        !isOvelhaGestando(o.id)
+    );
+  }, [ovinos, gestacoes, partos]);
 
   const handleSelectReproducao = (id: string) => {
     setReproducaoId(id);
 
-    if (id) {
-      const r = reproducoesById.get(id);
-      if (r) {
-        setOvelhaPaiId(String(r.carneiroPai?.id ?? ""));
-        setOvelhaMaeId(String(r.ovelhaMae?.id ?? ""));
-        setCarneiroPaiNome(r.carneiroPai?.nome || `#${r.carneiroPai?.id ?? ""}`);
-        setOvelhaMaeNome(r.ovelhaMae?.nome || `#${r.ovelhaMae?.id ?? ""}`);
-      }
-    } else {
+    if (!id) {
       setOvelhaPaiId("");
       setOvelhaMaeId("");
-      setCarneiroPaiNome("");
-      setOvelhaMaeNome("");
+      return;
     }
+
+    const r = reproducoesById.get(id);
+    if (r) {
+      setOvelhaPaiId(String(r.carneiro ?? ""));
+      setOvelhaMaeId(String(r.ovelha ?? ""));
+    }
+  };
+
+
+  const nomeOvino = (id: string | number | undefined): string => {
+    const o = ovinos.find((ov) => ov.id === Number(id));
+    return o ? `${o.nome ?? `#${o.id}`} • ${formatEnum(o.raca)}` : "—";
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -121,8 +120,6 @@ const CadastrarGestacao: React.FC = () => {
       setReproducaoId("");
       setOvelhaPaiId("");
       setOvelhaMaeId("");
-      setCarneiroPaiNome("");
-      setOvelhaMaeNome("");
       setDataGestacao("");
     } catch (err) {
       console.error(err);
@@ -141,14 +138,23 @@ const CadastrarGestacao: React.FC = () => {
             ) : errorRepros ? (
               <p style={{ color: "red" }}>{errorRepros}</p>
             ) : (
-              <select id="reproducaoId" value={reproducaoId} onChange={(e) => handleSelectReproducao(e.target.value)}>
+              <select
+                id="reproducaoId"
+                value={reproducaoId}
+                onChange={(e) => handleSelectReproducao(e.target.value)}
+              >
                 <option value="">Nenhuma (informar manualmente)</option>
-                {(reproducoes ?? []).map((r) => (
-                  <option key={r.id} value={String(r.id)}>
-                    {formatEnum(r.typeReproducao)} • {r.carneiroPai?.nome || `#${r.carneiroPai?.id}`} ×{" "}
-                    {r.ovelhaMae?.nome || `#${r.ovelhaMae?.id}`} • {formatDate(r.dataReproducao)}
-                  </option>
-                ))}
+                {(reproducoes ?? []).map((r) => {
+                  const carneiroNome = nomeOvino(r.carneiro);
+                  const ovelhaNome = nomeOvino(r.ovelha);
+
+                  return (
+                    <option key={r.id} value={String(r.id)}>
+                      {formatEnum(r.typeReproducao)} • {carneiroNome} × {ovelhaNome} •{" "}
+                      {formatDate(r.dataReproducao)}
+                    </option>
+                  );
+                })}
               </select>
             )}
           </li>
@@ -156,13 +162,18 @@ const CadastrarGestacao: React.FC = () => {
           <li className="flex-column">
             <label htmlFor="ovelhaPaiId">Carneiro (pai)</label>
             {reproducaoId ? (
-              <input type="text" value={carneiroPaiNome} readOnly disabled />
+              <input type="text" value={nomeOvino(ovelhaPaiId)} readOnly disabled />
             ) : loadingOvinos ? (
               <p>Carregando ovinos...</p>
             ) : errorOvinos ? (
               <p style={{ color: "red" }}>{errorOvinos}</p>
             ) : (
-              <select id="ovelhaPaiId" value={ovelhaPaiId} onChange={(e) => setOvelhaPaiId(e.target.value)} required>
+              <select
+                id="ovelhaPaiId"
+                value={ovelhaPaiId}
+                onChange={(e) => setOvelhaPaiId(e.target.value)}
+                required
+              >
                 <option value="">Selecione o carneiro...</option>
                 {machos.map((o) => (
                   <option key={o.id} value={String(o.id)}>
@@ -176,13 +187,18 @@ const CadastrarGestacao: React.FC = () => {
           <li className="flex-column">
             <label htmlFor="ovelhaMaeId">Ovelha (mãe)</label>
             {reproducaoId ? (
-              <input type="text" value={ovelhaMaeNome} readOnly disabled />
+              <input type="text" value={nomeOvino(ovelhaMaeId)} readOnly disabled />
             ) : loadingOvinos ? (
               <p>Carregando ovinos...</p>
             ) : errorOvinos ? (
               <p style={{ color: "red" }}>{errorOvinos}</p>
             ) : (
-              <select id="ovelhaMaeId" value={ovelhaMaeId} onChange={(e) => setOvelhaMaeId(e.target.value)} required>
+              <select
+                id="ovelhaMaeId"
+                value={ovelhaMaeId}
+                onChange={(e) => setOvelhaMaeId(e.target.value)}
+                required
+              >
                 <option value="">Selecione a ovelha...</option>
                 {femeas.map((o) => (
                   <option key={o.id} value={String(o.id)}>

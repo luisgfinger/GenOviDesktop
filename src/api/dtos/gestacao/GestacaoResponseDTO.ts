@@ -3,7 +3,7 @@ import type { ReproducaoResponseDTO } from "../reproducao/ReproducaoResponseDTO"
 
 export interface GestacaoResponseDTO {
   id: number;
-  reproducao?: ReproducaoResponseDTO;
+  reproducao?: ReproducaoResponseDTO | null;
   ovelhaMae: Ovino;
   ovelhaPai: Ovino;
   dataGestacao: string;

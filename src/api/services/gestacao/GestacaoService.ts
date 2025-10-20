@@ -4,88 +4,65 @@ import type { GestacaoResponseDTO } from "../../dtos/gestacao/GestacaoResponseDT
 import type { Ovino } from "../../models/ovino/OvinoModel";
 import type { ReproducaoResponseDTO } from "../../dtos/reproducao/ReproducaoResponseDTO";
 
+function mapReproducao(r: any): ReproducaoResponseDTO | undefined {
+  if (!r) return undefined;
+
+  return {
+    id: r.id,
+    carneiro: r.carneiroId ?? r.carneiroPai?.id ?? null,
+    ovelha: r.ovelhaId ?? r.ovelhaMae?.id ?? null,
+    typeReproducao: r.typeReproducao ?? "",
+    dataReproducao: r.dataReproducao ?? "",
+    observacoes: r.observacoes ?? null,
+  };
+}
+
+function mapGestacao(g: any): GestacaoResponseDTO {
+  return {
+    id: g.id,
+    dataGestacao: g.dataGestacao ?? "",
+    reproducao: mapReproducao(g.reproducao),
+    ovelhaPai: {
+      id: g.ovelhaPai?.id ?? g.carneiroId ?? 0,
+      nome: g.ovelhaPai?.nome ?? g.carneiro?.nome ?? "",
+      fbb: g.ovelhaPai?.fbb ?? "",
+      rfid: g.ovelhaPai?.rfid ?? 0,
+      raca: g.ovelhaPai?.raca ?? "",
+      sexo: g.ovelhaPai?.sexo ?? "MACHO",
+      dataNascimento: g.ovelhaPai?.dataNascimento ?? "",
+    } as Ovino,
+    ovelhaMae: {
+      id: g.ovelhaMae?.id ?? g.ovelhaId ?? 0,
+      nome: g.ovelhaMae?.nome ?? "",
+      fbb: g.ovelhaMae?.fbb ?? "",
+      rfid: g.ovelhaMae?.rfid ?? 0,
+      raca: g.ovelhaMae?.raca ?? "",
+      sexo: g.ovelhaMae?.sexo ?? "FEMEA",
+      dataNascimento: g.ovelhaMae?.dataNascimento ?? "",
+    } as Ovino,
+  };
+}
+
 export class GestacaoService {
   static async listar(): Promise<GestacaoResponseDTO[]> {
-    const { data } = await Api.get<any[]>("/user/gestacoes");
-
-    return data.map(
-      (g: any): GestacaoResponseDTO => ({
-        id: g.id,
-        reproducao: g.reproducao
-          ? ({
-              id: g.reproducao.id,
-              carneiroPai:
-                g.reproducao.carneiroPai ??
-                g.reproducao.carneiroId ??
-                ({} as Ovino),
-              ovelhaMae:
-                g.reproducao.ovelhaMae ??
-                g.reproducao.ovelhaId ??
-                ({} as Ovino),
-              typeReproducao: g.reproducao.typeReproducao,
-              dataReproducao: g.reproducao.dataReproducao,
-              observacoes: g.reproducao.observacoes,
-            } as ReproducaoResponseDTO)
-          : ({} as ReproducaoResponseDTO),
-        ovelhaPai: (g.ovelhaPai ?? g.carneiroId ?? {}) as Ovino,
-        ovelhaMae: (g.ovelhaMae ?? g.ovelhaId ?? {}) as Ovino,
-        dataGestacao: g.dataGestacao,
-      })
-    );
+    try {
+      const { data } = await Api.get<any[]>("/user/gestacoes");
+      console.log("✅ Gestacoes recebidas:", data);
+      return data.map(mapGestacao);
+    } catch (err: any) {
+      console.error("❌ Erro ao carregar gestações:", err.response?.data || err);
+      throw new Error("Não foi possível carregar as gestações.");
+    }
   }
 
   static async buscarPorId(id: number): Promise<GestacaoResponseDTO> {
     const { data } = await Api.get<any>(`/user/gestacoes/${id}`);
-
-    return {
-      id: data.id,
-      reproducao: data.reproducao
-        ? ({
-            id: data.reproducao.id,
-            carneiroPai:
-              data.reproducao.carneiroPai ??
-              data.reproducao.carneiroId ??
-              ({} as Ovino),
-            ovelhaMae:
-              data.reproducao.ovelhaMae ??
-              data.reproducao.ovelhaId ??
-              ({} as Ovino),
-            typeReproducao: data.reproducao.typeReproducao,
-            dataReproducao: data.reproducao.dataReproducao,
-            observacoes: data.reproducao.observacoes,
-          } as ReproducaoResponseDTO)
-        : ({} as ReproducaoResponseDTO),
-      ovelhaPai: (data.ovelhaPai ?? data.carneiroId ?? {}) as Ovino,
-      ovelhaMae: (data.ovelhaMae ?? data.ovelhaId ?? {}) as Ovino,
-      dataGestacao: data.dataGestacao,
-    };
+    return mapGestacao(data);
   }
 
   static async criar(dto: GestacaoRequestDTO): Promise<GestacaoResponseDTO> {
     const { data } = await Api.post<any>("/user/gestacoes", dto);
-
-    return {
-      id: data.id,
-      reproducao: data.reproducao
-        ? ({
-            id: data.reproducao.id,
-            carneiroPai:
-              data.reproducao.carneiroPai ??
-              data.reproducao.carneiroId ??
-              ({} as Ovino),
-            ovelhaMae:
-              data.reproducao.ovelhaMae ??
-              data.reproducao.ovelhaId ??
-              ({} as Ovino),
-            typeReproducao: data.reproducao.typeReproducao,
-            dataReproducao: data.reproducao.dataReproducao,
-            observacoes: data.reproducao.observacoes,
-          } as ReproducaoResponseDTO)
-        : ({} as ReproducaoResponseDTO),
-      ovelhaPai: (data.ovelhaPai ?? data.carneiroId ?? {}) as Ovino,
-      ovelhaMae: (data.ovelhaMae ?? data.ovelhaId ?? {}) as Ovino,
-      dataGestacao: data.dataGestacao,
-    };
+    return mapGestacao(data);
   }
 
   static async editar(
@@ -93,29 +70,7 @@ export class GestacaoService {
     dto: GestacaoRequestDTO
   ): Promise<GestacaoResponseDTO> {
     const { data } = await Api.put<any>(`/user/gestacoes/${id}`, dto);
-
-    return {
-      id: data.id,
-      reproducao: data.reproducao
-        ? ({
-            id: data.reproducao.id,
-            carneiroPai:
-              data.reproducao.carneiroPai ??
-              data.reproducao.carneiroId ??
-              ({} as Ovino),
-            ovelhaMae:
-              data.reproducao.ovelhaMae ??
-              data.reproducao.ovelhaId ??
-              ({} as Ovino),
-            typeReproducao: data.reproducao.typeReproducao,
-            dataReproducao: data.reproducao.dataReproducao,
-            observacoes: data.reproducao.observacoes,
-          } as ReproducaoResponseDTO)
-        : ({} as ReproducaoResponseDTO),
-      ovelhaPai: (data.ovelhaPai ?? data.carneiroId ?? {}) as Ovino,
-      ovelhaMae: (data.ovelhaMae ?? data.ovelhaId ?? {}) as Ovino,
-      dataGestacao: data.dataGestacao,
-    };
+    return mapGestacao(data);
   }
 
   static async remover(id: number): Promise<void> {
