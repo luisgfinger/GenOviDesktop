@@ -77,6 +77,7 @@ const CadastrarGestacao: React.FC = () => {
     );
   }, [ovinos, gestacoes, partos]);
 
+
   const handleSelectReproducao = (id: string) => {
     setReproducaoId(id);
 
@@ -88,8 +89,8 @@ const CadastrarGestacao: React.FC = () => {
 
     const r = reproducoesById.get(id);
     if (r) {
-      setOvelhaPaiId(String(r.carneiro ?? ""));
-      setOvelhaMaeId(String(r.ovelha ?? ""));
+      setOvelhaPaiId(r.carneiro?.id ? String(r.carneiro.id) : "");
+      setOvelhaMaeId(r.ovelha?.id ? String(r.ovelha.id) : "");
     }
   };
 
@@ -98,6 +99,7 @@ const CadastrarGestacao: React.FC = () => {
     const o = ovinos.find((ov) => ov.id === Number(id));
     return o ? `${o.nome ?? `#${o.id}`} • ${formatEnum(o.raca)}` : "—";
   };
+
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -145,8 +147,8 @@ const CadastrarGestacao: React.FC = () => {
               >
                 <option value="">Nenhuma (informar manualmente)</option>
                 {(reproducoes ?? []).map((r) => {
-                  const carneiroNome = nomeOvino(r.carneiro);
-                  const ovelhaNome = nomeOvino(r.ovelha);
+                  const carneiroNome = r.carneiro?.nome ?? "—";
+                  const ovelhaNome = r.ovelha?.nome ?? "—";
 
                   return (
                     <option key={r.id} value={String(r.id)}>

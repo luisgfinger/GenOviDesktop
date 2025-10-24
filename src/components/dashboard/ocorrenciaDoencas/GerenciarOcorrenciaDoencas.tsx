@@ -5,6 +5,8 @@ import "./GerenciarOcorrenciaDoencas.css";
 import Button from "../../common/buttons/Button";
 import PaginationMenu from "../../common/paginationMenu/PaginationMenu";
 import FilterBar from "../../common/filter-bar/FilterBar";
+import ActionButtons from "../../common/buttons/ActionButtons";
+import OcorrenciaDoencaDetalhes from "./OcorrenciaDoencaDetalhes";
 
 import { useOcorrenciasDoenca } from "../../../api/hooks/ocorrenciaDoencas/UseOcorrenciaDoencas";
 import type { OcorrenciaDoencaResponseDTO } from "../../../api/dtos/ocorrendiaDoenca/OcorrenciaDoencaResponseDTO";
@@ -19,17 +21,22 @@ function normalize(s?: string) {
 
 const PAGE_SIZE = 5;
 
-const GerenciarOcorrenciaDoencas: React.FC = () => {
+const GerenciarOcorrenciasDoenca: React.FC = () => {
   const { ocorrencias, loading, error } = useOcorrenciasDoenca();
 
   const [q, setQ] = useState("");
-  const [tipo, setTipo] = useState<string>("TODOS");
   const [dateFrom, setDateFrom] = useState("");
   const [dateTo, setDateTo] = useState("");
   const [page, setPage] = useState(1);
   const [viewAll, setViewAll] = useState(false);
+  const [selected, setSelected] = useState<OcorrenciaDoencaResponseDTO | null>(
+    null
+  );
 
-  const items = useMemo<OcorrenciaDoencaResponseDTO[]>(() => ocorrencias ?? [], [ocorrencias]);
+  const items = useMemo<OcorrenciaDoencaResponseDTO[]>(
+    () => ocorrencias ?? [],
+    [ocorrencias]
+  );
 
   const filtered: OcorrenciaDoencaResponseDTO[] = useMemo(() => {
     const query = normalize(q.trim());
@@ -37,22 +44,22 @@ const GerenciarOcorrenciaDoencas: React.FC = () => {
     const dt = dateTo ? new Date(`${dateTo}T23:59:59`) : null;
 
     return items
-      .filter((p) => {
+      .filter((o) => {
         if (df || dt) {
-          const d = new Date(p.dataInicio ?? "");
+          const d = new Date(o.dataInicio ?? "");
           if (Number.isNaN(d.getTime())) return false;
           if (df && d < df) return false;
           if (dt && d > dt) return false;
         }
+
         if (!query) return true;
 
         const campos = [
-          p.ovino.nome ?? "",
-          p.doenca.nome ?? "",
-          String(p.ovino.rfid ?? ""),
-          p.ovino.fbb ?? "",
-          formatDate(p.dataInicio, true),
-          formatDate(p.dataInicio, true),
+          o.ovino?.nome ?? "",
+          o.doenca?.nome ?? "",
+          o.doenca?.descricao ?? "",
+          String(o.ovino?.rfid ?? ""),
+          formatDate(o.dataInicio, true),
         ].map((x) => normalize(x));
 
         return campos.some((c) => c.includes(query));
@@ -62,32 +69,35 @@ const GerenciarOcorrenciaDoencas: React.FC = () => {
         const db = new Date(b.dataInicio ?? "").getTime();
         return (db || 0) - (da || 0);
       });
-  }, [items, q, tipo, dateFrom, dateTo]);
+  }, [items, q, dateFrom, dateTo]);
 
-  const totalPages = viewAll ? 1 : Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+  const totalPages = viewAll
+    ? 1
+    : Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
   const currentPage = viewAll ? 1 : Math.min(page, totalPages);
   const startIdx = (currentPage - 1) * PAGE_SIZE;
-  const pageItems = viewAll ? filtered : filtered.slice(startIdx, startIdx + PAGE_SIZE);
+  const pageItems = viewAll
+    ? filtered
+    : filtered.slice(startIdx, startIdx + PAGE_SIZE);
 
   const clearFilters = () => {
     setQ("");
-    setTipo("TODOS");
     setDateFrom("");
     setDateTo("");
     setPage(1);
     setViewAll(false);
   };
 
-  if (loading) return <p>Carregando doentes…</p>;
+  if (loading) return <p>Carregando ocorrências de doenças…</p>;
   if (error) return <p style={{ color: "red" }}>{error}</p>;
 
   return (
     <div className="ocorrencia-page">
       <div className="ocorrencia-header flex">
-        <h2>Doentes</h2>
-        <Link to="/dashboard/ovinos/doencas/adoecimento">
+        <h2>Ocorrências de Doenças</h2>
+        <Link to="/dashboard/ovinos/ocorrencias-doenca/cadastrar">
           <Button type="button" variant="cardPrimary">
-            Novo Adoecimento
+            Nova Ocorrência
           </Button>
         </Link>
       </div>
@@ -102,7 +112,7 @@ const GerenciarOcorrenciaDoencas: React.FC = () => {
         clearFilters={clearFilters}
         setPage={setPage}
         setViewAll={setViewAll}
-        placeholder="Buscar por nome, doença, FBB, RFID..."
+        placeholder="Buscar por ovino, doença, descrição ou RFID..."
       />
 
       <div className="ocorrencia-counter">
@@ -111,37 +121,61 @@ const GerenciarOcorrenciaDoencas: React.FC = () => {
       </div>
 
       {pageItems.length === 0 ? (
-        <div className="ocorrencia-empty">Nenhum doente encontrado.</div>
+        <div className="ocorrencia-empty">
+          Nenhuma ocorrência de doença encontrada.
+        </div>
       ) : (
         <div className="ocorrencia-list">
-          {pageItems.map((g) => (
-            <div key={g.id} className="ocorrencia-card">
+          {pageItems.map((o) => (
+            <div key={o.id} className="ocorrencia-card">
               <div>
                 <div className="ocorrencia-col-title">Ovino</div>
-                <div className="ocorrencia-col-main">{g.ovino.nome ?? "—"}</div>
+                <div className="ocorrencia-col-main">
+                  {o.ovino?.nome ?? "—"}
+                </div>
                 <div className="ocorrencia-meta">
-                  FBB: {g.ovino.fbb ?? "—"} • RFID: {g.ovino.rfid ?? "—"}
+                  FBB: {o.ovino?.fbb ?? "—"} • RFID: {o.ovino?.rfid ?? "—"}
                 </div>
               </div>
               <div>
-                <div className="ocorrencia-col-title">Detalhes</div>
+                <div className="ocorrencia-col-title">Doença</div>
                 <div className="ocorrencia-meta">
-                  <br />
                   <span>
-                    <strong>Data Início:</strong>{" "}
-                    {formatDate(g.dataInicio, true) ?? "Não informado"}
+                    <strong>Nome:</strong> {o.doenca?.nome ?? "—"}
                   </span>
                   <br />
                   <span>
-                    <strong>Doença:</strong>{" "}
-                    {g.doenca.nome ?? "Não informado"}
+                    <strong>Data de Início:</strong>{" "}
+                    {formatDate(o.dataInicio, true)}
                   </span>
+                  <br />
+                  {o.dataFinal ? (
+                    <span>
+                      <strong>Data Final:</strong>{" "}
+                      {formatDate(o.dataFinal, true)}
+                    </span>
+                  ) : (
+                    <span>
+                      <strong>Curado:</strong> {o.curado ? "Sim" : "Não"}
+                    </span>
+                  )}
+                  <br />
                 </div>
+              </div>
+              <div className="ocorrencia-actions flex">
+                <Button variant="cardSecondary" onClick={() => setSelected(o)}>
+                  Ver mais
+                </Button>
+                <ActionButtons
+                  onEdit={() => setSelected(o)}
+                  showRemove={false}
+                />
               </div>
             </div>
           ))}
         </div>
       )}
+
       {!viewAll && totalPages > 1 && (
         <div className="ocorrencia-pagination">
           <PaginationMenu
@@ -159,13 +193,24 @@ const GerenciarOcorrenciaDoencas: React.FC = () => {
 
       {viewAll && filtered.length > PAGE_SIZE && (
         <div className="ocorrencia-pagination">
-          <Button type="button" variant="cardSecondary" onClick={() => setViewAll(false)}>
+          <Button
+            type="button"
+            variant="cardSecondary"
+            onClick={() => setViewAll(false)}
+          >
             Voltar à paginação
           </Button>
         </div>
+      )}
+
+      {selected && (
+        <OcorrenciaDoencaDetalhes
+          ocorrencia={selected}
+          onClose={() => setSelected(null)}
+        />
       )}
     </div>
   );
 };
 
-export default GerenciarOcorrenciaDoencas;
+export default GerenciarOcorrenciasDoenca;

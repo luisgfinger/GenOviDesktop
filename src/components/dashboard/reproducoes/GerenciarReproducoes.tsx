@@ -5,7 +5,6 @@ import "./GerenciarReproducoes.css";
 import Button from "../../common/buttons/Button";
 import PaginationMenu from "../../common/paginationMenu/PaginationMenu";
 import { useReproducoes } from "../../../api/hooks/reproducao/UseReproducoes";
-import { useOvinos } from "../../../api/hooks/ovino/UseOvinos";
 import type { ReproducaoResponseDTO } from "../../../api/dtos/reproducao/ReproducaoResponseDTO";
 import { TypeReproducao } from "../../../api/enums/typeReproducao/TypeReproducao";
 import { formatEnum } from "../../../utils/formatEnum";
@@ -21,16 +20,12 @@ function normalize(s?: string) {
     .toLowerCase();
 }
 
-type ReproducaoUI = ReproducaoResponseDTO & {
-  carneiroId?: number | null;
-  ovelhaId?: number | null;
-};
+type ReproducaoUI = ReproducaoResponseDTO;
 
 const PAGE_SIZE = 5;
 
 const GerenciarReproducoes: React.FC = () => {
   const { reproducoes, loading, error } = useReproducoes();
-  const { ovinos, loading: loadingOvinos } = useOvinos();
 
   const [q, setQ] = useState("");
   const [tipo, setTipo] = useState<string>("TODOS");
@@ -41,23 +36,18 @@ const GerenciarReproducoes: React.FC = () => {
   const [selectedRepro, setSelectedRepro] = useState<ReproducaoUI | null>(null);
 
   const reprosHydrated: any[] = useMemo(() => {
-    if (!reproducoes || !ovinos) return [];
-
-    return reproducoes.map((r) => {
-      const carneiro = ovinos.find((o) => o.id === r.carneiro);
-      const ovelha = ovinos.find((o) => o.id === r.ovelha);
-
-      return {
-        ...r,
-        carneiroNome: carneiro?.nome ?? "—",
-        carneiroFbb: carneiro?.fbb ?? "—",
-        carneiroRfid: carneiro?.rfid ?? "—",
-        ovelhaNome: ovelha?.nome ?? "—",
-        ovelhaFbb: ovelha?.fbb ?? "—",
-        ovelhaRfid: ovelha?.rfid ?? "—",
-      };
-    });
-  }, [reproducoes, ovinos]);
+    if (!reproducoes) return [];
+    console.log(reproducoes);
+    return reproducoes.map((r) => ({
+      ...r,
+      carneiroNome: r.carneiro?.nome ?? "—",
+      carneiroFbb: r.carneiro?.fbb ?? "—",
+      carneiroRfid: r.carneiro?.rfid ?? "—",
+      ovelhaNome: r.ovelha?.nome ?? "—",
+      ovelhaFbb: r.ovelha?.fbb ?? "—",
+      ovelhaRfid: r.ovelha?.rfid ?? "—",
+    }));
+  }, [reproducoes]);
 
   const filtered = useMemo(() => {
     const query = normalize(q.trim());
@@ -117,7 +107,7 @@ const GerenciarReproducoes: React.FC = () => {
     setViewAll(false);
   };
 
-  if (loading || loadingOvinos) return <p>Carregando reproduções…</p>;
+  if (loading) return <p>Carregando reproduções…</p>;
   if (error) return <p style={{ color: "red" }}>{error}</p>;
 
   return (
@@ -159,16 +149,16 @@ const GerenciarReproducoes: React.FC = () => {
             <div key={r.id} className="repros-card">
               <div>
                 <div className="repros-col-title">Carneiro (Macho)</div>
-                <div className="repros-col-main">{r.carneiroNome}</div>
+                <div className="repros-col-main">{r.carneiro?.nome ?? "—"}</div>
                 <div className="repros-meta">
-                  RFID: {r.carneiroRfid}
+                  RFID: {r.carneiro?.rfid ?? "—"}
                 </div>
               </div>
               <div>
                 <div className="repros-col-title">Ovelha (Fêmea)</div>
-                <div className="repros-col-main">{r.ovelhaNome}</div>
+                <div className="repros-col-main">{r.ovelha?.nome ?? "—"}</div>
                 <div className="repros-meta">
-                  RFID: {r.ovelhaRfid}
+                  RFID: {r.ovelha?.rfid ?? "—"}
                 </div>
               </div>
               <div>

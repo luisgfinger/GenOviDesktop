@@ -2,16 +2,17 @@ import type { Reproducao } from "../../models/reproducao/ReproducaoModel";
 import type { ReproducaoRequestDTO } from "../../dtos/reproducao/ReproducaoRequestDTO";
 import type { ReproducaoResponseDTO } from "../../dtos/reproducao/ReproducaoResponseDTO";
 import type { TypeReproducao } from "../../enums/typeReproducao/TypeReproducao";
+import type { Ovino } from "../../models/ovino/OvinoModel"; // se já existir
 
 export class ReproducaoMapper {
   static toEntity(
     dto: ReproducaoRequestDTO,
-    carneiro: number,
-    ovelha: number,
+    carneiro: Ovino,
+    ovelha: Ovino,
     typeReproducao: TypeReproducao
   ): Reproducao {
     return {
-      id: 0, 
+      id: dto.id ?? 0,
       carneiro,
       ovelha,
       typeReproducao,

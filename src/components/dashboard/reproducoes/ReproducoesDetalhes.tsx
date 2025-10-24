@@ -28,14 +28,8 @@ const ReproducaoDetalhes: React.FC<ReproducaoDetalhesProps> = ({
     [ovinos]
   );
 
-  const carneiro = useMemo(
-    () => ovinos.find((o) => o.id === (reproducao.carneiro ?? 0)),
-    [ovinos, reproducao.carneiro]
-  );
-  const ovelha = useMemo(
-    () => ovinos.find((o) => o.id === (reproducao.ovelha ?? 0)),
-    [ovinos, reproducao.ovelha]
-  );
+  const carneiro = reproducao.carneiro ?? null;
+  const ovelha = reproducao.ovelha ?? null;
 
   const campos: CampoConfig<ReproducaoResponseDTO>[] = [
     {
@@ -75,8 +69,11 @@ const ReproducaoDetalhes: React.FC<ReproducaoDetalhesProps> = ({
           <span>Carregando...</span>
         ) : (
           <select
-            onChange={(e) => onChange(Number(e.target.value))}
-            defaultValue={reproducao.carneiro ?? ""}
+            onChange={(e) => {
+              const selected = machos.find((m) => m.id === Number(e.target.value)) ?? null;
+              onChange(selected);
+            }}
+            defaultValue={carneiro?.id ?? ""}
           >
             <option value="">Selecione</option>
             {machos.map((m) => (
@@ -96,8 +93,11 @@ const ReproducaoDetalhes: React.FC<ReproducaoDetalhesProps> = ({
           <span>Carregando...</span>
         ) : (
           <select
-            onChange={(e) => onChange(Number(e.target.value))}
-            defaultValue={reproducao.ovelha ?? ""}
+            onChange={(e) => {
+              const selected = femeas.find((f) => f.id === Number(e.target.value)) ?? null;
+              onChange(selected);
+            }}
+            defaultValue={ovelha?.id ?? ""}
           >
             <option value="">Selecione</option>
             {femeas.map((f) => (
@@ -126,12 +126,13 @@ const ReproducaoDetalhes: React.FC<ReproducaoDetalhesProps> = ({
     },
   ];
 
+
   const handleSave = async (atualizado: ReproducaoResponseDTO) => {
     if (!atualizado.id) return;
 
     await ReproducaoService.editar(atualizado.id, {
-      carneiroId: atualizado.carneiro ?? null,
-      ovelhaId: atualizado.ovelha ?? null,
+      carneiroId: atualizado.carneiro?.id ?? null,
+      ovelhaId: atualizado.ovelha?.id ?? null,
       typeReproducao: atualizado.typeReproducao ?? "",
       dataReproducao: atualizado.dataReproducao ?? "",
       observacoes: atualizado.observacoes ?? "",

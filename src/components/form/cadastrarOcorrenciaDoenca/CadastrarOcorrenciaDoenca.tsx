@@ -60,7 +60,7 @@ const CadastrarOcorrenciaDoenca: React.FC = () => {
       ovinoId: Number(ovinoId),
       doencaId: Number(doencaId),
       dataInicio: new Date(dataInicio).toISOString(),
-      curado: false,
+      curada: false,
     };
 
     try {

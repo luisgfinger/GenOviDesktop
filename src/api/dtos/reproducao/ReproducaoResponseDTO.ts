@@ -1,7 +1,9 @@
+import type { Ovino } from "../../models/ovino/OvinoModel";
+
 export interface ReproducaoResponseDTO {
   id: number;
-  carneiro: number;
-  ovelha: number;
+  carneiro: Ovino;
+  ovelha: Ovino;
   typeReproducao: string;
   dataReproducao: string;
   observacoes?: string | null;

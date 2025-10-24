@@ -70,3 +70,8 @@
   align-items: center;
   justify-content: center;
 }
+
+.ocorrencia-actions{
+  align-items: center;
+  gap: 30px;
+}

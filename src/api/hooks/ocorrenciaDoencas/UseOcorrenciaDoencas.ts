@@ -3,6 +3,7 @@ import { OcorrenciaDoencaService } from "../../services/ocorrenciaDoenca.ts/Ocor
 import type { OcorrenciaDoencaRequestDTO } from "../../dtos/ocorrendiaDoenca/OcorrenciaDoencaRequestDTO";
 import type { OcorrenciaDoencaResponseDTO } from "../../dtos/ocorrendiaDoenca/OcorrenciaDoencaResponseDTO";
 
+
 export function useOcorrenciasDoenca() {
   const [ocorrencias, setOcorrencias] = useState<OcorrenciaDoencaResponseDTO[]>([]);
   const [loading, setLoading] = useState(true);
@@ -24,8 +25,9 @@ export function useOcorrenciasDoenca() {
     fetchData();
   }, []);
 
-  return { ocorrencias, loading, error };
+  return { ocorrencias, loading, error, setOcorrencias };
 }
+
 
 export function useOcorrenciaDoenca(id: number | null) {
   const [ocorrencia, setOcorrencia] = useState<OcorrenciaDoencaResponseDTO | null>(null);
@@ -54,7 +56,7 @@ export function useOcorrenciaDoenca(id: number | null) {
     fetchOcorrencia();
   }, [id]);
 
-  return { ocorrencia, loading, error };
+  return { ocorrencia, loading, error, setOcorrencia };
 }
 
 export function useCriarOcorrenciaDoenca() {
@@ -80,4 +82,54 @@ export function useCriarOcorrenciaDoenca() {
   };
 
   return { criarOcorrencia, novaOcorrencia, loading, error };
+}
+
+export function useEditarOcorrenciaDoenca() {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [ocorrenciaEditada, setOcorrenciaEditada] = useState<OcorrenciaDoencaResponseDTO | null>(null);
+
+  const editarOcorrencia = async (id: number, dto: OcorrenciaDoencaRequestDTO) => {
+    setLoading(true);
+    setError(null);
+
+    try {
+      const updated = await OcorrenciaDoencaService.editar(id, dto);
+      setOcorrenciaEditada(updated);
+      return updated;
+    } catch (err) {
+      console.error("Erro ao editar ocorrência de doença:", err);
+      setError("Não foi possível editar a ocorrência.");
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return { editarOcorrencia, ocorrenciaEditada, loading, error };
+}
+
+export function useRemoverOcorrenciaDoenca() {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [sucesso, setSucesso] = useState(false);
+
+  const removerOcorrencia = async (id: number) => {
+    setLoading(true);
+    setError(null);
+    setSucesso(false);
+
+    try {
+      await OcorrenciaDoencaService.remover(id);
+      setSucesso(true);
+    } catch (err) {
+      console.error("Erro ao remover ocorrência de doença:", err);
+      setError("Não foi possível remover a ocorrência.");
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return { removerOcorrencia, sucesso, loading, error };
 }

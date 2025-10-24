@@ -36,4 +36,23 @@ export class OcorrenciaDoencaService {
     const { data } = await Api.post<any>("/user/ocorrencias-doencas", payload);
     return mapOcorrenciaDoenca(data);
   }
+
+  static async editar(
+    id: number,
+    dto: OcorrenciaDoencaRequestDTO
+  ): Promise<OcorrenciaDoencaResponseDTO> {
+    const payload: any = Object.fromEntries(
+      Object.entries(dto).filter(([_, v]) => v !== undefined)
+    );
+
+    const { data } = await Api.put<any>(
+      `/user/ocorrencias-doencas/${id}`,
+      payload
+    );
+    return mapOcorrenciaDoenca(data);
+  }
+
+  static async remover(id: number): Promise<void> {
+    await Api.delete(`/user/ocorrencias-doencas/${id}`);
+  }
 }

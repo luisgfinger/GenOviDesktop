@@ -21,13 +21,22 @@ export const OvinoService = {
     return responseToModel(data);
   },
 
-  editar: async (id: number, payload: OvinoRequestDTO): Promise<Ovino> => {
-    const { data } = await Api.put<OvinoResponseDTO>(
-      `/user/ovinos/${id}`,
-      payload
-    );
-    return responseToModel(data);
-  },
+editar: async (id: number, payload: OvinoRequestDTO): Promise<Ovino> => {
+  const formatado = {
+    ...payload,
+    compra: (payload as any).compra?.id ?? payload.compra,
+    parto: (payload as any).parto?.id ?? payload.parto,
+    maeId: (payload as any).maeId?.id ?? payload.maeId,
+    paiId: (payload as any).paiId?.id ?? payload.paiId,
+  };
+
+  console.log("Payload enviado:", formatado);
+
+  const { data } = await Api.put<OvinoResponseDTO>(`/user/ovinos/${id}`, formatado);
+  return responseToModel(data);
+},
+
+
 
   desativar: async (id: number): Promise<void> => {
     await Api.patch(`/user/ovinos/${id}/disable`);

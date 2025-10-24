@@ -3,8 +3,8 @@ import type { Ovino } from "../ovino/OvinoModel";
 
 export interface Reproducao {
   id: number;
-  carneiro: number;
-  ovelha: number;
+  carneiro: Ovino;
+  ovelha: Ovino;
   typeReproducao: TypeReproducao;
   dataReproducao: string;
   observacoes?: string;  
