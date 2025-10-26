@@ -9,8 +9,10 @@ import ActionButtons from "../../common/buttons/ActionButtons";
 import OcorrenciaDoencaDetalhes from "./OcorrenciaDoencaDetalhes";
 
 import { useOcorrenciasDoenca } from "../../../api/hooks/ocorrenciaDoencas/UseOcorrenciaDoencas";
+import { useEditarOcorrenciaDoenca } from "../../../api/hooks/ocorrenciaDoencas/UseOcorrenciaDoencas";
 import type { OcorrenciaDoencaResponseDTO } from "../../../api/dtos/ocorrendiaDoenca/OcorrenciaDoencaResponseDTO";
 import { formatDate } from "../../../utils/formatDate";
+import { toast } from "react-toastify";
 
 function normalize(s?: string) {
   return (s ?? "")
@@ -23,10 +25,12 @@ const PAGE_SIZE = 5;
 
 const GerenciarOcorrenciasDoenca: React.FC = () => {
   const { ocorrencias, loading, error } = useOcorrenciasDoenca();
+  const { editarOcorrencia } = useEditarOcorrenciaDoenca();
 
   const [q, setQ] = useState("");
   const [dateFrom, setDateFrom] = useState("");
   const [dateTo, setDateTo] = useState("");
+  const [statusCurado, setStatusCurado] = useState("TODOS");
   const [page, setPage] = useState(1);
   const [viewAll, setViewAll] = useState(false);
   const [selected, setSelected] = useState<OcorrenciaDoencaResponseDTO | null>(
@@ -52,6 +56,9 @@ const GerenciarOcorrenciasDoenca: React.FC = () => {
           if (dt && d > dt) return false;
         }
 
+        if (statusCurado === "CURADOS" && !o.curado) return false;
+        if (statusCurado === "NAO_CURADOS" && o.curado) return false;
+
         if (!query) return true;
 
         const campos = [
@@ -69,7 +76,7 @@ const GerenciarOcorrenciasDoenca: React.FC = () => {
         const db = new Date(b.dataInicio ?? "").getTime();
         return (db || 0) - (da || 0);
       });
-  }, [items, q, dateFrom, dateTo]);
+  }, [items, q, dateFrom, dateTo, statusCurado]);
 
   const totalPages = viewAll
     ? 1
@@ -84,8 +91,36 @@ const GerenciarOcorrenciasDoenca: React.FC = () => {
     setQ("");
     setDateFrom("");
     setDateTo("");
+    setStatusCurado("TODOS");
     setPage(1);
     setViewAll(false);
+  };
+
+  const handleMarkCurado = async (ocorrencia: OcorrenciaDoencaResponseDTO) => {
+    if (!ocorrencia.id) return;
+    if (
+      !window.confirm(
+        `Deseja marcar a ocorrência do ovino "${ocorrencia.ovino?.nome}" como curada?`
+      )
+    )
+      return;
+
+    try {
+      const dataFinalAtual = new Date().toISOString();
+
+      await editarOcorrencia(ocorrencia.id, {
+        ovinoId: ocorrencia.ovino?.id ?? null,
+        doencaId: ocorrencia.doenca?.id ?? null,
+        dataInicio: ocorrencia.dataInicio ?? "",
+        dataFinal: dataFinalAtual,
+        curado: true,
+      });
+
+      toast.success("Ocorrência marcada como curada!");
+    } catch (err) {
+      console.error(err);
+      toast.error("Erro ao marcar ocorrência como curada.");
+    }
   };
 
   if (loading) return <p>Carregando ocorrências de doenças…</p>;
@@ -95,7 +130,7 @@ const GerenciarOcorrenciasDoenca: React.FC = () => {
     <div className="ocorrencia-page">
       <div className="ocorrencia-header flex">
         <h2>Ocorrências de Doenças</h2>
-        <Link to="/dashboard/ovinos/ocorrencias-doenca/cadastrar">
+        <Link to="/dashboard/ovinos/doencas/adoecimento">
           <Button type="button" variant="cardPrimary">
             Nova Ocorrência
           </Button>
@@ -113,6 +148,12 @@ const GerenciarOcorrenciasDoenca: React.FC = () => {
         setPage={setPage}
         setViewAll={setViewAll}
         placeholder="Buscar por ovino, doença, descrição ou RFID..."
+        status={statusCurado}
+        setStatus={setStatusCurado}
+        statusLabel="Status"
+        statusOptions={["CURADOS", "NAO_CURADOS"]}
+        allOptionLabel="Todos"
+        allOptionValue="TODOS"
       />
 
       <div className="ocorrencia-counter">
@@ -137,6 +178,7 @@ const GerenciarOcorrenciasDoenca: React.FC = () => {
                   FBB: {o.ovino?.fbb ?? "—"} • RFID: {o.ovino?.rfid ?? "—"}
                 </div>
               </div>
+
               <div>
                 <div className="ocorrencia-col-title">Doença</div>
                 <div className="ocorrencia-meta">
@@ -162,14 +204,26 @@ const GerenciarOcorrenciasDoenca: React.FC = () => {
                   <br />
                 </div>
               </div>
+
               <div className="ocorrencia-actions flex">
                 <Button variant="cardSecondary" onClick={() => setSelected(o)}>
                   Ver mais
                 </Button>
+
                 <ActionButtons
                   onEdit={() => setSelected(o)}
                   showRemove={false}
                 />
+
+                {!o.curado && (
+                  <Button
+                    type="button"
+                    variant="cardPrimary"
+                    onClick={() => handleMarkCurado(o)}
+                  >
+                    Marcar como curado
+                  </Button>
+                )}
               </div>
             </div>
           ))}

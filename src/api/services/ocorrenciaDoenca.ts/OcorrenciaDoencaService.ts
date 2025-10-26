@@ -11,7 +11,7 @@ function mapOcorrenciaDoenca(raw: any): OcorrenciaDoencaResponseDTO {
     doenca: (raw.doenca ?? raw.doencaId ?? {}) as Doenca,
     dataInicio: raw.dataInicio ?? "",
     dataFinal: raw.dataFinal ?? "",
-    curado: raw.curada ?? false,
+    curado: raw.curado ?? false,
   };
 }
 

@@ -90,7 +90,13 @@ const OvinoFullInfo: React.FC = () => {
         newValue = compras.find((c) => c.id === Number(tempValue)) ?? null;
       }
 
-      const updated = { ...ovino, [editField]: newValue };
+      let finalValue = newValue;
+
+      if (String(editField).toLowerCase().includes("data") && newValue) {
+        finalValue = newValue.includes("T") ? newValue : `${newValue}T00:00:00`;
+      }
+
+      const updated = { ...ovino, [editField]: finalValue };
 
       await OvinoService.editar(ovino.id, updated as any);
 

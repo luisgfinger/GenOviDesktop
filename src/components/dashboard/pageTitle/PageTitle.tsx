@@ -38,7 +38,7 @@ const PageTitle: React.FC = () => {
       case "/dashboard/ovinos/doencas/gerenciar":
         return "Gerenciar Doenças";
       case "/dashboard/ovinos/doencas/adoecimento":
-        return "Gerenciar Adoecimento";
+        return "Registrar Adoecimento";
       case "/dashboard/ovinos/doencas/doentes":
         return "Animais doentes";
       case "/dashboard/ovinos/medicamentos/criar":

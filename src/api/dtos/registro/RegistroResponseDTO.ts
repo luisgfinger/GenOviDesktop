@@ -8,6 +8,7 @@ import type { OcorrenciaDoenca } from "../../models/ocorrenciaDoenca/ocorrenciaD
 export interface RegistroResponseDTO {
   id: number;
   dataRegistro: string;
+  isSugestao: boolean;
   funcionario: Funcionario;
   reproducao?: Reproducao | null;
   gestacao?: Gestacao | null;
