@@ -23,6 +23,8 @@ import GerenciarAplicacoes from "../../components/dashboard/aplicacoes/Gerenciar
 import GerenciarRegistros from "../../components/dashboard/registros/GerenciarRegistros";
 import CadastrarCompraComOvinos from "../../components/form/cadastrarCompra/CadastrarCompraComOvinos";
 import GerenciarCompras from "../../components/dashboard/compra/GerenciarCompras";
+import CadastrarUsuario from "../../components/form/cadastrarUsuario/CadastrarUsuario";
+import GerenciarUsuarios from "../../components/dashboard/usuarios/GerenciarUsuarios";
 
 const Dashboard: React.FC = () => {
 
@@ -51,6 +53,14 @@ const Dashboard: React.FC = () => {
            <Route
             path="funcionarios/cadastrar"
             element={<CadastrarFuncionario/>}
+          />
+          <Route
+            path="usuarios"
+            element={<GerenciarUsuarios />}
+          />
+           <Route
+            path="usuarios/cadastrar"
+            element={<CadastrarUsuario/>}
           />
           <Route path="ovinos/fullinfo" element={<OvinoFullInfo />} />
           <Route path="ovinos/reproducoes/criar" element={<CadastrarReproducao />}/>

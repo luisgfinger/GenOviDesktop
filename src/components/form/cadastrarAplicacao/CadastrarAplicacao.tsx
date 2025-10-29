@@ -24,8 +24,6 @@ const CadastrarAplicacao: React.FC<CadastrarAplicacaoProps> = ({
     loading: loadingMed,
     error: errorMed,
   } = useMedicamentos();
-
-  console.log(medicamentos);
   const {
     criarAplicacao,
     loading: saving,
@@ -35,6 +33,7 @@ const CadastrarAplicacao: React.FC<CadastrarAplicacaoProps> = ({
   const [ovinoId, setOvinoId] = useState<string>("");
   const [medicamentoId, setMedicamentoId] = useState<string>("");
   const [data, setData] = useState<string>("");
+  const [enviarSugestao, setEnviarSugestao] = useState<boolean>(false); // ✅ novo estado
 
   const medicamentosFiltrados = medicamentos.filter(
     (m) => m.isVacina === isVacina
@@ -56,11 +55,13 @@ const CadastrarAplicacao: React.FC<CadastrarAplicacaoProps> = ({
 
     try {
       console.log("DTO enviado:", dto);
+      console.log("Enviar como sugestão:", enviarSugestao); // apenas para log
       await criarAplicacao(dto);
       toast.success("Aplicação cadastrada com sucesso!");
       setOvinoId("");
       setMedicamentoId("");
       setData("");
+      setEnviarSugestao(false);
     } catch (err) {
       console.error(err);
       toast.error("Erro ao cadastrar aplicação.");
@@ -91,7 +92,7 @@ const CadastrarAplicacao: React.FC<CadastrarAplicacaoProps> = ({
                 {ovinos.map((o) => (
                   <option key={o.id} value={String(o.id)}>
                     {o.nome} • {formatEnum(o.raca)} •{" "}
-                    {o.dataNascimento ? formatDate(o.dataNascimento)  : "-"}
+                    {o.dataNascimento ? formatDate(o.dataNascimento) : "-"}
                   </option>
                 ))}
               </select>
@@ -110,11 +111,7 @@ const CadastrarAplicacao: React.FC<CadastrarAplicacaoProps> = ({
               <select
                 id="medicamentoId"
                 value={medicamentoId}
-                onChange={(e) => {
-                  const value = e.target.value;
-                  console.log("Selecionado:", value);
-                  setMedicamentoId(value);
-                }}
+                onChange={(e) => setMedicamentoId(e.target.value)}
                 required
               >
                 <option value="">
@@ -138,6 +135,16 @@ const CadastrarAplicacao: React.FC<CadastrarAplicacaoProps> = ({
               onChange={(e) => setData(e.target.value)}
               required
             />
+          </li>
+
+          <li className="checkbox-sugestao">
+            <input
+              type="checkbox"
+              id="enviarSugestao"
+              checked={enviarSugestao}
+              onChange={(e) => setEnviarSugestao(e.target.checked)}
+            />
+            <label htmlFor="enviarSugestao">Enviar como sugestão</label>
           </li>
 
           <div className="cadastrarAplicacao-form-navigation">

@@ -8,5 +8,6 @@ export interface Usuario {
   senha: string;
   autenticacao2fa?: boolean | null;
   roles: Role[];
-  funcionario?: Funcionario;
+ funcionario?: Partial<Funcionario>;
+
 }

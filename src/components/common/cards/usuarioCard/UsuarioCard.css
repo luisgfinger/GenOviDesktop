@@ -1,0 +1,51 @@
+.usuarioCard-container {
+  background-color: var(--primary-color);
+  height: 310px;
+  width: 250px;
+  border-radius: 10px;
+  transition: transform 0.3s ease;
+  gap: 20px;
+}
+
+.usuarioCard-container .middle-column {
+  gap: 8px;
+}
+
+.usuarioCard-container:hover {
+  cursor: pointer;
+  transform: scale(1.08);
+}
+
+.usuarioCard-container li {
+  border-radius: 10px;
+  padding-top: 13px;
+}
+
+.usuarioCard-container li:first-child {
+  justify-content: center;
+  align-items: center;
+}
+
+.usuarioCard-container li h3 {
+  color: var(--full-black-color);
+  padding-left: 9px;
+}
+
+.usuarioCard-container li p {
+  padding-left: 9px;
+  color: var(--full-black-color);
+}
+
+.usuarioCard-container li span {
+  align-items: center;
+}
+
+.usuarioCard-container li span h3,
+.usuarioCard-container li span p {
+  font-size: 17px;
+}
+
+.usuarioCard-buttons {
+  align-items: center;
+  gap: 10px;
+}

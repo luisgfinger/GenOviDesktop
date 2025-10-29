@@ -1,0 +1,63 @@
+.usuarioSheet-container {
+  gap: 85px;
+  align-items: center;
+}
+
+.usuarioSheet-container-inside {
+  width: 848px;
+  max-height: 442px;
+  font-size: 13.58px;
+  background-color: #d9d9d9;
+  overflow-y: auto;
+  overflow-x: hidden;
+  border-radius: 10px;
+  justify-content: center;
+  align-items: center;
+}
+
+.usuarioSheet-titles-row {
+  background-color: #cac3af;
+  height: 34px;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  padding-left: 10px;
+  padding-right: 10px;
+  width: 100%;
+  align-items: center;
+  justify-content: center;
+}
+
+.usuarioSheet-titles-row span,
+.usuarioSheet-row span {
+  width: 20%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 34px;
+}
+
+.usuarioSheet-row {
+  transition: transform 0.3s ease;
+  padding-left: 10px;
+  padding-right: 10px;
+  width: 100%;
+}
+
+.usuarioSheet-row:hover {
+  cursor: pointer;
+  transform: scale(1.02);
+}
+
+.par {
+  background-color: #bbbbbb;
+}
+
+.impar {
+  background-color: #d9d9d9;
+}
+
+.usuarioSheet-row.selecionado {
+  background-color: #b1a97e;
+  font-weight: 600;
+}

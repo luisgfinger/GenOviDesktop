@@ -2,7 +2,6 @@ import React from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import Ovinos from "../../../assets/icons/ovinos.png";
 import Funcionarios from "../../../assets/icons/funcionarios.png";
-import Notificacoes from "../../../assets/icons/notificacoes.png";
 import Ia from "../../../assets/icons/ia.png";
 import Register from "../../../assets/icons/register.png";
 import Arrow from "../../../assets/icons/backArrow.png";
@@ -13,11 +12,11 @@ const SideMenu: React.FC = () => {
   const location = useLocation();
 
   const menuItems = [
-    { label: "OVINOS", icon: Ovinos, path: "/dashboard/ovinos" },
-    { label: "FUNCIONARIOS", icon: Funcionarios, path: "/dashboard/funcionarios" },
+    { label: "OVINOS", icon: Ovinos, path: "/dashboard/ovinos" },    
     {label: "REGISTROS", icon: Register, path: "/dashboard/registros"},
-    { label: "NOTIFICAÇÕES", icon: Notificacoes, path: "/notificacoes" },
     { label: "IA", icon: Ia, path: "/ia" },
+    { label: "FUNCIONARIOS", icon: Funcionarios, path: "/dashboard/funcionarios" },
+    { label: "USUÁRIOS", icon: Funcionarios, path: "/dashboard/usuarios" },
   ];
 
   const handleBack = () => {

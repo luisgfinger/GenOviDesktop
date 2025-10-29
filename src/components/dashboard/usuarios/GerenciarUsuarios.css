@@ -1,0 +1,13 @@
+.gerenciar-usuarios-container {
+  padding-top: 25px;
+  justify-content: center;
+  align-items: center;
+  gap: 26px;
+  padding-bottom: 30px;
+}
+
+.gerenciar-usuarios-container-inside {
+  display: grid;
+  grid-template-columns: repeat(4, max-content);
+  gap: 26px;
+}

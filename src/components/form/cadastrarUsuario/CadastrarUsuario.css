@@ -1,0 +1,60 @@
+.cadastrar-usuario-bg {
+  width: 100%;
+  height: 100%;
+  background-color: var(--primary-color);
+}
+
+.cadastrarUsuario-container {
+  background-color: var(--white-color);
+  width: 500px;
+  height: 640px;
+  align-self: center;
+  justify-self: center;
+  margin-top: 40px;
+  border-radius: 10px;
+  margin-bottom: 60px;
+  padding-top: 20px;
+}
+
+.cadastrarUsuario-container h3,
+.cadastrarUsuario-container label {
+  color: var(--full-black-color);
+}
+
+.cadastrarUsuario-container ul {
+  gap: 34px;
+  align-items: center;
+  margin-top: 42px;
+}
+
+.cadastrarUsuario-container input,
+.cadastrarUsuario-container select {
+  height: 40px;
+  border-radius: 10px;
+  border: none;
+  background-color: var(--secondary-color);
+  padding-left: 8px;
+  width: 350px;
+}
+
+.cadastrarUsuario-container input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--primary-color);
+  cursor: pointer;
+}
+
+.cadastrarUsuario-container button {
+  margin-top: 30px;
+}
+
+.cadastrarUsuario-container-checks{
+  width: 350px;
+  margin-top: 0px !important;
+  align-items: flex-start !important;
+  gap: 8px !important;
+}
+
+.cadastrarUsuario-container-checks li{
+  gap: 8px !important;
+}
