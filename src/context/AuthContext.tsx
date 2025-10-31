@@ -28,6 +28,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         localStorage.removeItem("email");
         localStorage.removeItem("token");
         localStorage.removeItem("loginTime");
+        localStorage.removeItem("usuarioId");
         setIsLoggedIn(false);
       }
     }
@@ -45,6 +46,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     localStorage.removeItem("email");
     localStorage.removeItem("token");
     localStorage.removeItem("loginTime");
+    localStorage.removeItem("usuarioId");
     setIsLoggedIn(false);
   };
 
