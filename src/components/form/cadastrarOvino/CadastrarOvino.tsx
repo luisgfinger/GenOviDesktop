@@ -181,7 +181,7 @@ const CadastrarOvino: React.FC<CadastrarOvinoProps> = ({
         fbb,
         dataNascimento: dataNasc ? `${dataNasc}:00` : undefined,
         dataCadastro: new Date().toISOString(),
-        typeGrauPureza: grauPureza,
+        grauPureza: grauPureza,
         sexo,
         status,
         maeId: idOvelhaMae ? Number(idOvelhaMae) : undefined,

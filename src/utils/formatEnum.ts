@@ -1,6 +1,5 @@
-export function formatEnum(value: string): string {
-  return value
-    .toLowerCase()
-    .replace(/_/g, " ")
-    .replace(/\b\w/g, (char) => char.toUpperCase());
+export function formatEnum(value?: string) {
+  if (!value) return "";
+  return value.toLowerCase().replace(/_/g, " ");
 }
+

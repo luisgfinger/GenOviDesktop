@@ -1,4 +1,4 @@
 export enum TypeSexo {
-  MACHO = "MACHO",
-  FEMEA = "FEMEA"
+  MACHO = "Macho",
+  FEMEA = "Fêmea"
 }

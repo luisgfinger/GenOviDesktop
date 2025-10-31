@@ -14,7 +14,7 @@ export interface OvinoResponseDTO {
   fbb: string;
   dataNascimento?: string;
   dataCadastro?: string;
-  typeGrauPureza: TypeGrauPureza;
+  grauPureza: TypeGrauPureza;
   sexo: TypeSexo;
   maeOvino?: { id: number; nome: string }; 
   paiOvino?: { id: number; nome: string };  

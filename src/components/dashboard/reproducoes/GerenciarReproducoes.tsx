@@ -166,7 +166,7 @@ const GerenciarReproducoes: React.FC = () => {
                 <div className="repros-meta">
                   <span>
                     <strong>Tipo:</strong>{" "}
-                    {r.typeReproducao ? formatEnum(r.typeReproducao) : "—"}
+                    {r.enumReproducao ? formatEnum(r.enumReproducao) : "—"}
                   </span>
                   <br />
                   <span>

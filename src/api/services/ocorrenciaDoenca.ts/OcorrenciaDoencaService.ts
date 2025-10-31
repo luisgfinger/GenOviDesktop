@@ -18,6 +18,7 @@ function mapOcorrenciaDoenca(raw: any): OcorrenciaDoencaResponseDTO {
 export class OcorrenciaDoencaService {
   static async listarTodos(): Promise<OcorrenciaDoencaResponseDTO[]> {
     const { data } = await Api.get<any[]>("/user/ocorrencias-doencas");
+    console.log("Dados recebidos:", data);
     return data.map(mapOcorrenciaDoenca);
   }
 

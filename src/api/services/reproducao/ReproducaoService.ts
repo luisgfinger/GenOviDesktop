@@ -12,7 +12,7 @@ export class ReproducaoService {
       id: r.id,
       carneiro: r.carneiro ?? null,
       ovelha: r.ovelha ?? null,
-      typeReproducao: r.typeReproducao,
+      enumReproducao: r.enumReproducao,
       dataReproducao: r.dataReproducao,
       observacoes: r.observacoes ?? null,
     }));
@@ -27,7 +27,7 @@ export class ReproducaoService {
       id: data.id,
       carneiro: data.carneiro ?? null,
       ovelha: data.ovelha ?? null,
-      typeReproducao: data.typeReproducao,
+      enumReproducao: data.enumReproducao,
       dataReproducao: data.dataReproducao,
       observacoes: data.observacoes ?? null,
     };
@@ -42,7 +42,7 @@ export class ReproducaoService {
       id: data.id,
       carneiro: data.carneiro ?? null,
       ovelha: data.ovelha ?? null,
-      typeReproducao: data.typeReproducao,
+      enumReproducao: data.enumReproducao,
       dataReproducao: data.dataReproducao,
       observacoes: data.observacoes ?? null,
     };
@@ -57,7 +57,7 @@ export class ReproducaoService {
       id: data.id,
       carneiro: data.carneiro ?? null,
       ovelha: data.ovelha ?? null,
-      typeReproducao: data.typeReproducao,
+      enumReproducao: data.enumReproducao,
       dataReproducao: data.dataReproducao,
       observacoes: data.observacoes ?? null,
     };

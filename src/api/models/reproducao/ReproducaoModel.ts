@@ -5,7 +5,7 @@ export interface Reproducao {
   id: number;
   carneiro: Ovino;
   ovelha: Ovino;
-  typeReproducao: TypeReproducao;
+  enumReproducao: TypeReproducao;
   dataReproducao: string;
   observacoes?: string;  
 }

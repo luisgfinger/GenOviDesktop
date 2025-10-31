@@ -12,7 +12,7 @@ export interface Ovino {
   fbb: string;
   dataNascimento?: string;
   dataCadastro?: string;
-  typeGrauPureza: TypeGrauPureza;
+  grauPureza: TypeGrauPureza;
   sexo: TypeSexo;
 
   ovinoMae?: {

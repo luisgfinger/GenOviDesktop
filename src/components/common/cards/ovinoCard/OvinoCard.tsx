@@ -45,7 +45,7 @@ const OvinoCard: React.FC<OvinoCardProps> = ({
         </span>
         <span className="flex">
           <h3>PUREZA:</h3>
-          <p>{formatEnum(ovino.typeGrauPureza)}</p>
+          <p>{formatEnum(ovino.grauPureza)}</p>
         </span>
       </li>
       <li className="ovinoCard-buttons flex-column">

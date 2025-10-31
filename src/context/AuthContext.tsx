@@ -2,7 +2,7 @@ import React, { createContext, useContext, useState, useEffect } from "react";
 
 interface AuthContextType {
   isLoggedIn: boolean;
-  login: (username: string, token: string) => void;
+  login: (email: string, token: string) => void;
   logout: () => void;
   loading: boolean;
 }
@@ -14,18 +14,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const username = localStorage.getItem("username");
+    const email = localStorage.getItem("email");
     const token = localStorage.getItem("token");
     const loginTime = localStorage.getItem("loginTime");
 
-    if (username && token && loginTime) {
+    if (email && token && loginTime) {
       const now = Date.now();
       const twentyFourHours = 24 * 60 * 60 * 1000;
 
       if (now - Number(loginTime) < twentyFourHours) {
         setIsLoggedIn(true);
       } else {
-        localStorage.removeItem("username");
+        localStorage.removeItem("email");
         localStorage.removeItem("token");
         localStorage.removeItem("loginTime");
         setIsLoggedIn(false);
@@ -34,15 +34,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setLoading(false);
   }, []);
 
-  const login = (username: string, token: string) => {
-    localStorage.setItem("username", username);
+  const login = (email: string, token: string) => {
+    localStorage.setItem("email", email);
     localStorage.setItem("token", token);
     localStorage.setItem("loginTime", Date.now().toString());
     setIsLoggedIn(true);
   };
 
   const logout = () => {
-    localStorage.removeItem("username");
+    localStorage.removeItem("email");
     localStorage.removeItem("token");
     localStorage.removeItem("loginTime");
     setIsLoggedIn(false);

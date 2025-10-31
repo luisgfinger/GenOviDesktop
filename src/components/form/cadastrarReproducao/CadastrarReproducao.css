@@ -161,3 +161,24 @@
 }
 
 
+.cadastrarReproducao-container .checkbox-sugestao {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 560px;
+  max-width: 100%;
+}
+
+.cadastrarReproducao-container .checkbox-sugestao input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--primary-color);
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.cadastrarReproducao-container .checkbox-sugestao label {
+  color: var(--full-black-color);
+  font-size: 15px;
+  cursor: pointer;
+}

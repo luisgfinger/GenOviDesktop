@@ -10,7 +10,7 @@ export interface OvinoRequestDTO {
   fbb: string;
   dataNascimento?: string;
   dataCadastro?: string;
-  typeGrauPureza: TypeGrauPureza;
+  grauPureza: TypeGrauPureza;
   sexo: TypeSexo;
   status: TypeStatus;
   fotoOvino?: string;

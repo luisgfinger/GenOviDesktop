@@ -10,6 +10,7 @@ import { useCriarAplicacao } from "../../../api/hooks/aplicacao/UseAplicacoes";
 import type { AplicacaoRequestDTO } from "../../../api/dtos/aplicacao/AplicacaoRequestDTO";
 import { formatEnum } from "../../../utils/formatEnum";
 import { formatDate } from "../../../utils/formatDate";
+import { createRegistroAuto} from "../../../utils/criarRegistro";
 
 interface CadastrarAplicacaoProps {
   isVacina: boolean;
@@ -33,7 +34,7 @@ const CadastrarAplicacao: React.FC<CadastrarAplicacaoProps> = ({
   const [ovinoId, setOvinoId] = useState<string>("");
   const [medicamentoId, setMedicamentoId] = useState<string>("");
   const [data, setData] = useState<string>("");
-  const [enviarSugestao, setEnviarSugestao] = useState<boolean>(false); // ✅ novo estado
+  const [enviarSugestao, setEnviarSugestao] = useState<boolean>(false);
 
   const medicamentosFiltrados = medicamentos.filter(
     (m) => m.isVacina === isVacina
@@ -55,8 +56,14 @@ const CadastrarAplicacao: React.FC<CadastrarAplicacaoProps> = ({
 
     try {
       console.log("DTO enviado:", dto);
-      console.log("Enviar como sugestão:", enviarSugestao); // apenas para log
-      await criarAplicacao(dto);
+      console.log("Enviar como sugestão:", enviarSugestao);
+
+      const novaAplicacao = await criarAplicacao(dto);
+
+      console.log("Nova aplicação criada:", novaAplicacao);
+
+      await createRegistroAuto("aplicacao", novaAplicacao, enviarSugestao);
+
       toast.success("Aplicação cadastrada com sucesso!");
       setOvinoId("");
       setMedicamentoId("");

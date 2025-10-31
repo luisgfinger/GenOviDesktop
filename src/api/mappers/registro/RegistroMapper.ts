@@ -5,12 +5,12 @@ export const registroMapper = {
   toRequest: (dto: RegistroRequestDTO): any => ({
     dataRegistro: dto.dataRegistro,
     isSugestao: dto.isSugestao,
-    funcionarioId: dto.funcionarioId,
-    reproducaoId: dto.reproducaoId ?? undefined,
-    gestacaoId: dto.gestacaoId ?? undefined,
-    partoId: dto.partoId ?? undefined,
-    aplicacaoId: dto.aplicacaoId ?? undefined,
-    ocorrenciaDoencaId: dto.ocorrenciaDoencaId ?? undefined,
+    idFuncionario: dto.idFuncionario,
+    idReproducao: dto.idReproducao ?? undefined,
+    idGestacao: dto.idGestacao ?? undefined,
+    idParto: dto.idParto ?? undefined,
+    idAplicacoes: dto.idAplicacoes ?? undefined,
+    idOcorrenciaDoencas: dto.idOcorrenciaDoencas ?? undefined,
   }),
 
   fromResponse: (data: any): RegistroResponseDTO => ({

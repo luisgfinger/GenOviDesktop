@@ -1,4 +1,4 @@
 export enum TypeReproducao {
-  INSEMINACAO_ARTIFICIAL = "INSEMINACAO_ARTIFICIAL",
-  MONTA_NATURAL = "MONTA_NATURAL"
+  INSEMINACAO_ARTIFICIAL = "Inseminação Artificial",
+  MONTA_NATURAL = "Monta Natural",
 }

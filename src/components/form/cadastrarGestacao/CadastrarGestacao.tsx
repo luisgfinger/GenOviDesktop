@@ -9,6 +9,7 @@ import { useCriarGestacao, useGestacoes } from "../../../api/hooks/gestacao/UseG
 import { usePartos } from "../../../api/hooks/parto/UsePartos";
 import { formatEnum } from "../../../utils/formatEnum";
 import { formatDate } from "../../../utils/formatDate";
+import { createRegistroAuto } from "../../../utils/criarRegistro"; // ✅ adicionada
 
 import { TypeSexo } from "../../../api/enums/typeSexo/TypeSexo";
 import type { GestacaoRequestDTO } from "../../../api/dtos/gestacao/GestacaoRequestDTO";
@@ -42,6 +43,7 @@ const CadastrarGestacao: React.FC = () => {
   const [ovelhaMaeId, setOvelhaMaeId] = useState<string>("");
   const [ovelhaPaiId, setOvelhaPaiId] = useState<string>("");
   const [dataGestacao, setDataGestacao] = useState<string>("");
+  const [enviarSugestao, setEnviarSugestao] = useState<boolean>(false); // ✅ nova checkbox
 
   const reproducoesById = useMemo(() => {
     const map = new Map<string, ReproducaoResponseDTO>();
@@ -77,7 +79,6 @@ const CadastrarGestacao: React.FC = () => {
     );
   }, [ovinos, gestacoes, partos]);
 
-
   const handleSelectReproducao = (id: string) => {
     setReproducaoId(id);
 
@@ -94,12 +95,10 @@ const CadastrarGestacao: React.FC = () => {
     }
   };
 
-
   const nomeOvino = (id: string | number | undefined): string => {
     const o = ovinos.find((ov) => ov.id === Number(id));
     return o ? `${o.nome ?? `#${o.id}`} • ${formatEnum(o.raca)}` : "—";
   };
-
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -117,12 +116,17 @@ const CadastrarGestacao: React.FC = () => {
     };
 
     try {
-      await criarGestacao(dto);
+      const novaGestacao = await criarGestacao(dto);
+
+      await createRegistroAuto("gestacao", novaGestacao as any, enviarSugestao);
+
+
       toast.success("Gestação cadastrada com sucesso!");
       setReproducaoId("");
       setOvelhaPaiId("");
       setOvelhaMaeId("");
       setDataGestacao("");
+      setEnviarSugestao(false);
     } catch (err) {
       console.error(err);
       toast.error("Erro ao cadastrar gestação.");
@@ -152,7 +156,7 @@ const CadastrarGestacao: React.FC = () => {
 
                   return (
                     <option key={r.id} value={String(r.id)}>
-                      {formatEnum(r.typeReproducao)} • {carneiroNome} × {ovelhaNome} •{" "}
+                      {formatEnum(r.enumReproducao)} • {carneiroNome} × {ovelhaNome} •{" "}
                       {formatDate(r.dataReproducao)}
                     </option>
                   );
@@ -220,6 +224,17 @@ const CadastrarGestacao: React.FC = () => {
               onChange={(e) => setDataGestacao(e.target.value)}
               required
             />
+          </li>
+
+          {/* ✅ Checkbox para sugestão */}
+          <li className="checkbox-sugestao">
+            <input
+              type="checkbox"
+              id="enviarSugestao"
+              checked={enviarSugestao}
+              onChange={(e) => setEnviarSugestao(e.target.checked)}
+            />
+            <label htmlFor="enviarSugestao">Enviar como sugestão</label>
           </li>
 
           <div className="cadastrarGestacao-form-navigation">

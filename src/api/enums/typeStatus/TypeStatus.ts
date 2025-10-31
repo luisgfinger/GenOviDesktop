@@ -1,6 +1,6 @@
 export enum TypeStatus {
-  ATIVO = "ATIVO",
-  VENDIDO = "VENDIDO",
-  DESATIVADO = "DESATIVADO",
-  MORTO = "MORTO",
+  ATIVO = "Ativo",
+  VENDIDO = "Vendido",
+  DESATIVADO = "Desativado",
+  MORTO = "Morto",
 }

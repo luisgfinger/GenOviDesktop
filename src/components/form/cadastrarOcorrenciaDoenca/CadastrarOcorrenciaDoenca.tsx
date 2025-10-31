@@ -11,7 +11,7 @@ import type { OcorrenciaDoencaRequestDTO } from "../../../api/dtos/ocorrendiaDoe
 import type { DoencaResponseDTO } from "../../../api/dtos/doenca/DoencaResponseDTO";
 import { useDoencas } from "../../../api/hooks/doenca/UseDoencas";
 import { formatDate } from "../../../utils/formatDate";
-
+import { createRegistroAuto } from "../../../utils/criarRegistro";
 
 const CadastrarOcorrenciaDoenca: React.FC = () => {
   const { ovinos, loading: loadingOvinos, error: errorOvinos } = useOvinos();
@@ -27,6 +27,8 @@ const CadastrarOcorrenciaDoenca: React.FC = () => {
   const [ovinoNome, setOvinoNome] = useState<string>("");
   const [dataInicio, setDataInicio] = useState<string>("");
 
+  const [enviarSugestao, setEnviarSugestao] = useState<boolean>(false);
+
   const doencasById = useMemo(() => {
     const m = new Map<string, DoencaResponseDTO>();
     (doencas ?? []).forEach((r) => m.set(String(r.id), r));
@@ -35,7 +37,6 @@ const CadastrarOcorrenciaDoenca: React.FC = () => {
 
   const handleSelectDoenca = (id: string) => {
     setDoencaId(id);
-
     if (id) {
       const r = doencasById.get(id);
       if (r) {
@@ -64,12 +65,17 @@ const CadastrarOcorrenciaDoenca: React.FC = () => {
     };
 
     try {
-      console.log("DTO enviado:", dto);
-      await criarOcorrencia(dto);
+      const novaOcorrencia = await criarOcorrencia(dto);
+
+      console.log("Nova Ocorrencia Doenca criada:", novaOcorrencia);
+
+      await createRegistroAuto("ocorrenciaDoenca", novaOcorrencia, enviarSugestao);
+
       toast.success("Adoecimento cadastrada com sucesso!");
       setOvinoId("");
       setDoencaId("");
       setDataInicio("");
+      setEnviarSugestao(false);
     } catch (err) {
       console.error(err);
       toast.error("Erro ao cadastrar adoecimento.");
@@ -107,21 +113,22 @@ const CadastrarOcorrenciaDoenca: React.FC = () => {
 
           <li className="flex-column">
             <label htmlFor="ovinoId">Ovino</label>
-              <select
-                id="ovinoId"
-                value={ovinoId}
-                onChange={(e) => setOvinoId(e.target.value)}
-                required
-              >
-                <option value="">Selecione o ovino...</option>
-                {ovinos.map((o) => (
-                  <option key={o.id} value={String(o.id)}>
-                    {o.nome} • {formatEnum(o.raca)} •{" "}
-                    {o.dataNascimento ? formatDate(o.dataNascimento): "-"}
-                  </option>
-                ))}
-              </select>
+            <select
+              id="ovinoId"
+              value={ovinoId}
+              onChange={(e) => setOvinoId(e.target.value)}
+              required
+            >
+              <option value="">Selecione o ovino...</option>
+              {ovinos.map((o) => (
+                <option key={o.id} value={String(o.id)}>
+                  {o.nome} • {formatEnum(o.raca)} •{" "}
+                  {o.dataNascimento ? formatDate(o.dataNascimento) : "-"}
+                </option>
+              ))}
+            </select>
           </li>
+
           <li className="flex-column">
             <label htmlFor="dataInicio">Data de início</label>
             <input
@@ -132,6 +139,17 @@ const CadastrarOcorrenciaDoenca: React.FC = () => {
               required
             />
           </li>
+
+          <li className="checkbox-sugestao">
+            <input
+              type="checkbox"
+              id="enviarSugestao"
+              checked={enviarSugestao}
+              onChange={(e) => setEnviarSugestao(e.target.checked)}
+            />
+            <label htmlFor="enviarSugestao">Enviar como sugestão</label>
+          </li>
+
           <div className="cadastrarOcorrenciaDoenca-form-navigation">
             <Button type="submit" variant="cardPrimary" disabled={saving}>
               {saving ? "Salvando..." : "Cadastrar adoecimento"}

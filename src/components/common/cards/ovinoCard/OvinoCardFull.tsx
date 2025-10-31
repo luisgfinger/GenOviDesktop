@@ -67,8 +67,8 @@ const OvinoCardFull: React.FC<OvinoCardFullProps> = ({
         {renderField("Raça", formatEnum(ovino.raca), "raca")}
         {renderField(
           "Grau de Pureza",
-          formatEnum(ovino.typeGrauPureza),
-          "typeGrauPureza"
+          formatEnum(ovino.grauPureza),
+          "grauPureza"
         )}
         {renderField("Status", formatEnum(ovino.status), "status")}
         {renderField(

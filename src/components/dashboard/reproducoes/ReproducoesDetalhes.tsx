@@ -34,7 +34,7 @@ const ReproducaoDetalhes: React.FC<ReproducaoDetalhesProps> = ({
   const campos: CampoConfig<ReproducaoResponseDTO>[] = [
     {
       label: "Tipo de Reprodução",
-      key: "typeReproducao",
+      key: "enumReproducao",
       renderView: (valor) => (valor ? formatEnum(valor as TypeReproducao) : "—"),
       renderEdit: (valor, onChange) => (
         <select value={valor ?? ""} onChange={(e) => onChange(e.target.value)}>
@@ -133,7 +133,7 @@ const ReproducaoDetalhes: React.FC<ReproducaoDetalhesProps> = ({
     await ReproducaoService.editar(atualizado.id, {
       carneiroId: atualizado.carneiro?.id ?? null,
       ovelhaId: atualizado.ovelha?.id ?? null,
-      typeReproducao: atualizado.typeReproducao ?? "",
+      enumReproducao: atualizado.enumReproducao ?? "",
       dataReproducao: atualizado.dataReproducao ?? "",
       observacoes: atualizado.observacoes ?? "",
     });

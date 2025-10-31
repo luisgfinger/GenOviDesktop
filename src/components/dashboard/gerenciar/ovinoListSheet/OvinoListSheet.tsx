@@ -60,7 +60,7 @@ const OvinoListSheet: React.FC<OvinoListSheetProps> = ({ ovinos }) => {
             <span className="flex">{ovino.sexo}</span>
             <span className="flex">{ovino.ovinoMae?.nome ?? "Não informado"}</span>
             <span className="flex">{ovino.ovinoPai?.nome ?? "Não informado"}</span>
-            <span className="flex">{ovino.typeGrauPureza}</span>
+            <span className="flex">{ovino.grauPureza}</span>
           </li>
         ))}
       </ul>

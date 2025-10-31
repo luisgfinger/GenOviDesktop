@@ -10,6 +10,7 @@ import {
 export const UsuarioService = {
   async listar(): Promise<Usuario[]> {
     const response = await Api.get<UsuarioResponseDTO[]>("/auth/usuarios");
+    console.log(response.data);
     return response.data.map(fromUsuarioResponseDTO);
   },
 

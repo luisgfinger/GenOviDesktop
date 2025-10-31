@@ -4,7 +4,7 @@ export interface ReproducaoResponseDTO {
   id: number;
   carneiro: Ovino;
   ovelha: Ovino;
-  typeReproducao: string;
+  enumReproducao: string;
   dataReproducao: string;
   observacoes?: string | null;
 }

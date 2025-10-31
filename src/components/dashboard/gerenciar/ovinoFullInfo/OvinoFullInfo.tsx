@@ -161,7 +161,7 @@ const OvinoFullInfo: React.FC = () => {
         </select>
       );
     }
-    if (editField === "typeGrauPureza") {
+    if (editField === "grauPureza") {
       return (
         <select
           value={tempValue}
@@ -179,7 +179,7 @@ const OvinoFullInfo: React.FC = () => {
 
     if (editField === "ovinoMae" || editField === "ovinoPai") {
       const options = ovinos.filter((o) =>
-        editField === "ovinoMae" ? o.sexo === "FEMEA" : o.sexo === "MACHO"
+        editField === "ovinoMae" ? o.sexo === "Fêmea" : o.sexo === "Macho"
       );
       return (
         <select

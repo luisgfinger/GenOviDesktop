@@ -7,11 +7,12 @@ import { useOvinos } from "../../../api/hooks/ovino/UseOvinos";
 import { useGestacoes } from "../../../api/hooks/gestacao/UseGestacoes";
 import { useCriarParto } from "../../../api/hooks/parto/UsePartos";
 import { formatEnum } from "../../../utils/formatEnum";
+import { formatDate } from "../../../utils/formatDate";
+import { createRegistroAuto } from "../../../utils/criarRegistro";
 
 import { TypeSexo } from "../../../api/enums/typeSexo/TypeSexo";
 import type { PartoRequestDTO } from "../../../api/dtos/parto/PartoRequestDTO";
 import type { GestacaoResponseDTO } from "../../../api/dtos/gestacao/GestacaoResponseDTO";
-import { formatDate } from "../../../utils/formatDate";
 
 function monthsBetween(iso?: string): number {
   if (!iso) return 0;
@@ -27,7 +28,7 @@ function monthsBetween(iso?: string): number {
   return Math.max(0, months);
 }
 
-const MIN_MALE_MONTHS = 7;  
+const MIN_MALE_MONTHS = 7;
 const MIN_FEMALE_MONTHS = 8;
 
 interface CadastrarPartoProps {
@@ -40,14 +41,9 @@ interface CadastrarPartoProps {
   ) => void;
 }
 
-const CadastrarParto: React.FC<CadastrarPartoProps> = ({ onSuccess }) => { 
-
+const CadastrarParto: React.FC<CadastrarPartoProps> = ({ onSuccess }) => {
   const { ovinos, loading: loadingOvinos, error: errorOvinos } = useOvinos();
-  const {
-    gestacoes,
-    loading: loadingRepros,
-    error: errorRepros,
-  } = useGestacoes();
+  const { gestacoes, loading: loadingGestacoes, error: errorGestacoes } = useGestacoes();
   const { criarParto, loading: saving, error: errorSalvar } = useCriarParto();
 
   const [gestacaoId, setGestacaoId] = useState<string>("");
@@ -55,6 +51,7 @@ const CadastrarParto: React.FC<CadastrarPartoProps> = ({ onSuccess }) => {
   const [ovelhaPaiId, setOvelhaPaiId] = useState<string>("");
   const [dataParto, setDataParto] = useState<string>("");
   const [qtdFilhotes, setQtdFilhotes] = useState<number>(1);
+  const [enviarSugestao, setEnviarSugestao] = useState<boolean>(false);
 
   const [carneiroPaiNome, setCarneiroPaiNome] = useState<string>("");
   const [ovelhaMaeNome, setOvelhaMaeNome] = useState<string>("");
@@ -65,25 +62,25 @@ const CadastrarParto: React.FC<CadastrarPartoProps> = ({ onSuccess }) => {
     return m;
   }, [gestacoes]);
 
-const machos = useMemo(
-  () =>
-    (ovinos ?? []).filter(
-      (o) =>
-        o.sexo === TypeSexo.MACHO &&
-        monthsBetween(o.dataNascimento) >= MIN_MALE_MONTHS
-    ),
-  [ovinos]
-);
+  const machos = useMemo(
+    () =>
+      (ovinos ?? []).filter(
+        (o) =>
+          o.sexo === TypeSexo.MACHO &&
+          monthsBetween(o.dataNascimento) >= MIN_MALE_MONTHS
+      ),
+    [ovinos]
+  );
 
-const femeas = useMemo(
-  () =>
-    (ovinos ?? []).filter(
-      (o) =>
-        o.sexo === TypeSexo.FEMEA &&
-        monthsBetween(o.dataNascimento) >= MIN_FEMALE_MONTHS
-    ),
-  [ovinos]
-);
+  const femeas = useMemo(
+    () =>
+      (ovinos ?? []).filter(
+        (o) =>
+          o.sexo === TypeSexo.FEMEA &&
+          monthsBetween(o.dataNascimento) >= MIN_FEMALE_MONTHS
+      ),
+    [ovinos]
+  );
 
   const handleSelectGestacao = (id: string) => {
     setGestacaoId(id);
@@ -122,6 +119,9 @@ const femeas = useMemo(
     try {
       console.log("DTO enviado:", dto);
       const partoCriado = await criarParto(dto);
+
+      await createRegistroAuto("parto", partoCriado as any, enviarSugestao);
+
       toast.success("Parto cadastrado com sucesso!");
 
       onSuccess?.(
@@ -138,6 +138,8 @@ const femeas = useMemo(
       setCarneiroPaiNome("");
       setOvelhaMaeNome("");
       setDataParto("");
+      setQtdFilhotes(1);
+      setEnviarSugestao(false);
     } catch (err) {
       console.error(err);
       toast.error("Erro ao cadastrar parto.");
@@ -146,17 +148,14 @@ const femeas = useMemo(
 
   return (
     <div className="cadastrar-parto-bg flex-column">
-      <form
-        className="cadastrarParto-container flex-column"
-        onSubmit={handleSubmit}
-      >
+      <form className="cadastrarParto-container flex-column" onSubmit={handleSubmit}>
         <ul className="flex-column">
           <li className="flex-column">
             <label htmlFor="gestacaoId">Gestação (opcional)</label>
-            {loadingRepros ? (
+            {loadingGestacoes ? (
               <p>Carregando gestações...</p>
-            ) : errorRepros ? (
-              <p style={{ color: "red" }}>{errorRepros}</p>
+            ) : errorGestacoes ? (
+              <p style={{ color: "red" }}>{errorGestacoes}</p>
             ) : (
               <select
                 id="gestacaoId"
@@ -193,8 +192,7 @@ const femeas = useMemo(
                 <option value="">Selecione o carneiro...</option>
                 {machos.map((o) => (
                   <option key={o.id} value={String(o.id)}>
-                    {o.nome} • {formatEnum(o.raca)} •{" "}
-                    {formatDate(o.dataNascimento ?? "-")}
+                    {o.nome} • {formatEnum(o.raca)} • {formatDate(o.dataNascimento ?? "-")}
                   </option>
                 ))}
               </select>
@@ -219,13 +217,13 @@ const femeas = useMemo(
                 <option value="">Selecione a ovelha...</option>
                 {femeas.map((o) => (
                   <option key={o.id} value={String(o.id)}>
-                    {o.nome} • {formatEnum(o.raca)} •{" "}
-                    {formatDate(o.dataNascimento ?? "-")}
+                    {o.nome} • {formatEnum(o.raca)} • {formatDate(o.dataNascimento ?? "-")}
                   </option>
                 ))}
               </select>
             )}
           </li>
+
           <li className="flex-column">
             <label htmlFor="dataParto">Data do parto</label>
             <input
@@ -236,6 +234,7 @@ const femeas = useMemo(
               required
             />
           </li>
+
           <li className="flex-column">
             <label htmlFor="qtdFilhotes">Quantidade de filhotes</label>
             <input
@@ -246,6 +245,16 @@ const femeas = useMemo(
               onChange={(e) => setQtdFilhotes(Number(e.target.value))}
             />
           </li>
+          <li className="checkbox-sugestao">
+            <input
+              type="checkbox"
+              id="enviarSugestao"
+              checked={enviarSugestao}
+              onChange={(e) => setEnviarSugestao(e.target.checked)}
+            />
+            <label htmlFor="enviarSugestao">Enviar como sugestão</label>
+          </li>
+
           <div className="cadastrarParto-form-navigation">
             <Button type="submit" variant="cardPrimary" disabled={saving}>
               {saving ? "Salvando..." : "Cadastrar parto"}
