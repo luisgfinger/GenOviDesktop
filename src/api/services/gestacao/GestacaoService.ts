@@ -11,7 +11,7 @@ function mapReproducao(r: any): ReproducaoResponseDTO | undefined {
     id: r.id,
     carneiro: r.carneiroId ?? r.carneiroPai?.id ?? null,
     ovelha: r.ovelhaId ?? r.ovelhaMae?.id ?? null,
-    typeReproducao: r.typeReproducao ?? "",
+    enumReproducao: r.enumReproducao ?? "",
     dataReproducao: r.dataReproducao ?? "",
     observacoes: r.observacoes ?? null,
   };
@@ -47,7 +47,6 @@ export class GestacaoService {
   static async listar(): Promise<GestacaoResponseDTO[]> {
     try {
       const { data } = await Api.get<any[]>("/user/gestacoes");
-      console.log("✅ Gestacoes recebidas:", data);
       return data.map(mapGestacao);
     } catch (err: any) {
       console.error("❌ Erro ao carregar gestações:", err.response?.data || err);

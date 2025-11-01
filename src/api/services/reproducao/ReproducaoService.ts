@@ -6,8 +6,6 @@ export class ReproducaoService {
 
   static async listar(): Promise<ReproducaoResponseDTO[]> {
     const { data } = await Api.get<ReproducaoResponseDTO[]>("/user/reproducoes");
-    console.log("Reproduções recebidas:", data);
-
     return data.map((r: any): ReproducaoResponseDTO => ({
       id: r.id,
       carneiro: r.carneiro ?? null,

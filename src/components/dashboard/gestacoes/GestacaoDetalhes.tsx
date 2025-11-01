@@ -160,8 +160,8 @@ const GestacaoDetalhes: React.FC<GestacaoDetalhesProps> = ({
             {reproducoes.map((r) => (
               <option key={r.id} value={r.id}>
                 {`#${r.id}`} —{" "}
-                {r.typeReproducao
-                  ? formatEnum(r.typeReproducao as TypeReproducao)
+                {r.enumReproducao
+                  ? formatEnum(r.enumReproducao as TypeReproducao)
                   : "Sem tipo"}
               </option>
             ))}

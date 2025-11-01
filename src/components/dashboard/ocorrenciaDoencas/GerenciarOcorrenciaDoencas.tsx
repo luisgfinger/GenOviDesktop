@@ -5,8 +5,8 @@ import "./GerenciarOcorrenciaDoencas.css";
 import Button from "../../common/buttons/Button";
 import PaginationMenu from "../../common/paginationMenu/PaginationMenu";
 import FilterBar from "../../common/filter-bar/FilterBar";
-import ActionButtons from "../../common/buttons/ActionButtons";
 import OcorrenciaDoencaDetalhes from "./OcorrenciaDoencaDetalhes";
+import OcorrenciaDoencaCard from "../../common/cards/registrosCard/OcorrenciaDoencaCard";
 
 import { useOcorrenciasDoenca } from "../../../api/hooks/ocorrenciaDoencas/UseOcorrenciaDoencas";
 import { useEditarOcorrenciaDoenca } from "../../../api/hooks/ocorrenciaDoencas/UseOcorrenciaDoencas";
@@ -37,10 +37,7 @@ const GerenciarOcorrenciasDoenca: React.FC = () => {
     null
   );
 
-  const items = useMemo<OcorrenciaDoencaResponseDTO[]>(
-    () => ocorrencias ?? [],
-    [ocorrencias]
-  );
+  const items = useMemo<OcorrenciaDoencaResponseDTO[]>(() => ocorrencias ?? [], [ocorrencias]);
 
   const filtered: OcorrenciaDoencaResponseDTO[] = useMemo(() => {
     const query = normalize(q.trim());
@@ -128,6 +125,7 @@ const GerenciarOcorrenciasDoenca: React.FC = () => {
 
   return (
     <div className="ocorrencia-page">
+      {/* Cabeçalho */}
       <div className="ocorrencia-header flex">
         <h2>Ocorrências de Doenças</h2>
         <Link to="/dashboard/ovinos/doencas/adoecimento">
@@ -137,6 +135,7 @@ const GerenciarOcorrenciasDoenca: React.FC = () => {
         </Link>
       </div>
 
+      {/* Filtros */}
       <FilterBar
         q={q}
         setQ={setQ}
@@ -161,6 +160,7 @@ const GerenciarOcorrenciasDoenca: React.FC = () => {
         <strong>{filtered.length}</strong> resultado(s).
       </div>
 
+      {/* Cards */}
       {pageItems.length === 0 ? (
         <div className="ocorrencia-empty">
           Nenhuma ocorrência de doença encontrada.
@@ -168,64 +168,12 @@ const GerenciarOcorrenciasDoenca: React.FC = () => {
       ) : (
         <div className="ocorrencia-list">
           {pageItems.map((o) => (
-            <div key={o.id} className="ocorrencia-card">
-              <div>
-                <div className="ocorrencia-col-title">Ovino</div>
-                <div className="ocorrencia-col-main">
-                  {o.ovino?.nome ?? "—"}
-                </div>
-                <div className="ocorrencia-meta">
-                  FBB: {o.ovino?.fbb ?? "—"} • RFID: {o.ovino?.rfid ?? "—"}
-                </div>
-              </div>
-
-              <div>
-                <div className="ocorrencia-col-title">Doença</div>
-                <div className="ocorrencia-meta">
-                  <span>
-                    <strong>Nome:</strong> {o.doenca?.nome ?? "—"}
-                  </span>
-                  <br />
-                  <span>
-                    <strong>Data de Início:</strong>{" "}
-                    {formatDate(o.dataInicio, true)}
-                  </span>
-                  <br />
-                  {o.dataFinal ? (
-                    <span>
-                      <strong>Data Final:</strong>{" "}
-                      {formatDate(o.dataFinal, true)}
-                    </span>
-                  ) : (
-                    <span>
-                      <strong>Curado:</strong> {o.curado ? "Sim" : "Não"}
-                    </span>
-                  )}
-                  <br />
-                </div>
-              </div>
-
-              <div className="ocorrencia-actions flex">
-                <Button variant="cardSecondary" onClick={() => setSelected(o)}>
-                  Ver mais
-                </Button>
-
-                <ActionButtons
-                  onEdit={() => setSelected(o)}
-                  showRemove={false}
-                />
-
-                {!o.curado && (
-                  <Button
-                    type="button"
-                    variant="cardPrimary"
-                    onClick={() => handleMarkCurado(o)}
-                  >
-                    Marcar como curado
-                  </Button>
-                )}
-              </div>
-            </div>
+            <OcorrenciaDoencaCard
+              key={o.id}
+              ocorrencia={o}
+              onView={() => setSelected(o)}
+              onMarkCurado={() => handleMarkCurado(o)}
+            />
           ))}
         </div>
       )}

@@ -1,3 +1,8 @@
+/* ============================
+   Estilos principais da página de Registros
+   Compatível com o CSS unificado dos cards
+   ============================ */
+
 .registro-page {
   display: flex;
   flex-direction: column;
@@ -8,6 +13,7 @@
   margin-bottom: 30px;
 }
 
+/* Cabeçalho */
 .registro-header {
   display: flex;
   justify-content: space-between;
@@ -19,17 +25,20 @@
   color: var(--full-black-color);
 }
 
+/* Contador de registros */
 .registro-counter {
   font-size: 14px;
   opacity: 0.85;
 }
 
+/* Lista de cards */
 .registro-list {
   display: flex;
   flex-direction: column;
   gap: 12px;
 }
 
+/* Card (usa a mesma base dos outros módulos) */
 .registro-card {
   background: var(--white-color);
   border-radius: 10px;
@@ -42,6 +51,7 @@
   transition: all 0.2s ease;
 }
 
+/* Colunas */
 .registro-col-title {
   font-size: 18px;
   opacity: 0.7;
@@ -59,12 +69,14 @@
   max-width: 520px;
 }
 
+/* Ações (botões Ver mais / Editar) */
 .registro-actions {
   display: flex;
   align-items: flex-end;
   gap: 16px;
 }
 
+/* Quando não há registros */
 .registro-empty {
   padding: 16px;
   background: var(--white-color);
@@ -73,6 +85,7 @@
   text-align: center;
 }
 
+/* Paginação */
 .registro-pagination {
   display: flex;
   gap: 8px;
@@ -80,6 +93,47 @@
   justify-content: center;
 }
 
+/* Info adicional da página */
 .registro-page-info {
   font-size: 14px;
+}
+
+/* ============================
+   Integração visual com os cards unificados
+   (mantém consistência entre Registros e demais módulos)
+   ============================ */
+
+.registro-list .card {
+  border: 1px solid #f1f1f1;
+  border-radius: 10px;
+  background: var(--white-color);
+  padding: 12px;
+  transition: all 0.2s ease;
+}
+
+.registro-list .card:hover {
+  transform: scale(1.01);
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.08);
+}
+
+.registro-list .card-col-title {
+  font-size: 18px;
+  opacity: 0.7;
+}
+
+.registro-list .card-col-main {
+  font-weight: 600;
+  color: var(--full-black-color);
+}
+
+.registro-list .card-meta {
+  font-size: 16px;
+  opacity: 0.8;
+}
+
+.registro-list .card-actions {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  justify-content: flex-end;
 }

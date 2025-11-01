@@ -8,10 +8,9 @@ import { usePartos } from "../../../api/hooks/parto/UsePartos";
 import { useOvinos } from "../../../api/hooks/ovino/UseOvinos";
 import type { PartoResponseDTO } from "../../../api/dtos/parto/PartoResponseDTO";
 import FilterBar from "../../common/filter-bar/FilterBar";
-import ActionButtons from "../../common/buttons/ActionButtons";
 import PartoDetalhes from "./PartoDetalhes";
 import { formatDate } from "../../../utils/formatDate";
-
+import PartoCard from "../../common/cards/registrosCard/PartoCard";
 
 function normalize(s?: string) {
   return (s ?? "")
@@ -42,14 +41,14 @@ const GerenciarPartos: React.FC = () => {
   const partosHydrated: PartoUI[] = useMemo(() => {
     return (partos ?? []).map((p) => {
       const ovelhaPai =
-        p.ovinoPai?.id && ovinos
-          ? (ovinos.find((o) => o.id === p.ovinoPai?.id) ?? p.ovinoPai)
-          : p.ovinoPai;
+        p.pai?.id && ovinos
+          ? (ovinos.find((o) => o.id === p.pai?.id) ?? p.pai)
+          : p.pai;
 
       const ovelhaMae =
-        p.ovinoMae?.id && ovinos
-          ? (ovinos.find((o) => o.id === p.ovinoMae.id) ?? p.ovinoMae)
-          : p.ovinoMae;
+        p.mae?.id && ovinos
+          ? (ovinos.find((o) => o.id === p.mae.id) ?? p.mae)
+          : p.mae;
 
       return { ...p, ovelhaPai, ovelhaMae };
     });
@@ -143,54 +142,7 @@ const GerenciarPartos: React.FC = () => {
       ) : (
         <div className="partos-list">
           {pageItems.map((p) => (
-            <div
-              key={p.id}
-              className="partos-card"
-            >
-              <div>
-                <div className="partos-col-title">Ovelha (mãe)</div>
-                <div className="partos-col-main">{p.ovelhaMae?.nome ?? "—"}</div>
-                <div className="partos-meta">
-                  FBB: {p.ovelhaMae?.fbb ?? "—"} • RFID:{" "}
-                  {p.ovelhaMae?.rfid ?? "—"}
-                </div>
-              </div>
-
-              <div>
-                <div className="partos-col-title">Carneiro (pai)</div>
-                <div className="partos-col-main">
-                  {p.ovelhaPai?.nome ?? "—"}
-                </div>
-                <div className="partos-meta">
-                  FBB: {p.ovelhaPai?.fbb ?? "—"} • RFID:{" "}
-                  {p.ovelhaPai?.rfid ?? "—"}
-                </div>
-              </div>
-
-              <div>
-                <div className="partos-col-title">Data do Parto</div>
-                <div className="partos-meta">{formatDate(p.dataParto, true)}</div>
-              </div>
-
-              <div>
-                <div className="partos-meta">
-                  <Button
-                    variant="cardSecondary"
-                    onClick={() => setSelectedParto(p)}
-                  >
-                    Ver mais
-                  </Button>
-                </div>
-              </div>
-              <div>
-                <div className="partos-meta">
-                  <ActionButtons
-                    onEdit={() => setSelectedParto(p)}
-                    showRemove={false}
-                  />
-                </div>
-              </div>
-            </div>
+            <PartoCard key={p.id} parto={p} onView={() => setSelectedParto(p)} />
           ))}
         </div>
       )}

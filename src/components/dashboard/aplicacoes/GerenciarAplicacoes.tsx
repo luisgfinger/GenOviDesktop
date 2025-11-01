@@ -5,12 +5,12 @@ import "./GerenciarAplicacoes.css";
 import Button from "../../common/buttons/Button";
 import PaginationMenu from "../../common/paginationMenu/PaginationMenu";
 import FilterBar from "../../common/filter-bar/FilterBar";
-import ActionButtons from "../../common/buttons/ActionButtons";
 import AplicacaoDetalhes from "./AplicacaoDetalhes";
 
 import { useAplicacoes } from "../../../api/hooks/aplicacao/UseAplicacoes";
 import type { AplicacaoResponseDTO } from "../../../api/dtos/aplicacao/AplicacaoResponseDTO";
 import { formatDate } from "../../../utils/formatDate";
+import AplicacaoCard from "../../common/cards/registrosCard/AplicacaoCard";
 
 function normalize(s?: string) {
   return (s ?? "")
@@ -37,10 +37,7 @@ const GerenciarAplicacoes: React.FC<GerenciarAplicacoesProps> = ({
   const [viewAll, setViewAll] = useState(false);
   const [selected, setSelected] = useState<AplicacaoResponseDTO | null>(null);
 
-  const items = useMemo<AplicacaoResponseDTO[]>(
-    () => aplicacoes ?? [],
-    [aplicacoes]
-  );
+  const items = useMemo<AplicacaoResponseDTO[]>(() => aplicacoes ?? [], [aplicacoes]);
 
   const filteredByType = useMemo(
     () => items.filter((a) => a.medicamento?.isVacina === isVacina),
@@ -106,7 +103,9 @@ const GerenciarAplicacoes: React.FC<GerenciarAplicacoesProps> = ({
       <div className="aplicacao-header flex">
         <h2>{isVacina ? "Vacinas" : "Medicamentos"}</h2>
         <Link
-          to={`/dashboard/ovinos/aplicacoes/cadastrar/${isVacina ? "vacina" : "medicamento"}`}
+          to={`/dashboard/ovinos/aplicacoes/cadastrar/${
+            isVacina ? "vacina" : "medicamento"
+          }`}
         >
           <Button type="button" variant="cardPrimary">
             Nova {isVacina ? "Vacinação" : "Aplicação"}
@@ -141,44 +140,12 @@ const GerenciarAplicacoes: React.FC<GerenciarAplicacoesProps> = ({
       ) : (
         <div className="aplicacao-list">
           {pageItems.map((a) => (
-            <div key={a.id} className="aplicacao-card">
-              <div>
-                <div className="aplicacao-col-title">Ovino</div>
-                <div className="aplicacao-col-main">{a.ovino?.nome ?? "—"}</div>
-                <div className="aplicacao-meta">
-                  FBB: {a.ovino?.fbb ?? "—"} • RFID: {a.ovino?.rfid ?? "—"}
-                </div>
-              </div>
-              <div>
-                <div className="aplicacao-col-title">
-                  {isVacina ? "Vacinação" : "Aplicação"}
-                </div>
-                <div className="aplicacao-meta">
-                  <span>
-                    <strong>Data:</strong> {formatDate(a.dataAplicacao, true)}
-                  </span>
-                  <br />
-                  <span>
-                    <strong>{isVacina ? "Vacina" : "Medicamento"}:</strong>{" "}
-                    {a.medicamento?.nome ?? "—"}
-                  </span>
-                  <br />
-                  <span>
-                    <strong>Fabricante:</strong>{" "}
-                    {a.medicamento?.fabricante ?? "—"}
-                  </span>
-                </div>
-              </div>
-              <div className="aplicacao-actions">
-                <Button variant="cardSecondary" onClick={() => setSelected(a)}>
-                  Ver mais
-                </Button>
-                <ActionButtons
-                  onEdit={() => setSelected(a)}
-                  showRemove={false}
-                />
-              </div>
-            </div>
+            <AplicacaoCard
+              key={a.id}
+              aplicacao={a}
+              onView={() => setSelected(a)}
+              onEdit={() => setSelected(a)}
+            />
           ))}
         </div>
       )}

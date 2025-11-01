@@ -7,11 +7,10 @@ import PaginationMenu from "../../common/paginationMenu/PaginationMenu";
 import { useReproducoes } from "../../../api/hooks/reproducao/UseReproducoes";
 import type { ReproducaoResponseDTO } from "../../../api/dtos/reproducao/ReproducaoResponseDTO";
 import { TypeReproducao } from "../../../api/enums/typeReproducao/TypeReproducao";
-import { formatEnum } from "../../../utils/formatEnum";
 import FilterBar from "../../common/filter-bar/FilterBar";
-import ActionButtons from "../../common/buttons/ActionButtons";
 import ReproducaoDetalhes from "./ReproducoesDetalhes";
 import { formatDate } from "../../../utils/formatDate";
+import ReproducaoCard from "../../common/cards/registrosCard/ReproducaoCard";
 
 function normalize(s?: string) {
   return (s ?? "")
@@ -37,7 +36,6 @@ const GerenciarReproducoes: React.FC = () => {
 
   const reprosHydrated: any[] = useMemo(() => {
     if (!reproducoes) return [];
-    console.log(reproducoes);
     return reproducoes.map((r) => ({
       ...r,
       carneiroNome: r.carneiro?.nome ?? "—",
@@ -146,47 +144,11 @@ const GerenciarReproducoes: React.FC = () => {
       ) : (
         <div className="repros-list">
           {pageItems.map((r) => (
-            <div key={r.id} className="repros-card">
-              <div>
-                <div className="repros-col-title">Carneiro (Macho)</div>
-                <div className="repros-col-main">{r.carneiro?.nome ?? "—"}</div>
-                <div className="repros-meta">
-                  RFID: {r.carneiro?.rfid ?? "—"}
-                </div>
-              </div>
-              <div>
-                <div className="repros-col-title">Ovelha (Fêmea)</div>
-                <div className="repros-col-main">{r.ovelha?.nome ?? "—"}</div>
-                <div className="repros-meta">
-                  RFID: {r.ovelha?.rfid ?? "—"}
-                </div>
-              </div>
-              <div>
-                <div className="repros-col-title">Detalhes</div>
-                <div className="repros-meta">
-                  <span>
-                    <strong>Tipo:</strong>{" "}
-                    {r.enumReproducao ? formatEnum(r.enumReproducao) : "—"}
-                  </span>
-                  <br />
-                  <span>
-                    <strong>Data:</strong> {formatDate(r.dataReproducao, true)}
-                  </span>
-                </div>
-              </div>
-              <div className="repros-buttons flex">
-                <Button
-                  variant="cardSecondary"
-                  onClick={() => setSelectedRepro(r)}
-                >
-                  Ver mais
-                </Button>
-                <ActionButtons
-                  onEdit={() => setSelectedRepro(r)}
-                  showRemove={false}
-                />
-              </div>
-            </div>
+            <ReproducaoCard
+              key={r.id}
+              reproducao={r}
+              onView={() => setSelectedRepro(r)}
+            />
           ))}
         </div>
       )}

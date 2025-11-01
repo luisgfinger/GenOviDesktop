@@ -35,8 +35,8 @@ export class PartoService {
       return {
         id: p.id,
         gestacao: gest,
-        ovinoPai: ovinoPai as Ovino,
-        ovinoMae: ovinoMae as Ovino,
+        pai: ovinoPai as Ovino,
+        mae: ovinoMae as Ovino,
         dataParto: p.dataParto,
       } as PartoResponseDTO;
     });
@@ -60,8 +60,8 @@ export class PartoService {
     return {
       id: data.id,
       gestacao: gest,
-      ovinoPai: ovinoPai as Ovino,
-      ovinoMae: ovinoMae as Ovino,
+      pai: ovinoPai as Ovino,
+      mae: ovinoMae as Ovino,
       dataParto: data.dataParto,
     };
   }
@@ -84,8 +84,8 @@ export class PartoService {
     return {
       id: data.id,
       gestacao: gestCriado,
-      ovinoPai: ovinoPaiCriado as Ovino,
-      ovinoMae: ovinoMaeCriado as Ovino,
+      pai: ovinoPaiCriado as Ovino,
+      mae: ovinoMaeCriado as Ovino,
       dataParto: data.dataParto,
     };
   }
@@ -111,8 +111,8 @@ export class PartoService {
     return {
       id: data.id,
       gestacao: gestEditado,
-      ovinoPai: ovinoPaiEditado as Ovino,
-      ovinoMae: ovinoMaeEditado as Ovino,
+      pai: ovinoPaiEditado as Ovino,
+      mae: ovinoMaeEditado as Ovino,
       dataParto: data.dataParto,
     };
   }

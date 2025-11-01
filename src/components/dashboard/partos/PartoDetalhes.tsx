@@ -74,7 +74,7 @@ const PartoDetalhes: React.FC<PartoDetalhesProps> = ({ parto, onClose }) => {
     },
     {
       label: "Pai (Carneiro)",
-      key: "ovinoPai",
+      key: "pai",
       renderView: (valor) => valor?.nome ?? "—",
       renderEdit: (_, onChange) =>
         loadingOvinos ? (
@@ -87,7 +87,7 @@ const PartoDetalhes: React.FC<PartoDetalhesProps> = ({ parto, onClose }) => {
               );
               onChange(selected);
             }}
-            defaultValue={parto.ovinoPai?.id ?? ""}
+            defaultValue={parto.pai?.id ?? ""}
           >
             <option value="">Selecione</option>
             {machos.map((m) => (
@@ -100,7 +100,7 @@ const PartoDetalhes: React.FC<PartoDetalhesProps> = ({ parto, onClose }) => {
     },
     {
       label: "Mãe (Ovelha)",
-      key: "ovinoMae",
+      key: "mae",
       renderView: (valor) => valor?.nome ?? "—",
       renderEdit: (_, onChange) =>
         loadingOvinos ? (
@@ -113,7 +113,7 @@ const PartoDetalhes: React.FC<PartoDetalhesProps> = ({ parto, onClose }) => {
               );
               onChange(selected);
             }}
-            defaultValue={parto.ovinoMae?.id ?? ""}
+            defaultValue={parto.mae?.id ?? ""}
           >
             <option value="">Selecione</option>
             {femeas.map((f) => (
@@ -158,8 +158,8 @@ const PartoDetalhes: React.FC<PartoDetalhesProps> = ({ parto, onClose }) => {
   const handleSave = async (atualizado: PartoResponseDTO) => {
     if (!atualizado.id) return;
     await PartoService.editar(atualizado.id, {
-      ovelhaMaeId: atualizado.ovinoMae.id,
-      ovelhaPaiId: atualizado.ovinoPai?.id,
+      ovelhaMaeId: atualizado.mae.id,
+      ovelhaPaiId: atualizado.pai?.id,
       dataParto: atualizado.dataParto ?? "",
       gestacaoId: atualizado.gestacao?.id ?? undefined,
     });

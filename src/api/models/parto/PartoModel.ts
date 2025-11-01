@@ -3,8 +3,8 @@ import type { Gestacao } from "../gestacao/GestacaoModel";
 
 export interface Parto {
   id: number;
-  ovinoMae: Ovino;
-  ovinoPai: Ovino;
+  mae: Ovino;
+  pai: Ovino;
   gestacao: Gestacao;
   dataParto: string;
 }

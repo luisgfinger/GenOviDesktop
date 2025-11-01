@@ -9,8 +9,8 @@ import { useOvinos } from "../../../api/hooks/ovino/UseOvinos";
 import { usePartos } from "../../../api/hooks/parto/UsePartos";
 import type { GestacaoResponseDTO } from "../../../api/dtos/gestacao/GestacaoResponseDTO";
 import FilterBar from "../../common/filter-bar/FilterBar";
-import ActionButtons from "../../common/buttons/ActionButtons";
 import GestacaoDetalhes from "./GestacaoDetalhes";
+import GestacaoCard from "../../common/cards/registrosCard/GestacaoCard";
 import { formatDate } from "../../../utils/formatDate";
 
 function normalize(s?: string) {
@@ -43,7 +43,6 @@ const GerenciarGestacoes: React.FC = () => {
   const [viewAll, setViewAll] = useState(false);
   const [selectedGestacao, setSelectedGestacao] =
     useState<GestacaoUI | null>(null);
-
 
   const gestacoesHydrated: GestacaoUI[] = useMemo(() => {
     return (gestacoes ?? []).map((g) => {
@@ -85,6 +84,7 @@ const GerenciarGestacoes: React.FC = () => {
         if (status !== "TODOS" && g.statusGestacao !== status) return false;
 
         if (!query) return true;
+
         const campos = [
           g.ovelhaPai?.nome ?? "",
           g.ovelhaMae?.nome ?? "",
@@ -104,7 +104,6 @@ const GerenciarGestacoes: React.FC = () => {
       });
   }, [gestacoesHydrated, q, dateFrom, dateTo, status]);
 
-
   const totalPages = viewAll
     ? 1
     : Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
@@ -113,7 +112,6 @@ const GerenciarGestacoes: React.FC = () => {
   const pageItems = viewAll
     ? filtered
     : filtered.slice(startIdx, startIdx + PAGE_SIZE);
-
 
   const clearFilters = () => {
     setQ("");
@@ -129,7 +127,6 @@ const GerenciarGestacoes: React.FC = () => {
 
   return (
     <div className="gestacoes-page">
-     
       <div className="gestacoes-header flex">
         <h2>Gestações</h2>
         <Link to="/dashboard/ovinos/gestacoes/criar">
@@ -159,64 +156,22 @@ const GerenciarGestacoes: React.FC = () => {
         ]}
       />
 
-     
       <div className="gestacoes-counter">
         Mostrando <strong>{pageItems.length}</strong> de{" "}
         <strong>{filtered.length}</strong> resultado(s).
       </div>
 
-   
       {pageItems.length === 0 ? (
         <div className="gestacoes-empty">Nenhuma gestação encontrada.</div>
       ) : (
         <div className="gestacoes-list">
           {pageItems.map((g) => (
-            <div key={g.id} className="gestacoes-card">
-              
-              <div>
-                <div className="gestacoes-col-title">Ovelha (mãe)</div>
-                <div className="gestacoes-col-main">
-                  {g.ovelhaMae?.nome ?? "—"}
-                </div>
-                <div className="gestacoes-meta">
-                  RFID:{" "}
-                  {g.ovelhaMae?.rfid ?? "—"}
-                </div>
-              </div>
-
-          
-              <div>
-                <div className="gestacoes-col-title">Carneiro (pai)</div>
-                <div className="gestacoes-col-main">
-                  {g.ovelhaPai?.nome ?? "—"}
-                </div>
-                <div className="gestacoes-meta">
-                  RFID:{" "}
-                  {g.ovelhaPai?.rfid ?? "—"}
-                </div>
-              </div>
-
-        
-              <div>
-                <div className="gestacoes-col-title">Início</div>
-                <div className="gestacoes-meta">
-                  {formatDate(g.dataGestacao, true)}
-                </div>
-              </div>
-              <div className="gestacoes-actions flex">
-                <Button
-                  variant="cardSecondary"
-                  onClick={() => setSelectedGestacao(g)}
-                >
-                  Ver mais
-                </Button>
-
-                <ActionButtons
-                  onEdit={() => setSelectedGestacao(g)}
-                  showRemove={false}
-                />
-              </div>
-            </div>
+            <GestacaoCard
+              key={g.id}
+              gestacao={g}
+              onView={() => setSelectedGestacao(g)}
+              onEdit={() => setSelectedGestacao(g)}
+            />
           ))}
         </div>
       )}
