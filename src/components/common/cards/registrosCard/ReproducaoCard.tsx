@@ -8,35 +8,63 @@ interface ReproducaoCardProps {
   reproducao: ReproducaoResponseDTO;
   onView: () => void;
   onEdit?: () => void;
+  confirmado?: boolean;
 }
 
-const ReproducaoCard: React.FC<ReproducaoCardProps> = ({ reproducao, onView, onEdit }) => {
+const ReproducaoCard: React.FC<ReproducaoCardProps> = ({
+  reproducao,
+  onView,
+  onEdit,
+  confirmado = false,
+}) => {
   return (
     <div className="card">
-      <span className="card-type reproducao">Reprodução</span>
+      <span className="card-type reproducao">
+        <div className="card-header-info flex">
+          <strong>Reprodução</strong>
+          <span>
+            <strong>Responsável:</strong>{" "}
+            {localStorage.getItem("funcionarioNome") ?? "—"}
+          </span>
+          <span>
+            <strong>Confirmado:</strong> {confirmado ? "Sim" : "Não"}
+          </span>
+        </div>
+      </span>
 
       <div>
-        <div className="card-col-title"><strong>Carneiro (Macho)</strong></div>
+        <div className="card-col-title">
+          <strong>Carneiro (Macho)</strong>
+        </div>
         <div className="card-col-main">{reproducao.carneiro?.nome ?? "—"}</div>
-        <div className="card-meta">RFID: {reproducao.carneiro?.rfid ?? "—"}</div>
+        <div className="card-meta">
+          RFID: {reproducao.carneiro?.rfid ?? "—"}
+        </div>
       </div>
 
       <div>
-        <div className="card-col-title"><strong>Ovelha (Fêmea)</strong></div>
+        <div className="card-col-title">
+          <strong>Ovelha (Fêmea)</strong>
+        </div>
         <div className="card-col-main">{reproducao.ovelha?.nome ?? "—"}</div>
         <div className="card-meta">RFID: {reproducao.ovelha?.rfid ?? "—"}</div>
       </div>
 
       <div>
-        <div className="card-col-title"><strong>Detalhes</strong></div>
+        <div className="card-col-title">
+          <strong>Detalhes</strong>
+        </div>
         <div className="card-meta">
-          <strong>Tipo:</strong> {reproducao.enumReproducao ?? "—"}<br />
+          <strong>Tipo:</strong> {reproducao.enumReproducao ?? "—"}
+          <br />
           <strong>Data:</strong> {formatDate(reproducao.dataReproducao, true)}
         </div>
       </div>
 
       <div className="card-actions">
-        <Button variant="cardSecondary" onClick={onView}>Ver mais</Button>
+        <Button variant="cardSecondary" onClick={onView}>
+          Ver mais
+        </Button>
       </div>
     </div>
   );

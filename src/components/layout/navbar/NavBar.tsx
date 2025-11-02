@@ -42,6 +42,7 @@ const Navbar: React.FC = () => {
             </h3>
           </li>
         ))}
+        <li>Usuário: {localStorage.getItem("funcionarioNome")}</li>
       </ul>
       {isLoggedIn && <a><Button onClick={handleLogout}>Logout</Button></a>}
     </nav>

@@ -1,8 +1,11 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
+import { getUsuarioIdByEmail } from "../utils/getUsuarioIdByEmail";
+import { getFuncionarioIdByUsuarioId } from "../utils/getFuncionarioIdByUsuarioId";
+import { UsuarioService } from "../api/services/usuario/UsuarioService";
 
 interface AuthContextType {
   isLoggedIn: boolean;
-  login: (email: string, token: string) => void;
+  login: (email: string, token: string) => Promise<void>;
   logout: () => void;
   loading: boolean;
 }
@@ -25,21 +28,42 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (now - Number(loginTime) < twentyFourHours) {
         setIsLoggedIn(true);
       } else {
-        localStorage.removeItem("email");
-        localStorage.removeItem("token");
-        localStorage.removeItem("loginTime");
-        localStorage.removeItem("usuarioId");
-        setIsLoggedIn(false);
+        logout();
       }
     }
     setLoading(false);
   }, []);
 
-  const login = (email: string, token: string) => {
+  const login = async (email: string, token: string) => {
     localStorage.setItem("email", email);
     localStorage.setItem("token", token);
     localStorage.setItem("loginTime", Date.now().toString());
     setIsLoggedIn(true);
+
+    try {
+      const usuarioId = await getUsuarioIdByEmail();
+      if (!usuarioId) return;
+
+      if (usuarioId === 1) {
+        localStorage.setItem("funcionarioNome", "Admin");
+        localStorage.setItem("usuarioId", "1");
+        console.log("Usuário admin detectado — nome definido como 'Admin'.");
+        return;
+      }
+
+      const funcionarioId = await getFuncionarioIdByUsuarioId(usuarioId);
+      if (!funcionarioId) return;
+
+      const usuario = await UsuarioService.buscarPorId(usuarioId);
+      const nomeFuncionario = usuario.funcionario?.nome ?? null;
+
+      if (nomeFuncionario) {
+        console.log("Salvando nome do funcionário no localStorage:", nomeFuncionario);
+        localStorage.setItem("funcionarioNome", nomeFuncionario);
+      }
+    } catch (error) {
+      console.error("Erro ao salvar nome do funcionário:", error);
+    }
   };
 
   const logout = () => {
@@ -47,6 +71,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     localStorage.removeItem("token");
     localStorage.removeItem("loginTime");
     localStorage.removeItem("usuarioId");
+    localStorage.removeItem("funcionarioNome");
     setIsLoggedIn(false);
   };
 

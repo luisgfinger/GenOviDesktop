@@ -223,6 +223,7 @@ const GerenciarRegistros: React.FC = () => {
                 return (
                   <OcorrenciaDoencaCard
                     key={r.id}
+                    confirmado={r.isSugestao ? false : true}
                     ocorrencia={entidade}
                     onView={handleView}
                     onMarkCurado={() => handleMarkCurado(entidade)}

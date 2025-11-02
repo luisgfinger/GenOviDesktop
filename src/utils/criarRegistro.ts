@@ -11,34 +11,40 @@ import { getFuncionarioIdByUsuarioId } from "./getFuncionarioIdByUsuarioId";
 
 export async function createRegistroAuto(
   tipo: "aplicacao" | "reproducao" | "gestacao" | "parto" | "ocorrenciaDoenca",
-  entidade:
-    | Aplicacao
-    | Reproducao
-    | Gestacao
-    | Parto
-    | OcorrenciaDoenca,
+  entidade: Aplicacao | Reproducao | Gestacao | Parto | OcorrenciaDoenca,
   isSugestao = false
 ) {
   try {
-    const usuarioId = await getUsuarioIdByEmail();
+    let usuarioId = localStorage.getItem("usuarioId");
+    let funcionarioId = localStorage.getItem("funcionarioId");
+
     if (!usuarioId) {
-      console.warn("Nenhum usuário logado encontrado. Registro não será criado.");
-      return;
+      const foundUsuarioId = await getUsuarioIdByEmail();
+      if (!foundUsuarioId) {
+        console.warn("Nenhum usuário logado encontrado. Registro não será criado.");
+        return;
+      }
+      usuarioId = String(foundUsuarioId);
+      localStorage.setItem("usuarioId", usuarioId);
     }
 
-    let idFuncionario = await getFuncionarioIdByUsuarioId(usuarioId);
-
-    if (!idFuncionario) {
-      console.warn(
-        "Usuário logado não possui funcionário vinculado. Usando funcionário ID = 1 como padrão."
-      );
-      idFuncionario = 1;
+    if (!funcionarioId) {
+      const foundFuncionarioId = await getFuncionarioIdByUsuarioId(Number(usuarioId));
+      if (foundFuncionarioId) {
+        funcionarioId = String(foundFuncionarioId);
+        localStorage.setItem("funcionarioId", funcionarioId);
+      } else {
+        console.warn(
+          "Usuário logado não possui funcionário vinculado. Usando funcionário ID = 1 como padrão."
+        );
+        funcionarioId = "1";
+      }
     }
 
     const dto: RegistroRequestDTO = {
-     dataRegistro: new Date().toISOString().split("Z")[0],
+      dataRegistro: new Date().toISOString().split("Z")[0],
       isSugestao,
-      idFuncionario: idFuncionario,
+      idFuncionario: Number(funcionarioId),
       idAplicacoes: undefined,
       idReproducao: undefined,
       idGestacao: undefined,
@@ -63,13 +69,12 @@ export async function createRegistroAuto(
         dto.idOcorrenciaDoencas = (entidade as OcorrenciaDoenca).id;
         break;
     }
+
     console.log("DTO enviado para RegistroService:", dto);
     await RegistroService.criar(dto);
 
-    console.log(
-      `Registro automático criado para ${tipo} (funcionário ID: ${idFuncionario}).`
-    );
+    console.log(`✅ Registro automático criado para ${tipo} (funcionário ID: ${funcionarioId}).`);
   } catch (error) {
-    console.error(`Erro ao criar registro automático (${tipo}):`, error);
+    console.error(`❌ Erro ao criar registro automático (${tipo}):`, error);
   }
 }

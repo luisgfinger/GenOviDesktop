@@ -9,28 +9,51 @@ interface PartoCardProps {
   parto: PartoResponseDTO;
   onView: () => void;
   onEdit?: () => void;
+  confirmado?: boolean;
 }
 
-const PartoCard: React.FC<PartoCardProps> = ({ parto, onView, onEdit }) => {
+const PartoCard: React.FC<PartoCardProps> = ({
+  parto,
+  onView,
+  onEdit,
+  confirmado = false,
+}) => {
   return (
     <div className="card">
-      <span className="card-type">Parto</span>
+      <span className="card-type">
+        <div className="card-header-info flex">
+          <strong>Parto</strong>
+          <span>
+            <strong>Responsável:</strong>{" "}
+            {localStorage.getItem("funcionarioNome") ?? "—"}
+          </span>
+          <span>
+            <strong>Confirmado:</strong> {confirmado ? "Sim" : "Não"}
+          </span>
+        </div>
+      </span>
       <div>
-        <div className="card-col-title"><strong>Ovelha (mãe)</strong></div>
+        <div className="card-col-title">
+          <strong>Ovelha (mãe)</strong>
+        </div>
         <div className="card-col-main">{parto.mae?.nome ?? "—"}</div>
         <div className="card-meta">
           FBB: {parto.mae?.fbb ?? "—"} • RFID: {parto.mae?.rfid ?? "—"}
         </div>
       </div>
       <div>
-        <div className="card-col-title"><strong>Carneiro (pai)</strong></div>
+        <div className="card-col-title">
+          <strong>Carneiro (pai)</strong>
+        </div>
         <div className="card-col-main">{parto.mae?.nome ?? "—"}</div>
         <div className="card-meta">
           FBB: {parto.mae?.fbb ?? "—"} • RFID: {parto.mae?.rfid ?? "—"}
         </div>
       </div>
       <div>
-        <div className="card-col-title"><strong>Data do Parto</strong></div>
+        <div className="card-col-title">
+          <strong>Data do Parto</strong>
+        </div>
         <div className="card-meta">{formatDate(parto.dataParto, true)}</div>
       </div>
       <div className="card-actions">

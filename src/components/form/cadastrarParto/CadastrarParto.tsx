@@ -252,7 +252,7 @@ const CadastrarParto: React.FC<CadastrarPartoProps> = ({ onSuccess }) => {
               checked={enviarSugestao}
               onChange={(e) => setEnviarSugestao(e.target.checked)}
             />
-            <label htmlFor="enviarSugestao">Enviar como sugestão</label>
+            <label htmlFor="enviarSugestao">Enviar como solicitação</label>
           </li>
 
           <div className="cadastrarParto-form-navigation">

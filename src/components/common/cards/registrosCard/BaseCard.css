@@ -46,3 +46,6 @@
   letter-spacing: 0.3px;
 }
 
+.card-header-info {
+  gap: 36px;
+}
