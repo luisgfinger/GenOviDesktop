@@ -46,17 +46,19 @@ const GerenciarRegistros: React.FC = () => {
   const [viewAll, setViewAll] = useState(false);
   const [selected, setSelected] = useState<RegistroResponseDTO | null>(null);
   const [selectedTipo, setSelectedTipo] = useState<
-    "aplicacao" | "reproducao" | "gestacao" | "parto" | "ocorrenciaDoenca" | null
-  >(null);
-
-  const items = useMemo(() => registros ?? [], [registros]);
-
-  const getTipoRegistro = (r: RegistroResponseDTO):
     | "aplicacao"
     | "reproducao"
     | "gestacao"
     | "parto"
-    | "ocorrenciaDoenca" => {
+    | "ocorrenciaDoenca"
+    | null
+  >(null);
+
+  const items = useMemo(() => registros ?? [], [registros]);
+
+  const getTipoRegistro = (
+    r: RegistroResponseDTO
+  ): "aplicacao" | "reproducao" | "gestacao" | "parto" | "ocorrenciaDoenca" => {
     if (r.aplicacao) return "aplicacao";
     if (r.reproducao) return "reproducao";
     if (r.gestacao) return "gestacao";
@@ -194,35 +196,43 @@ const GerenciarRegistros: React.FC = () => {
               case "aplicacao":
                 return (
                   <AplicacaoCard
-                    key={r.id}
+                    key={r.idRegistro}
                     aplicacao={entidade}
                     onView={handleView}
+                    confirmado={r.isSugestao ? false : true}
                   />
                 );
               case "reproducao":
                 return (
                   <ReproducaoCard
-                    key={r.id}
+                    key={r.idRegistro}
                     reproducao={entidade}
                     onView={handleView}
+                    confirmado={r.isSugestao ? false : true}
                   />
                 );
               case "gestacao":
                 return (
                   <GestacaoCard
-                    key={r.id}
+                    confirmado={r.isSugestao ? false : true}
+                    key={r.idRegistro}
                     gestacao={entidade}
                     onView={handleView}
                   />
                 );
               case "parto":
                 return (
-                  <PartoCard key={r.id} parto={entidade} onView={handleView} />
+                  <PartoCard
+                    key={r.idRegistro}
+                    parto={entidade}
+                    onView={handleView}
+                    confirmado={r.isSugestao ? false : true}
+                  />
                 );
               case "ocorrenciaDoenca":
                 return (
                   <OcorrenciaDoencaCard
-                    key={r.id}
+                    key={r.idRegistro}
                     confirmado={r.isSugestao ? false : true}
                     ocorrencia={entidade}
                     onView={handleView}
@@ -263,49 +273,53 @@ const GerenciarRegistros: React.FC = () => {
         </div>
       )}
 
-      {selected && selectedTipo && (() => {
-        const entidade = selected[selectedTipo as keyof RegistroResponseDTO] as any;
-        switch (selectedTipo) {
-          case "aplicacao":
-            return (
-              <AplicacaoDetalhes
-                aplicacao={entidade}
-                isVacina={!!entidade.medicamento?.isVacina}
-                onClose={() => setSelected(null)}
-              />
-            );
-          case "reproducao":
-            return (
-              <ReproducaoDetalhes
-                reproducao={entidade}
-                onClose={() => setSelected(null)}
-              />
-            );
-          case "gestacao":
-            return (
-              <GestacaoDetalhes
-                gestacao={entidade}
-                onClose={() => setSelected(null)}
-              />
-            );
-          case "parto":
-            return (
-              <PartoDetalhes
-                parto={entidade}
-                onClose={() => setSelected(null)}
-              />
-            );
-          case "ocorrenciaDoenca":
-            return (
-              <OcorrenciaDoencaDetalhes
-                ocorrencia={entidade}
-                onClose={() => setSelected(null)}
-              />
-            );
-          default:
-            return null;
-        }
-      })()}
+      {selected &&
+        selectedTipo &&
+        (() => {
+          const entidade = selected[
+            selectedTipo as keyof RegistroResponseDTO
+          ] as any;
+          switch (selectedTipo) {
+            case "aplicacao":
+              return (
+                <AplicacaoDetalhes
+                  aplicacao={entidade}
+                  isVacina={!!entidade.medicamento?.isVacina}
+                  onClose={() => setSelected(null)}
+                />
+              );
+            case "reproducao":
+              return (
+                <ReproducaoDetalhes
+                  reproducao={entidade}
+                  onClose={() => setSelected(null)}
+                />
+              );
+            case "gestacao":
+              return (
+                <GestacaoDetalhes
+                  gestacao={entidade}
+                  onClose={() => setSelected(null)}
+                />
+              );
+            case "parto":
+              return (
+                <PartoDetalhes
+                  parto={entidade}
+                  onClose={() => setSelected(null)}
+                />
+              );
+            case "ocorrenciaDoenca":
+              return (
+                <OcorrenciaDoencaDetalhes
+                  ocorrencia={entidade}
+                  onClose={() => setSelected(null)}
+                />
+              );
+            default:
+              return null;
+          }
+        })()}
     </div>
   );
 };

@@ -14,7 +14,7 @@ export const registroMapper = {
   }),
 
   fromResponse: (data: any): RegistroResponseDTO => ({
-    id: data.id,
+    idRegistro: data.idRegistro,
     dataRegistro: data.dataRegistro,
     isSugestao: data.isSugestao,
     funcionario: data.funcionario,

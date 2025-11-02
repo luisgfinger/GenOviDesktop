@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import "./GerenciarAplicacoes.css";
 
@@ -11,6 +11,7 @@ import { useAplicacoes } from "../../../api/hooks/aplicacao/UseAplicacoes";
 import type { AplicacaoResponseDTO } from "../../../api/dtos/aplicacao/AplicacaoResponseDTO";
 import { formatDate } from "../../../utils/formatDate";
 import AplicacaoCard from "../../common/cards/registrosCard/AplicacaoCard";
+import { getRegistroStatusByEntityId } from "../../../utils/getRegistroStatusById";
 
 function normalize(s?: string) {
   return (s ?? "")
@@ -25,9 +26,7 @@ interface GerenciarAplicacoesProps {
   isVacina: boolean;
 }
 
-const GerenciarAplicacoes: React.FC<GerenciarAplicacoesProps> = ({
-  isVacina,
-}) => {
+const GerenciarAplicacoes: React.FC<GerenciarAplicacoesProps> = ({ isVacina }) => {
   const { aplicacoes, loading, error } = useAplicacoes();
 
   const [q, setQ] = useState("");
@@ -37,12 +36,32 @@ const GerenciarAplicacoes: React.FC<GerenciarAplicacoesProps> = ({
   const [viewAll, setViewAll] = useState(false);
   const [selected, setSelected] = useState<AplicacaoResponseDTO | null>(null);
 
+  const [registroStatus, setRegistroStatus] = useState<Record<number, boolean>>({});
+
   const items = useMemo<AplicacaoResponseDTO[]>(() => aplicacoes ?? [], [aplicacoes]);
 
   const filteredByType = useMemo(
     () => items.filter((a) => a.medicamento?.isVacina === isVacina),
     [items, isVacina]
   );
+
+  useEffect(() => {
+    if (!filteredByType.length) return;
+
+    const fetchStatuses = async () => {
+      const statusMap: Record<number, boolean> = {};
+
+      for (const a of filteredByType) {
+        if (!a.id) continue;
+        const status = await getRegistroStatusByEntityId(a.id);
+        statusMap[a.id] = status === false;
+      }
+
+      setRegistroStatus(statusMap);
+    };
+
+    fetchStatuses();
+  }, [filteredByType]);
 
   const filtered: AplicacaoResponseDTO[] = useMemo(() => {
     const query = normalize(q.trim());
@@ -103,9 +122,7 @@ const GerenciarAplicacoes: React.FC<GerenciarAplicacoesProps> = ({
       <div className="aplicacao-header flex">
         <h2>{isVacina ? "Vacinas" : "Medicamentos"}</h2>
         <Link
-          to={`/dashboard/ovinos/aplicacoes/cadastrar/${
-            isVacina ? "vacina" : "medicamento"
-          }`}
+          to={`/dashboard/ovinos/aplicacoes/cadastrar/${isVacina ? "vacina" : "medicamento"}`}
         >
           <Button type="button" variant="cardPrimary">
             Nova {isVacina ? "Vacinação" : "Aplicação"}
@@ -123,9 +140,7 @@ const GerenciarAplicacoes: React.FC<GerenciarAplicacoesProps> = ({
         clearFilters={clearFilters}
         setPage={setPage}
         setViewAll={setViewAll}
-        placeholder={`Buscar por ovino, ${
-          isVacina ? "vacina" : "medicamento"
-        }, fabricante ou RFID...`}
+        placeholder={`Buscar por ovino, ${isVacina ? "vacina" : "medicamento"}, fabricante ou RFID...`}
       />
 
       <div className="aplicacao-counter">
@@ -143,6 +158,7 @@ const GerenciarAplicacoes: React.FC<GerenciarAplicacoesProps> = ({
             <AplicacaoCard
               key={a.id}
               aplicacao={a}
+              confirmado={registroStatus[a.id ?? 0] ?? false}
               onView={() => setSelected(a)}
               onEdit={() => setSelected(a)}
             />

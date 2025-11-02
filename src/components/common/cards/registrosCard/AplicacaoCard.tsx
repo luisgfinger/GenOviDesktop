@@ -3,12 +3,14 @@ import Button from "../../../common/buttons/Button";
 import "./BaseCard.css";
 import { formatDate } from "../../../../utils/formatDate";
 import type { AplicacaoResponseDTO } from "../../../../api/dtos/aplicacao/AplicacaoResponseDTO";
+import { updateRegistroToggle } from "../../../../utils/updateRegistroToggle";
+import { toast } from "react-toastify";
 
 interface AplicacaoCardProps {
   aplicacao: AplicacaoResponseDTO;
   onView: () => void;
   onEdit?: () => void;
-  confirmado?: boolean;
+  confirmado: boolean;
 }
 
 const AplicacaoCard: React.FC<AplicacaoCardProps> = ({
@@ -17,6 +19,15 @@ const AplicacaoCard: React.FC<AplicacaoCardProps> = ({
   onEdit,
   confirmado = false,
 }) => {
+     const handleToggleConfirmado = async () => {
+        try {
+          await updateRegistroToggle(aplicacao.id, "isSugestao");
+          toast.success("Registro atualizado como confirmado!");
+        } catch (error) {
+          console.error("Erro ao confirmar registro:", error);
+          toast.error("Erro ao marcar como confirmado.");
+        }
+      };
   const isVacina = aplicacao.medicamento?.isVacina === true;
   const titulo = isVacina ? "Vacinação" : "Medicação";
 
@@ -60,6 +71,11 @@ const AplicacaoCard: React.FC<AplicacaoCardProps> = ({
         <Button variant="cardSecondary" onClick={onView}>
           Ver mais
         </Button>
+        {!confirmado && (
+          <Button variant="cardPrimary" onClick={handleToggleConfirmado}>
+            Confirmar
+          </Button>
+        )}
       </div>
     </div>
   );

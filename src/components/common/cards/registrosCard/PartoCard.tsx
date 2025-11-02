@@ -4,12 +4,14 @@ import "./BaseCard.css";
 
 import { formatDate } from "../../../../utils/formatDate";
 import type { PartoResponseDTO } from "../../../../api/dtos/parto/PartoResponseDTO";
+import { updateRegistroToggle } from "../../../../utils/updateRegistroToggle";
+import { toast } from "react-toastify";
 
 interface PartoCardProps {
   parto: PartoResponseDTO;
   onView: () => void;
   onEdit?: () => void;
-  confirmado?: boolean;
+  confirmado: boolean;
 }
 
 const PartoCard: React.FC<PartoCardProps> = ({
@@ -18,6 +20,15 @@ const PartoCard: React.FC<PartoCardProps> = ({
   onEdit,
   confirmado = false,
 }) => {
+   const handleToggleConfirmado = async () => {
+      try {
+        await updateRegistroToggle(parto.id, "isSugestao");
+        toast.success("Registro atualizado como confirmado!");
+      } catch (error) {
+        console.error("Erro ao confirmar registro:", error);
+        toast.error("Erro ao marcar como confirmado.");
+      }
+    };
   return (
     <div className="card">
       <span className="card-type">
@@ -60,6 +71,11 @@ const PartoCard: React.FC<PartoCardProps> = ({
         <Button variant="cardSecondary" onClick={onView}>
           Ver mais
         </Button>
+        {!confirmado && (
+          <Button variant="cardPrimary" onClick={handleToggleConfirmado}>
+            Confirmar
+          </Button>
+        )}
       </div>
     </div>
   );

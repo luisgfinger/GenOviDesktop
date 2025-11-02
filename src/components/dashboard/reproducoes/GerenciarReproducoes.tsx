@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import "./GerenciarReproducoes.css";
 
@@ -11,7 +11,7 @@ import FilterBar from "../../common/filter-bar/FilterBar";
 import ReproducaoDetalhes from "./ReproducoesDetalhes";
 import { formatDate } from "../../../utils/formatDate";
 import ReproducaoCard from "../../common/cards/registrosCard/ReproducaoCard";
-
+import { getRegistroStatusByEntityId } from "../../../utils/getRegistroStatusById";
 function normalize(s?: string) {
   return (s ?? "")
     .normalize("NFD")
@@ -34,6 +34,8 @@ const GerenciarReproducoes: React.FC = () => {
   const [viewAll, setViewAll] = useState(false);
   const [selectedRepro, setSelectedRepro] = useState<ReproducaoUI | null>(null);
 
+  const [registroStatus, setRegistroStatus] = useState<Record<number, boolean>>({});
+
   const reprosHydrated: any[] = useMemo(() => {
     if (!reproducoes) return [];
     return reproducoes.map((r) => ({
@@ -46,6 +48,24 @@ const GerenciarReproducoes: React.FC = () => {
       ovelhaRfid: r.ovelha?.rfid ?? "—",
     }));
   }, [reproducoes]);
+
+  useEffect(() => {
+    if (!reprosHydrated.length) return;
+
+    const fetchStatuses = async () => {
+      const statusMap: Record<number, boolean> = {};
+
+      for (const r of reprosHydrated) {
+        if (!r.id) continue;
+        const status = await getRegistroStatusByEntityId(r.id);
+        statusMap[r.id] = status === false;
+      }
+
+      setRegistroStatus(statusMap);
+    };
+
+    fetchStatuses();
+  }, [reprosHydrated]);
 
   const filtered = useMemo(() => {
     const query = normalize(q.trim());
@@ -147,6 +167,7 @@ const GerenciarReproducoes: React.FC = () => {
             <ReproducaoCard
               key={r.id}
               reproducao={r}
+              confirmado={registroStatus[r.id ?? 0] ?? false}
               onView={() => setSelectedRepro(r)}
             />
           ))}

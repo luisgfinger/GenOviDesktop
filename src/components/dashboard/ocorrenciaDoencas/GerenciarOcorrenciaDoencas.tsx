@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import "./GerenciarOcorrenciaDoencas.css";
 
@@ -13,6 +13,7 @@ import { useEditarOcorrenciaDoenca } from "../../../api/hooks/ocorrenciaDoencas/
 import type { OcorrenciaDoencaResponseDTO } from "../../../api/dtos/ocorrendiaDoenca/OcorrenciaDoencaResponseDTO";
 import { formatDate } from "../../../utils/formatDate";
 import { toast } from "react-toastify";
+import { getRegistroStatusByEntityId } from "../../../utils/getRegistroStatusById";
 
 function normalize(s?: string) {
   return (s ?? "")
@@ -33,11 +34,29 @@ const GerenciarOcorrenciasDoenca: React.FC = () => {
   const [statusCurado, setStatusCurado] = useState("TODOS");
   const [page, setPage] = useState(1);
   const [viewAll, setViewAll] = useState(false);
-  const [selected, setSelected] = useState<OcorrenciaDoencaResponseDTO | null>(
-    null
-  );
+  const [selected, setSelected] = useState<OcorrenciaDoencaResponseDTO | null>(null);
+
+  const [registroStatus, setRegistroStatus] = useState<Record<number, boolean>>({});
 
   const items = useMemo<OcorrenciaDoencaResponseDTO[]>(() => ocorrencias ?? [], [ocorrencias]);
+
+  useEffect(() => {
+    if (!items.length) return;
+
+    const fetchStatuses = async () => {
+      const statusMap: Record<number, boolean> = {};
+
+      for (const o of items) {
+        if (!o.id) continue;
+        const status = await getRegistroStatusByEntityId(o.id);
+        statusMap[o.id] = status === false; 
+      }
+
+      setRegistroStatus(statusMap);
+    };
+
+    fetchStatuses();
+  }, [items]);
 
   const filtered: OcorrenciaDoencaResponseDTO[] = useMemo(() => {
     const query = normalize(q.trim());
@@ -80,9 +99,7 @@ const GerenciarOcorrenciasDoenca: React.FC = () => {
     : Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
   const currentPage = viewAll ? 1 : Math.min(page, totalPages);
   const startIdx = (currentPage - 1) * PAGE_SIZE;
-  const pageItems = viewAll
-    ? filtered
-    : filtered.slice(startIdx, startIdx + PAGE_SIZE);
+  const pageItems = viewAll ? filtered : filtered.slice(startIdx, startIdx + PAGE_SIZE);
 
   const clearFilters = () => {
     setQ("");
@@ -95,11 +112,7 @@ const GerenciarOcorrenciasDoenca: React.FC = () => {
 
   const handleMarkCurado = async (ocorrencia: OcorrenciaDoencaResponseDTO) => {
     if (!ocorrencia.id) return;
-    if (
-      !window.confirm(
-        `Deseja marcar a ocorrência do ovino "${ocorrencia.ovino?.nome}" como curada?`
-      )
-    )
+    if (!window.confirm(`Deseja marcar a ocorrência do ovino "${ocorrencia.ovino?.nome}" como curada?`))
       return;
 
     try {
@@ -125,7 +138,6 @@ const GerenciarOcorrenciasDoenca: React.FC = () => {
 
   return (
     <div className="ocorrencia-page">
-      {/* Cabeçalho */}
       <div className="ocorrencia-header flex">
         <h2>Ocorrências de Doenças</h2>
         <Link to="/dashboard/ovinos/doencas/adoecimento">
@@ -135,7 +147,6 @@ const GerenciarOcorrenciasDoenca: React.FC = () => {
         </Link>
       </div>
 
-      {/* Filtros */}
       <FilterBar
         q={q}
         setQ={setQ}
@@ -160,17 +171,15 @@ const GerenciarOcorrenciasDoenca: React.FC = () => {
         <strong>{filtered.length}</strong> resultado(s).
       </div>
 
-      {/* Cards */}
       {pageItems.length === 0 ? (
-        <div className="ocorrencia-empty">
-          Nenhuma ocorrência de doença encontrada.
-        </div>
+        <div className="ocorrencia-empty">Nenhuma ocorrência de doença encontrada.</div>
       ) : (
         <div className="ocorrencia-list">
           {pageItems.map((o) => (
             <OcorrenciaDoencaCard
               key={o.id}
               ocorrencia={o}
+              confirmado={registroStatus[o.id ?? 0] ?? false}
               onView={() => setSelected(o)}
               onMarkCurado={() => handleMarkCurado(o)}
             />
@@ -195,21 +204,14 @@ const GerenciarOcorrenciasDoenca: React.FC = () => {
 
       {viewAll && filtered.length > PAGE_SIZE && (
         <div className="ocorrencia-pagination">
-          <Button
-            type="button"
-            variant="cardSecondary"
-            onClick={() => setViewAll(false)}
-          >
+          <Button type="button" variant="cardSecondary" onClick={() => setViewAll(false)}>
             Voltar à paginação
           </Button>
         </div>
       )}
 
       {selected && (
-        <OcorrenciaDoencaDetalhes
-          ocorrencia={selected}
-          onClose={() => setSelected(null)}
-        />
+        <OcorrenciaDoencaDetalhes ocorrencia={selected} onClose={() => setSelected(null)} />
       )}
     </div>
   );

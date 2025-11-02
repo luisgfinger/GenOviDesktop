@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import "./GerenciarPartos.css";
 
@@ -11,6 +11,7 @@ import FilterBar from "../../common/filter-bar/FilterBar";
 import PartoDetalhes from "./PartoDetalhes";
 import { formatDate } from "../../../utils/formatDate";
 import PartoCard from "../../common/cards/registrosCard/PartoCard";
+import { getRegistroStatusByEntityId } from "../../../utils/getRegistroStatusById";
 
 function normalize(s?: string) {
   return (s ?? "")
@@ -32,11 +33,12 @@ const GerenciarPartos: React.FC = () => {
 
   const [q, setQ] = useState("");
   const [dateFrom, setDateFrom] = useState("");
-  const [dateTo, setDateTo] = useState(""); 
+  const [dateTo, setDateTo] = useState("");
   const [page, setPage] = useState(1);
   const [viewAll, setViewAll] = useState(false);
-
   const [selectedParto, setSelectedParto] = useState<PartoUI | null>(null);
+
+  const [registroStatus, setRegistroStatus] = useState<Record<number, boolean>>({});
 
   const partosHydrated: PartoUI[] = useMemo(() => {
     return (partos ?? []).map((p) => {
@@ -53,6 +55,24 @@ const GerenciarPartos: React.FC = () => {
       return { ...p, ovelhaPai, ovelhaMae };
     });
   }, [partos, ovinos]);
+
+  useEffect(() => {
+    if (!partosHydrated.length) return;
+
+    const fetchStatuses = async () => {
+      const statusMap: Record<number, boolean> = {};
+
+      for (const p of partosHydrated) {
+        if (!p.id) continue;
+        const status = await getRegistroStatusByEntityId(p.id);
+        statusMap[p.id] = status === false;
+      }
+
+      setRegistroStatus(statusMap);
+    };
+
+    fetchStatuses();
+  }, [partosHydrated]);
 
   const filtered: PartoUI[] = useMemo(() => {
     const query = normalize(q.trim());
@@ -142,7 +162,12 @@ const GerenciarPartos: React.FC = () => {
       ) : (
         <div className="partos-list">
           {pageItems.map((p) => (
-            <PartoCard key={p.id} parto={p} onView={() => setSelectedParto(p)} />
+            <PartoCard
+              key={p.id}
+              parto={p}
+              confirmado={registroStatus[p.id ?? 0] ?? false}
+              onView={() => setSelectedParto(p)}
+            />
           ))}
         </div>
       )}

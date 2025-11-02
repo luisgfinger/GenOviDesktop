@@ -2,6 +2,8 @@ import React from "react";
 import Button from "../../../common/buttons/Button";
 import "./BaseCard.css";
 import { formatDate } from "../../../../utils/formatDate";
+import { updateRegistroToggle } from "../../../../utils/updateRegistroToggle"; 
+import { toast } from "react-toastify";
 import type { OcorrenciaDoencaResponseDTO } from "../../../../api/dtos/ocorrendiaDoenca/OcorrenciaDoencaResponseDTO";
 
 interface OcorrenciaDoencaCardProps {
@@ -17,6 +19,16 @@ const OcorrenciaDoencaCard: React.FC<OcorrenciaDoencaCardProps> = ({
   onMarkCurado,
   confirmado = false,
 }) => {
+  const handleToggleConfirmado = async () => {
+    try {
+      await updateRegistroToggle(ocorrencia.id, "isSugestao");
+      toast.success("Registro atualizado como confirmado!");
+    } catch (error) {
+      console.error("Erro ao confirmar registro:", error);
+      toast.error("Erro ao marcar como confirmado.");
+    }
+  };
+
   return (
     <div className="card">
       <span className="card-type ocorrencia">
@@ -67,15 +79,18 @@ const OcorrenciaDoencaCard: React.FC<OcorrenciaDoencaCardProps> = ({
         </div>
         <div className="card-meta">{ocorrencia.doenca?.descricao ?? "—"}</div>
       </div>
-
       <div className="card-actions">
         <Button variant="cardSecondary" onClick={onView}>
           Ver mais
         </Button>
-
-        {!ocorrencia.curado && onMarkCurado && (
+        {confirmado && !ocorrencia.curado && onMarkCurado && (
           <Button variant="cardPrimary" onClick={onMarkCurado}>
             Marcar como curado
+          </Button>
+        )}
+        {!confirmado && (
+          <Button variant="cardPrimary" onClick={handleToggleConfirmado}>
+            Confirmar
           </Button>
         )}
       </div>

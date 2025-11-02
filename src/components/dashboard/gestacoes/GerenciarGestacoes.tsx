@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import "./GerenciarGestacoes.css";
 
@@ -12,6 +12,7 @@ import FilterBar from "../../common/filter-bar/FilterBar";
 import GestacaoDetalhes from "./GestacaoDetalhes";
 import GestacaoCard from "../../common/cards/registrosCard/GestacaoCard";
 import { formatDate } from "../../../utils/formatDate";
+import { getRegistroStatusByEntityId } from "../../../utils/getRegistroStatusById";
 
 function normalize(s?: string) {
   return (s ?? "")
@@ -36,13 +37,12 @@ const GerenciarGestacoes: React.FC = () => {
   const [q, setQ] = useState("");
   const [dateFrom, setDateFrom] = useState("");
   const [dateTo, setDateTo] = useState("");
-  const [status, setStatus] = useState<"TODOS" | "EM_ANDAMENTO" | "CONCLUIDA">(
-    "TODOS"
-  );
+  const [status, setStatus] = useState<"TODOS" | "EM_ANDAMENTO" | "CONCLUIDA">("TODOS");
   const [page, setPage] = useState(1);
   const [viewAll, setViewAll] = useState(false);
-  const [selectedGestacao, setSelectedGestacao] =
-    useState<GestacaoUI | null>(null);
+  const [selectedGestacao, setSelectedGestacao] = useState<GestacaoUI | null>(null);
+
+  const [registroStatus, setRegistroStatus] = useState<Record<number, boolean>>({});
 
   const gestacoesHydrated: GestacaoUI[] = useMemo(() => {
     return (gestacoes ?? []).map((g) => {
@@ -66,6 +66,24 @@ const GerenciarGestacoes: React.FC = () => {
       };
     });
   }, [gestacoes, ovinos, partos]);
+
+  useEffect(() => {
+    if (!gestacoesHydrated.length) return;
+
+    const fetchStatuses = async () => {
+      const statusMap: Record<number, boolean> = {};
+
+      for (const g of gestacoesHydrated) {
+        if (!g.id) continue;
+        const status = await getRegistroStatusByEntityId(g.id);
+        statusMap[g.id] = status === false;
+      }
+
+      setRegistroStatus(statusMap);
+    };
+
+    fetchStatuses();
+  }, [gestacoesHydrated]);
 
   const filtered: GestacaoUI[] = useMemo(() => {
     const query = normalize(q.trim());
@@ -104,14 +122,10 @@ const GerenciarGestacoes: React.FC = () => {
       });
   }, [gestacoesHydrated, q, dateFrom, dateTo, status]);
 
-  const totalPages = viewAll
-    ? 1
-    : Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+  const totalPages = viewAll ? 1 : Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
   const currentPage = viewAll ? 1 : Math.min(page, totalPages);
   const startIdx = (currentPage - 1) * PAGE_SIZE;
-  const pageItems = viewAll
-    ? filtered
-    : filtered.slice(startIdx, startIdx + PAGE_SIZE);
+  const pageItems = viewAll ? filtered : filtered.slice(startIdx, startIdx + PAGE_SIZE);
 
   const clearFilters = () => {
     setQ("");
@@ -169,6 +183,7 @@ const GerenciarGestacoes: React.FC = () => {
             <GestacaoCard
               key={g.id}
               gestacao={g}
+              confirmado={registroStatus[g.id ?? 0] ?? false}
               onView={() => setSelectedGestacao(g)}
               onEdit={() => setSelectedGestacao(g)}
             />

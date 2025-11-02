@@ -6,7 +6,7 @@ import type { Aplicacao } from "../aplicacao/AplicacaoModel";
 import type { OcorrenciaDoenca } from "../ocorrenciaDoenca/ocorrenciaDoencaModel";
 
 export interface Registro {
-  id: number;
+  idRegistro: number;
   dataRegistro: string;
   isSugestao: boolean;
   funcionario: Funcionario;
