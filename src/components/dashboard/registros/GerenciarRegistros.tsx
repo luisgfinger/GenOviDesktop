@@ -42,6 +42,8 @@ const GerenciarRegistros: React.FC = () => {
   const [q, setQ] = useState("");
   const [dateFrom, setDateFrom] = useState("");
   const [dateTo, setDateTo] = useState("");
+  const [funcionario, setFuncionario] = useState("TODOS");
+  const [status, setStatus] = useState<"TODOS" | "CONFIRMADO" | "NAO_CONFIRMADO">("TODOS");
   const [page, setPage] = useState(1);
   const [viewAll, setViewAll] = useState(false);
   const [selected, setSelected] = useState<RegistroResponseDTO | null>(null);
@@ -55,6 +57,13 @@ const GerenciarRegistros: React.FC = () => {
   >(null);
 
   const items = useMemo(() => registros ?? [], [registros]);
+
+  const funcionariosOptions = useMemo(() => {
+    const nomesUnicos = Array.from(
+      new Set(items.map((r) => r.funcionario?.nome).filter(Boolean))
+    );
+    return nomesUnicos.map((n) => ({ value: n!, label: n! }));
+  }, [items]);
 
   const getTipoRegistro = (
     r: RegistroResponseDTO
@@ -81,8 +90,13 @@ const GerenciarRegistros: React.FC = () => {
           if (dt && d > dt) return false;
         }
 
-        if (!query) return true;
+        if (funcionario !== "TODOS" && r.funcionario?.nome !== funcionario) {
+          return false;
+        }
+        if (status === "CONFIRMADO" && r.isSugestao) return false;
+        if (status === "NAO_CONFIRMADO" && !r.isSugestao) return false;
 
+        if (!query) return true;
         const campos = [
           r.funcionario?.nome ?? "",
           formatDate(r.dataRegistro, true),
@@ -100,7 +114,7 @@ const GerenciarRegistros: React.FC = () => {
         const db = new Date(b.dataRegistro ?? "").getTime();
         return (db || 0) - (da || 0);
       });
-  }, [items, q, dateFrom, dateTo]);
+  }, [items, q, dateFrom, dateTo, funcionario, status]);
 
   const totalPages = viewAll
     ? 1
@@ -115,6 +129,8 @@ const GerenciarRegistros: React.FC = () => {
     setQ("");
     setDateFrom("");
     setDateTo("");
+    setFuncionario("TODOS");
+    setStatus("TODOS");
     setPage(1);
     setViewAll(false);
   };
@@ -170,7 +186,12 @@ const GerenciarRegistros: React.FC = () => {
         clearFilters={clearFilters}
         setPage={setPage}
         setViewAll={setViewAll}
-        placeholder={`Buscar por funcionário, data ou ID...`}
+        placeholder="Buscar por funcionário, data ou ID..."
+        status={status}
+        setStatus={setStatus}
+        funcionario={funcionario}
+        setFuncionario={setFuncionario}
+        funcionarioOptions={funcionariosOptions}
       />
 
       <div className="registro-counter">
@@ -199,7 +220,7 @@ const GerenciarRegistros: React.FC = () => {
                     key={r.idRegistro}
                     aplicacao={entidade}
                     onView={handleView}
-                    confirmado={r.isSugestao ? false : true}
+                    confirmado={!r.isSugestao}
                   />
                 );
               case "reproducao":
@@ -208,13 +229,13 @@ const GerenciarRegistros: React.FC = () => {
                     key={r.idRegistro}
                     reproducao={entidade}
                     onView={handleView}
-                    confirmado={r.isSugestao ? false : true}
+                    confirmado={!r.isSugestao}
                   />
                 );
               case "gestacao":
                 return (
                   <GestacaoCard
-                    confirmado={r.isSugestao ? false : true}
+                    confirmado={!r.isSugestao}
                     key={r.idRegistro}
                     gestacao={entidade}
                     onView={handleView}
@@ -226,14 +247,14 @@ const GerenciarRegistros: React.FC = () => {
                     key={r.idRegistro}
                     parto={entidade}
                     onView={handleView}
-                    confirmado={r.isSugestao ? false : true}
+                    confirmado={!r.isSugestao}
                   />
                 );
               case "ocorrenciaDoenca":
                 return (
                   <OcorrenciaDoencaCard
                     key={r.idRegistro}
-                    confirmado={r.isSugestao ? false : true}
+                    confirmado={!r.isSugestao}
                     ocorrencia={entidade}
                     onView={handleView}
                     onMarkCurado={() => handleMarkCurado(entidade)}
@@ -276,9 +297,7 @@ const GerenciarRegistros: React.FC = () => {
       {selected &&
         selectedTipo &&
         (() => {
-          const entidade = selected[
-            selectedTipo as keyof RegistroResponseDTO
-          ] as any;
+          const entidade = selected[selectedTipo as keyof RegistroResponseDTO] as any;
           switch (selectedTipo) {
             case "aplicacao":
               return (

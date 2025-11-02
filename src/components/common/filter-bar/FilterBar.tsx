@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { TypeReproducao } from "../../../api/enums/typeReproducao/TypeReproducao";
 import { formatEnum } from "../../../utils/formatEnum";
 import Button from "../buttons/Button";
@@ -16,6 +16,9 @@ interface FilterBarProps<TStatus extends string = string> {
   status?: TStatus;
   setStatus?: React.Dispatch<React.SetStateAction<TStatus>>;
 
+  funcionario?: string;
+  setFuncionario?: (value: string) => void;
+
   dateFrom?: string;
   setDateFrom?: (value: string) => void;
   dateTo?: string;
@@ -29,9 +32,11 @@ interface FilterBarProps<TStatus extends string = string> {
 
   typeOptions?: Array<TypeOption | string>;
   statusOptions?: Array<TypeOption | string>;
+  funcionarioOptions?: Array<TypeOption | string>;
 
   typeLabel?: string;
   statusLabel?: string;
+  funcionarioLabel?: string;
 
   allOptionLabel?: string;
   allOptionValue?: string;
@@ -44,6 +49,8 @@ const FilterBar = <TStatus extends string = string>({
   setTipo,
   status,
   setStatus,
+  funcionario,
+  setFuncionario,
   dateFrom,
   setDateFrom,
   dateTo,
@@ -54,8 +61,10 @@ const FilterBar = <TStatus extends string = string>({
   placeholder = "Buscar...",
   typeOptions,
   statusOptions = [],
+  funcionarioOptions = [],
   typeLabel = "Tipo",
   statusLabel = "Status",
+  funcionarioLabel = "Funcionário",
   allOptionLabel = "Todos",
   allOptionValue = "TODOS",
 }: FilterBarProps<TStatus>) => {
@@ -73,6 +82,16 @@ const FilterBar = <TStatus extends string = string>({
     statusOptions && statusOptions.length > 0
       ? statusOptions.map((opt) =>
           typeof opt === "string" ? { value: opt, label: formatEnum(opt) } : opt
+        )
+      : [
+          { value: "CONFIRMADO", label: "Confirmado" },
+          { value: "NAO_CONFIRMADO", label: "Não Confirmado" },
+        ];
+
+  const normalizedFuncionarioOptions: TypeOption[] =
+    funcionarioOptions && funcionarioOptions.length > 0
+      ? funcionarioOptions.map((opt) =>
+          typeof opt === "string" ? { value: opt, label: opt } : opt
         )
       : [];
 
@@ -93,6 +112,29 @@ const FilterBar = <TStatus extends string = string>({
           }}
         />
       </div>
+
+      {setFuncionario && normalizedFuncionarioOptions.length > 0 && (
+        <div className="filter-group flex-column">
+          <label htmlFor="funcionario">{funcionarioLabel}</label>
+          <select
+            id="funcionario"
+            className="filter-select"
+            value={funcionario ?? allOptionValue}
+            onChange={(e) => {
+              setFuncionario(e.target.value);
+              setPage(1);
+              setViewAll(false);
+            }}
+          >
+            <option value={allOptionValue}>{allOptionLabel}</option>
+            {normalizedFuncionarioOptions.map((opt) => (
+              <option key={opt.value} value={opt.value}>
+                {opt.label}
+              </option>
+            ))}
+          </select>
+        </div>
+      )}
 
       {setTipo && (
         <div className="filter-group flex-column">
