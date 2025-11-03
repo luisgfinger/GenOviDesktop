@@ -35,7 +35,7 @@ const AplicacaoCard: React.FC<AplicacaoCardProps> = ({
     <div className="card">
       <span className={`card-type ${isVacina ? "vacina" : "aplicacao"}`}>
         <div className="card-header-info flex">
-          <strong>{titulo}</strong>
+          <strong>{titulo}(#{aplicacao.id})</strong>
           <span>
             <strong>Responsável:</strong>{" "}
             {localStorage.getItem("funcionarioNome") ?? "—"}

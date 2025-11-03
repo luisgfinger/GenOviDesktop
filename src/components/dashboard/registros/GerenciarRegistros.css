@@ -1,8 +1,3 @@
-/* ============================
-   Estilos principais da página de Registros
-   Compatível com o CSS unificado dos cards
-   ============================ */
-
 .registro-page {
   display: flex;
   flex-direction: column;
@@ -13,7 +8,6 @@
   margin-bottom: 30px;
 }
 
-/* Cabeçalho */
 .registro-header {
   display: flex;
   justify-content: space-between;
@@ -25,20 +19,17 @@
   color: var(--full-black-color);
 }
 
-/* Contador de registros */
 .registro-counter {
   font-size: 14px;
   opacity: 0.85;
 }
 
-/* Lista de cards */
 .registro-list {
   display: flex;
   flex-direction: column;
   gap: 12px;
 }
 
-/* Card (usa a mesma base dos outros módulos) */
 .registro-card {
   background: var(--white-color);
   border-radius: 10px;
@@ -69,14 +60,12 @@
   max-width: 520px;
 }
 
-/* Ações (botões Ver mais / Editar) */
 .registro-actions {
   display: flex;
   align-items: flex-end;
   gap: 16px;
 }
 
-/* Quando não há registros */
 .registro-empty {
   padding: 16px;
   background: var(--white-color);
@@ -85,7 +74,6 @@
   text-align: center;
 }
 
-/* Paginação */
 .registro-pagination {
   display: flex;
   gap: 8px;
@@ -93,15 +81,10 @@
   justify-content: center;
 }
 
-/* Info adicional da página */
 .registro-page-info {
   font-size: 14px;
 }
 
-/* ============================
-   Integração visual com os cards unificados
-   (mantém consistência entre Registros e demais módulos)
-   ============================ */
 
 .registro-list .card {
   border: 1px solid #f1f1f1;

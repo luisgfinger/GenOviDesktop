@@ -32,7 +32,7 @@ const GestacaoCard: React.FC<GestacaoCardProps> = ({
     <div className="card">
       <span className="card-type gestacao">
         <div className="card-header-info flex">
-          <strong>Gestação</strong>
+          <strong>Gestação(#{gestacao.id})</strong>
           <span>
             <strong>Responsável:</strong>{" "}
             {localStorage.getItem("funcionarioNome") ?? "—"}

@@ -26,6 +26,8 @@ import GestacaoDetalhes from "../gestacoes/GestacaoDetalhes";
 import PartoDetalhes from "../partos/PartoDetalhes";
 import OcorrenciaDoencaDetalhes from "../ocorrenciaDoencas/OcorrenciaDoencaDetalhes";
 
+import NovoRegistroMenu from "./NovoRegistroMenu"; // 👈 novo import
+
 function normalize(s?: string) {
   return (s ?? "")
     .normalize("NFD")
@@ -55,6 +57,7 @@ const GerenciarRegistros: React.FC = () => {
     | "ocorrenciaDoenca"
     | null
   >(null);
+  const [menuAberto, setMenuAberto] = useState(false); // 👈 controla o modal
 
   const items = useMemo(() => registros ?? [], [registros]);
 
@@ -169,11 +172,10 @@ const GerenciarRegistros: React.FC = () => {
     <div className="registro-page">
       <div className="registro-header flex">
         <h2>Registros</h2>
-        <Link to={`/dashboard/registros/cadastrar`}>
-          <Button type="button" variant="cardPrimary">
-            Novo Registro
-          </Button>
-        </Link>
+        {/* Abre o menu modal em vez de navegar direto */}
+        <Button type="button" variant="cardPrimary" onClick={() => setMenuAberto(true)}>
+          Novo Registro
+        </Button>
       </div>
 
       <FilterBar
@@ -339,6 +341,9 @@ const GerenciarRegistros: React.FC = () => {
               return null;
           }
         })()}
+
+      {/* Renderiza o menu modal */}
+      {menuAberto && <NovoRegistroMenu onClose={() => setMenuAberto(false)} />}
     </div>
   );
 };

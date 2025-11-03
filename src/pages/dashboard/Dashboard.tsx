@@ -33,7 +33,7 @@ const Dashboard: React.FC = () => {
       <div className="dashboard-inside flex-column">
         <PageTitle/>
         <Routes>
-          <Route path="ovinos" element={<DashboardMenu location="ovino"/>} />
+          <Route path="ovinos" element={<DashboardMenu/>} />
           <Route
             path="ovinos/gerenciar"
             element={<Gerenciar type="ovino"/>}
@@ -44,7 +44,7 @@ const Dashboard: React.FC = () => {
           />
           <Route
             path="funcionarios"
-            element={<DashboardMenu location="funcionarios"/>}
+            element={<Gerenciar type="funcionario"/>}
           />
           <Route
             path="funcionarios/gerenciar"

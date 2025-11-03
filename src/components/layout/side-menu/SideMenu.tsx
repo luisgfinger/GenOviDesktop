@@ -5,6 +5,7 @@ import Funcionarios from "../../../assets/icons/funcionarios.png";
 import Ia from "../../../assets/icons/ia.png";
 import Register from "../../../assets/icons/register.png";
 import Arrow from "../../../assets/icons/backArrow.png";
+import Users from "../../../assets/icons/users.png";
 import "./SideMenu.css";
 
 const SideMenu: React.FC = () => {
@@ -16,7 +17,7 @@ const SideMenu: React.FC = () => {
     {label: "REGISTROS", icon: Register, path: "/dashboard/registros"},
     { label: "IA", icon: Ia, path: "/ia" },
     { label: "FUNCIONARIOS", icon: Funcionarios, path: "/dashboard/funcionarios" },
-    { label: "USUÁRIOS", icon: Funcionarios, path: "/dashboard/usuarios" },
+    { label: "USUÁRIOS", icon: Users, path: "/dashboard/usuarios" },
   ];
 
   const handleBack = () => {

@@ -33,7 +33,7 @@ const OcorrenciaDoencaCard: React.FC<OcorrenciaDoencaCardProps> = ({
     <div className="card">
       <span className="card-type ocorrencia">
         <div className="card-header-info flex">
-          <strong>Adoecimento</strong>
+          <strong>Adoecimento(#{ocorrencia.id})</strong>
           <span>
             <strong>Responsável:</strong>{" "}
             {localStorage.getItem("funcionarioNome") ?? "—"}

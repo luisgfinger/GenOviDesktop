@@ -13,11 +13,7 @@ import Compra from "../../../assets/icons/buy.png";
 
 import "./DashboardMenu.css";
 
-interface DashboardMenuProps {
-  location: string;
-}
-
-const DashboardMenu: React.FC<DashboardMenuProps> = ({ location }) => {
+const DashboardMenu: React.FC = () => {
   const ovinosCardOptions = [
     {
       images: [{ src: Add, alt: "add" }],
@@ -65,87 +61,60 @@ const DashboardMenu: React.FC<DashboardMenuProps> = ({ location }) => {
     { text: "Gerenciar partos", href: "/dashboard/ovinos/partos/gerenciar" },
   ];
 
-  const funcionariosCardOptions = [
-    {
-      images: [{ src: Add, alt: "add" }],
-      text: "Cadastrar Funcionario",
-      href: "/dashboard/funcionarios/cadastrar",
-    },
-    {
-      images: [{ src: Manage, alt: "manage" }],
-      text: "Gerenciar Funcionario",
-      href: "/dashboard/funcionarios/gerenciar",
-    },
-  ];
-
   let start = 0;
 
   return (
     <ul className="dashboardMenu-content flex-column">
       <li>
-        <h3>{location === "ovino" ? "Ovinos" : "Funcionários"}</h3>
+        <h3>Ovinos</h3>
       </li>
 
       <li className="dashboardMenu-content-optionsLine dashboardMenu-content-optionsLine-line1 flex">
-        {location === "ovino"
-          ? ovinosCardOptions.map((option, index) => (
-              <OptionCard
-                key={index}
-                images={option.images}
-                text={option.text}
-                href={option.href}
-              />
-            ))
-          : funcionariosCardOptions.map((option, index) => (
-              <OptionCard
-                key={index}
-                images={option.images}
-                text={option.text}
-                href={option.href}
-              />
-            ))}
+        {ovinosCardOptions.map((option, index) => (
+          <OptionCard
+            key={index}
+            images={option.images}
+            text={option.text}
+            href={option.href}
+          />
+        ))}
+      </li>
+      <li>
+        <h3>Saúde e Reprodução</h3>
       </li>
 
-      {location === "ovino" && (
-        <>
-          <li>
-            <h3>Saúde e Reprodução</h3>
-          </li>
+      <li className="dashboardMenu-content-optionsLine flex">
+        {ovinosCardOptions2.map((option, index) => {
+          const end = start + option.childrenCount;
+          const childrenForCard = ovinoChildrenOptions.slice(start, end);
+          start = end;
 
-          <li className="dashboardMenu-content-optionsLine flex">
-            {ovinosCardOptions2.map((option, index) => {
-              const end = start + option.childrenCount;
-              const childrenForCard = ovinoChildrenOptions.slice(start, end);
-              start = end;
-
-              return (
-                <OptionCard
-                  key={index}
-                  images={option.images}
-                  text={option.text}
-                  href={option.href}
-                  childrenOptions={childrenForCard}
-                />
-              );
-            })}
-          </li>
-          <li>
-            <h3>Entrada e Saída</h3>
-          </li>
-
-          <li className="dashboardMenu-content-optionsLine flex">
+          return (
             <OptionCard
-              images={[{ src: Compra, alt: "compra" }]}
-              text="Compra"
-              href="/dashboard/ovinos/compra/gerenciar"
-              childrenOptions={[
-                { text: "Registrar compra", href: "/dashboard/ovinos/compra/criar" },
-                { text: "Gerenciar compras", href: "/dashboard/ovinos/compra/gerenciar" },
-              ]}
+              key={index}
+              images={option.images}
+              text={option.text}
+              href={option.href}
+              childrenOptions={childrenForCard}
             />
-          </li>
-        </>
-      )}
+          );
+        })}
+      </li>
+      <li>
+        <h3>Entrada e Saída</h3>
+      </li>
+
+      <li className="dashboardMenu-content-optionsLine flex">
+        <OptionCard
+          images={[{ src: Compra, alt: "compra" }]}
+          text="Compra"
+          href="/dashboard/ovinos/compra/gerenciar"
+          childrenOptions={[
+            { text: "Registrar compra", href: "/dashboard/ovinos/compra/criar" },
+            { text: "Gerenciar compras", href: "/dashboard/ovinos/compra/gerenciar" },
+          ]}
+        />
+      </li>
     </ul>
   );
 };
