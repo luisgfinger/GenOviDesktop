@@ -11,6 +11,7 @@ interface OcorrenciaDoencaCardProps {
   onView: () => void;
   onMarkCurado?: () => void;
   confirmado: boolean;
+  onConfirm: (id: number) => void;
 }
 
 const OcorrenciaDoencaCard: React.FC<OcorrenciaDoencaCardProps> = ({
@@ -18,11 +19,13 @@ const OcorrenciaDoencaCard: React.FC<OcorrenciaDoencaCardProps> = ({
   onView,
   onMarkCurado,
   confirmado = false,
+  onConfirm
 }) => {
   const handleToggleConfirmado = async () => {
     try {
       await updateRegistroToggle(ocorrencia.id, "isSugestao");
       toast.success("Registro atualizado como confirmado!");
+       if (onConfirm) onConfirm(ocorrencia.id);
     } catch (error) {
       console.error("Erro ao confirmar registro:", error);
       toast.error("Erro ao marcar como confirmado.");

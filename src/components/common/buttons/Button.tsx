@@ -8,7 +8,8 @@ type ButtonVariant =
   | "cardSecondary"
   | "card"
   | "pagination"
-  | "cadastrar";
+  | "cadastrar"
+  | "toast";
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: ButtonVariant;
@@ -28,6 +29,8 @@ const Button: React.FC<ButtonProps> = ({ variant, children, ...rest }) => {
         return "paginationMenu-button";
       case "cadastrar":
         return "cadastrar-button";
+      case "toast":
+        return "toast-button";
       default:
         return "";
     }

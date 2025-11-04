@@ -15,7 +15,7 @@ import { usePartos } from "../../../api/hooks/parto/UsePartos";
 
 import type { ReproducaoRequestDTO } from "../../../api/dtos/reproducao/ReproducaoRequestDTO";
 import { formatDate } from "../../../utils/formatDate";
-import { createRegistroAuto } from "../../../utils/criarRegistro"; // ✅ adicionado
+import { createRegistroAuto } from "../../../utils/criarRegistro";
 
 type Props = {
   minAgeMonths?: number;

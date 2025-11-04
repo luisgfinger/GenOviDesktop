@@ -1,5 +1,4 @@
-import React, { useMemo, useState } from "react";
-import { Link } from "react-router-dom";
+import React, { useEffect, useMemo, useState } from "react";
 import "./GerenciarRegistros.css";
 
 import Button from "../../common/buttons/Button";
@@ -11,7 +10,9 @@ import { useEditarOcorrenciaDoenca } from "../../../api/hooks/ocorrenciaDoencas/
 
 import type { RegistroResponseDTO } from "../../../api/dtos/registro/RegistroResponseDTO";
 import type { OcorrenciaDoencaResponseDTO } from "../../../api/dtos/ocorrendiaDoenca/OcorrenciaDoencaResponseDTO";
+
 import { formatDate } from "../../../utils/formatDate";
+import { getRegistroStatusByEntityId } from "../../../utils/getRegistroStatusById";
 import { toast } from "react-toastify";
 
 import AplicacaoCard from "../../common/cards/registrosCard/AplicacaoCard";
@@ -25,8 +26,7 @@ import ReproducaoDetalhes from "../reproducoes/ReproducoesDetalhes";
 import GestacaoDetalhes from "../gestacoes/GestacaoDetalhes";
 import PartoDetalhes from "../partos/PartoDetalhes";
 import OcorrenciaDoencaDetalhes from "../ocorrenciaDoencas/OcorrenciaDoencaDetalhes";
-
-import NovoRegistroMenu from "./NovoRegistroMenu"; // 👈 novo import
+import NovoRegistroMenu from "./NovoRegistroMenu";
 
 function normalize(s?: string) {
   return (s ?? "")
@@ -38,7 +38,7 @@ function normalize(s?: string) {
 const PAGE_SIZE = 6;
 
 const GerenciarRegistros: React.FC = () => {
-  const { registros, loading, error } = useRegistros();
+  const { registros, setRegistros, loading, error } = useRegistros();
   const { editarOcorrencia } = useEditarOcorrenciaDoenca();
 
   const [q, setQ] = useState("");
@@ -50,23 +50,12 @@ const GerenciarRegistros: React.FC = () => {
   const [viewAll, setViewAll] = useState(false);
   const [selected, setSelected] = useState<RegistroResponseDTO | null>(null);
   const [selectedTipo, setSelectedTipo] = useState<
-    | "aplicacao"
-    | "reproducao"
-    | "gestacao"
-    | "parto"
-    | "ocorrenciaDoenca"
-    | null
+    "aplicacao" | "reproducao" | "gestacao" | "parto" | "ocorrenciaDoenca" | null
   >(null);
-  const [menuAberto, setMenuAberto] = useState(false); // 👈 controla o modal
+  const [menuAberto, setMenuAberto] = useState(false);
+  const [registroStatus, setRegistroStatus] = useState<Record<number, boolean>>({});
 
   const items = useMemo(() => registros ?? [], [registros]);
-
-  const funcionariosOptions = useMemo(() => {
-    const nomesUnicos = Array.from(
-      new Set(items.map((r) => r.funcionario?.nome).filter(Boolean))
-    );
-    return nomesUnicos.map((n) => ({ value: n!, label: n! }));
-  }, [items]);
 
   const getTipoRegistro = (
     r: RegistroResponseDTO
@@ -77,6 +66,36 @@ const GerenciarRegistros: React.FC = () => {
     if (r.parto) return "parto";
     if (r.ocorrenciaDoenca) return "ocorrenciaDoenca";
     return "aplicacao";
+  };
+
+  useEffect(() => {
+    if (!items.length) return;
+
+    const fetchStatuses = async () => {
+      const statusMap: Record<number, boolean> = {};
+      for (const r of items) {
+        const tipo = getTipoRegistro(r);
+        const entidade = r[tipo as keyof RegistroResponseDTO] as any;
+        if (!entidade?.id) continue;
+
+        const status = await getRegistroStatusByEntityId(entidade.id);
+        statusMap[r.idRegistro] = status === false;
+      }
+      setRegistroStatus(statusMap);
+    };
+
+    fetchStatuses();
+  }, [items]);
+
+  const handleConfirm = (idRegistro: number) => {
+    toast.success("Registro confirmado com sucesso!");
+    setRegistroStatus((prev) => ({ ...prev, [idRegistro]: true }));
+
+    setRegistros((prev) =>
+      prev.map((r) =>
+        r.idRegistro === idRegistro ? { ...r, isSugestao: false } : r
+      )
+    );
   };
 
   const filtered: RegistroResponseDTO[] = useMemo(() => {
@@ -93,9 +112,8 @@ const GerenciarRegistros: React.FC = () => {
           if (dt && d > dt) return false;
         }
 
-        if (funcionario !== "TODOS" && r.funcionario?.nome !== funcionario) {
+        if (funcionario !== "TODOS" && r.funcionario?.nome !== funcionario)
           return false;
-        }
         if (status === "CONFIRMADO" && r.isSugestao) return false;
         if (status === "NAO_CONFIRMADO" && !r.isSugestao) return false;
 
@@ -119,14 +137,10 @@ const GerenciarRegistros: React.FC = () => {
       });
   }, [items, q, dateFrom, dateTo, funcionario, status]);
 
-  const totalPages = viewAll
-    ? 1
-    : Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+  const totalPages = viewAll ? 1 : Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
   const currentPage = viewAll ? 1 : Math.min(page, totalPages);
   const startIdx = (currentPage - 1) * PAGE_SIZE;
-  const pageItems = viewAll
-    ? filtered
-    : filtered.slice(startIdx, startIdx + PAGE_SIZE);
+  const pageItems = viewAll ? filtered : filtered.slice(startIdx, startIdx + PAGE_SIZE);
 
   const clearFilters = () => {
     setQ("");
@@ -138,6 +152,7 @@ const GerenciarRegistros: React.FC = () => {
     setViewAll(false);
   };
 
+  // ✅ Marcar ocorrência de doença como curada
   const handleMarkCurado = async (ocorrencia: OcorrenciaDoencaResponseDTO) => {
     if (!ocorrencia?.id) return;
     if (
@@ -172,7 +187,6 @@ const GerenciarRegistros: React.FC = () => {
     <div className="registro-page">
       <div className="registro-header flex">
         <h2>Registros</h2>
-        {/* Abre o menu modal em vez de navegar direto */}
         <Button type="button" variant="cardPrimary" onClick={() => setMenuAberto(true)}>
           Novo Registro
         </Button>
@@ -193,7 +207,6 @@ const GerenciarRegistros: React.FC = () => {
         setStatus={setStatus}
         funcionario={funcionario}
         setFuncionario={setFuncionario}
-        funcionarioOptions={funcionariosOptions}
       />
 
       <div className="registro-counter">
@@ -221,8 +234,9 @@ const GerenciarRegistros: React.FC = () => {
                   <AplicacaoCard
                     key={r.idRegistro}
                     aplicacao={entidade}
+                    confirmado={registroStatus[r.idRegistro] ?? !r.isSugestao}
                     onView={handleView}
-                    confirmado={!r.isSugestao}
+                    onConfirm={() => handleConfirm(r.idRegistro)}
                   />
                 );
               case "reproducao":
@@ -230,16 +244,16 @@ const GerenciarRegistros: React.FC = () => {
                   <ReproducaoCard
                     key={r.idRegistro}
                     reproducao={entidade}
+                    confirmado={registroStatus[r.idRegistro] ?? !r.isSugestao}
                     onView={handleView}
-                    confirmado={!r.isSugestao}
                   />
                 );
               case "gestacao":
                 return (
                   <GestacaoCard
-                    confirmado={!r.isSugestao}
                     key={r.idRegistro}
                     gestacao={entidade}
+                    confirmado={registroStatus[r.idRegistro] ?? !r.isSugestao}
                     onView={handleView}
                   />
                 );
@@ -248,16 +262,16 @@ const GerenciarRegistros: React.FC = () => {
                   <PartoCard
                     key={r.idRegistro}
                     parto={entidade}
+                    confirmado={registroStatus[r.idRegistro] ?? !r.isSugestao}
                     onView={handleView}
-                    confirmado={!r.isSugestao}
                   />
                 );
               case "ocorrenciaDoenca":
                 return (
                   <OcorrenciaDoencaCard
                     key={r.idRegistro}
-                    confirmado={!r.isSugestao}
                     ocorrencia={entidade}
+                    confirmado={registroStatus[r.idRegistro] ?? !r.isSugestao}
                     onView={handleView}
                     onMarkCurado={() => handleMarkCurado(entidade)}
                   />
@@ -286,11 +300,7 @@ const GerenciarRegistros: React.FC = () => {
 
       {viewAll && filtered.length > PAGE_SIZE && (
         <div className="registro-pagination">
-          <Button
-            type="button"
-            variant="cardSecondary"
-            onClick={() => setViewAll(false)}
-          >
+          <Button type="button" variant="cardSecondary" onClick={() => setViewAll(false)}>
             Voltar à paginação
           </Button>
         </div>
@@ -310,26 +320,11 @@ const GerenciarRegistros: React.FC = () => {
                 />
               );
             case "reproducao":
-              return (
-                <ReproducaoDetalhes
-                  reproducao={entidade}
-                  onClose={() => setSelected(null)}
-                />
-              );
+              return <ReproducaoDetalhes reproducao={entidade} onClose={() => setSelected(null)} />;
             case "gestacao":
-              return (
-                <GestacaoDetalhes
-                  gestacao={entidade}
-                  onClose={() => setSelected(null)}
-                />
-              );
+              return <GestacaoDetalhes gestacao={entidade} onClose={() => setSelected(null)} />;
             case "parto":
-              return (
-                <PartoDetalhes
-                  parto={entidade}
-                  onClose={() => setSelected(null)}
-                />
-              );
+              return <PartoDetalhes parto={entidade} onClose={() => setSelected(null)} />;
             case "ocorrenciaDoenca":
               return (
                 <OcorrenciaDoencaDetalhes
@@ -342,7 +337,6 @@ const GerenciarRegistros: React.FC = () => {
           }
         })()}
 
-      {/* Renderiza o menu modal */}
       {menuAberto && <NovoRegistroMenu onClose={() => setMenuAberto(false)} />}
     </div>
   );

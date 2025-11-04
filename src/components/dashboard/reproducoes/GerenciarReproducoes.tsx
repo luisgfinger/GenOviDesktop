@@ -36,6 +36,13 @@ const GerenciarReproducoes: React.FC = () => {
 
   const [registroStatus, setRegistroStatus] = useState<Record<number, boolean>>({});
 
+    const handleConfirm = (id: number) => {
+    setRegistroStatus((prev) => ({
+      ...prev,
+      [id]: true,
+    }));
+  };
+
   const reprosHydrated: any[] = useMemo(() => {
     if (!reproducoes) return [];
     return reproducoes.map((r) => ({
@@ -87,6 +94,7 @@ const GerenciarReproducoes: React.FC = () => {
         if (!query) return true;
 
         const campos = [
+          r.id ? String(r.id) : "",
           r.observacoes ?? "",
           r.typeReproducao ?? "",
           r.carneiroNome,
@@ -131,7 +139,6 @@ const GerenciarReproducoes: React.FC = () => {
   return (
     <div className="repros-page">
       <div className="repros-header flex">
-        <h2>Reproduções</h2>
         <Link to="/dashboard/ovinos/reproducoes/criar">
           <Button type="button" variant="cardPrimary">
             Nova Reprodução
@@ -151,7 +158,7 @@ const GerenciarReproducoes: React.FC = () => {
         clearFilters={clearFilters}
         setPage={setPage}
         setViewAll={setViewAll}
-        placeholder="Buscar por pai/mãe, FBB, RFID, observações…"
+        placeholder="Buscar por id, pai/mãe, FBB, RFID, observações…"
       />
 
       <div className="repros-counter">
@@ -169,6 +176,7 @@ const GerenciarReproducoes: React.FC = () => {
               reproducao={r}
               confirmado={registroStatus[r.id ?? 0] ?? false}
               onView={() => setSelectedRepro(r)}
+              onConfirm={handleConfirm}
             />
           ))}
         </div>

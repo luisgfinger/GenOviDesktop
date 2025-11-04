@@ -12,6 +12,7 @@ interface PartoCardProps {
   onView: () => void;
   onEdit?: () => void;
   confirmado: boolean;
+  onConfirm: (id: number) => void;
 }
 
 const PartoCard: React.FC<PartoCardProps> = ({
@@ -19,11 +20,13 @@ const PartoCard: React.FC<PartoCardProps> = ({
   onView,
   onEdit,
   confirmado = false,
+  onConfirm,
 }) => {
    const handleToggleConfirmado = async () => {
       try {
         await updateRegistroToggle(parto.id, "isSugestao");
         toast.success("Registro atualizado como confirmado!");
+        if (onConfirm) onConfirm(parto.id);
       } catch (error) {
         console.error("Erro ao confirmar registro:", error);
         toast.error("Erro ao marcar como confirmado.");

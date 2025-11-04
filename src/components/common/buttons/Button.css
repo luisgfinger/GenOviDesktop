@@ -81,3 +81,23 @@
     cursor: pointer;
 }
 
+.toast-button {
+  border: none;
+  border-radius: 8px;
+  background-color: var(--secondary-color);
+  color: var(--gray-color);
+  padding: 6px 14px;
+  font-size: 14px;
+  font-family: "Jockey One", sans-serif;
+  transition: background-color 0.2s ease, transform 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.toast-button:hover {
+  background-color: var(--primary-color);
+  color: var(--white-color);
+  transform: scale(1.05);
+  cursor: pointer;
+}

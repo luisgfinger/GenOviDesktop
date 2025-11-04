@@ -45,14 +45,14 @@ const PageTitle: React.FC = () => {
         return "Cadastrar Medicamento";
       case "/dashboard/ovinos/medicamentos/gerenciar":
         return "Gerenciar Medicamentos";
-      case "/dashboard/ovinos/medicamentos/aplicar":
+      case "/dashboard/ovinos/aplicacoes/cadastrar/medicamento":
         return "Registrar aplicação de medicamento";
       case "/dashboard/ovinos/vacinas/criar":
         return "Cadastrar Vacina";
       case "/dashboard/ovinos/vacinas/gerenciar":
         return "Gerenciar Vacinas";
-      case "/dashboard/ovinos/vacinas/aplicar":
-        return "Registrar aplicação de vacinas";
+      case "/dashboard/ovinos/aplicacoes/cadastrar/vacina":
+        return "Registrar aplicação de vacina";
       case "/dashboard/ovinos/vacinas/vacinacoes":
         return "Vacinações";
       case "/dashboard/ovinos/medicamentos/medicacoes":

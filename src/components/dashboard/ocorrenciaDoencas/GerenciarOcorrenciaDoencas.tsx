@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import "./GerenciarOcorrenciaDoencas.css";
 
 import Button from "../../common/buttons/Button";
@@ -34,11 +34,36 @@ const GerenciarOcorrenciasDoenca: React.FC = () => {
   const [statusCurado, setStatusCurado] = useState("TODOS");
   const [page, setPage] = useState(1);
   const [viewAll, setViewAll] = useState(false);
-  const [selected, setSelected] = useState<OcorrenciaDoencaResponseDTO | null>(null);
+  const [selected, setSelected] = useState<OcorrenciaDoencaResponseDTO | null>(
+    null
+  );
 
-  const [registroStatus, setRegistroStatus] = useState<Record<number, boolean>>({});
+  const handleConfirm = (id: number) => {
+    setRegistroStatus((prev) => ({
+      ...prev,
+      [id]: true,
+    }));
+  };
 
-  const items = useMemo<OcorrenciaDoencaResponseDTO[]>(() => ocorrencias ?? [], [ocorrencias]);
+  const location = useLocation();
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const searchId = params.get("searchId");
+    if (searchId) {
+      setQ(searchId);
+      setPage(1);
+      setViewAll(false);
+    }
+  }, [location.search]);
+
+  const [registroStatus, setRegistroStatus] = useState<Record<number, boolean>>(
+    {}
+  );
+
+  const items = useMemo<OcorrenciaDoencaResponseDTO[]>(
+    () => ocorrencias ?? [],
+    [ocorrencias]
+  );
 
   useEffect(() => {
     if (!items.length) return;
@@ -49,7 +74,7 @@ const GerenciarOcorrenciasDoenca: React.FC = () => {
       for (const o of items) {
         if (!o.id) continue;
         const status = await getRegistroStatusByEntityId(o.id);
-        statusMap[o.id] = status === false; 
+        statusMap[o.id] = status === false;
       }
 
       setRegistroStatus(statusMap);
@@ -78,6 +103,7 @@ const GerenciarOcorrenciasDoenca: React.FC = () => {
         if (!query) return true;
 
         const campos = [
+          String(o.id ?? ""),
           o.ovino?.nome ?? "",
           o.doenca?.nome ?? "",
           o.doenca?.descricao ?? "",
@@ -99,7 +125,9 @@ const GerenciarOcorrenciasDoenca: React.FC = () => {
     : Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
   const currentPage = viewAll ? 1 : Math.min(page, totalPages);
   const startIdx = (currentPage - 1) * PAGE_SIZE;
-  const pageItems = viewAll ? filtered : filtered.slice(startIdx, startIdx + PAGE_SIZE);
+  const pageItems = viewAll
+    ? filtered
+    : filtered.slice(startIdx, startIdx + PAGE_SIZE);
 
   const clearFilters = () => {
     setQ("");
@@ -112,7 +140,11 @@ const GerenciarOcorrenciasDoenca: React.FC = () => {
 
   const handleMarkCurado = async (ocorrencia: OcorrenciaDoencaResponseDTO) => {
     if (!ocorrencia.id) return;
-    if (!window.confirm(`Deseja marcar a ocorrência do ovino "${ocorrencia.ovino?.nome}" como curada?`))
+    if (
+      !window.confirm(
+        `Deseja marcar a ocorrência do ovino "${ocorrencia.ovino?.nome}" como curada?`
+      )
+    )
       return;
 
     try {
@@ -139,7 +171,6 @@ const GerenciarOcorrenciasDoenca: React.FC = () => {
   return (
     <div className="ocorrencia-page">
       <div className="ocorrencia-header flex">
-        <h2>Ocorrências de Doenças</h2>
         <Link to="/dashboard/ovinos/doencas/adoecimento">
           <Button type="button" variant="cardPrimary">
             Nova Ocorrência
@@ -157,7 +188,7 @@ const GerenciarOcorrenciasDoenca: React.FC = () => {
         clearFilters={clearFilters}
         setPage={setPage}
         setViewAll={setViewAll}
-        placeholder="Buscar por ovino, doença, descrição ou RFID..."
+        placeholder="Buscar por id, ovino, doença, descrição ou RFID..."
         status={statusCurado}
         setStatus={setStatusCurado}
         statusLabel="Status"
@@ -172,7 +203,9 @@ const GerenciarOcorrenciasDoenca: React.FC = () => {
       </div>
 
       {pageItems.length === 0 ? (
-        <div className="ocorrencia-empty">Nenhuma ocorrência de doença encontrada.</div>
+        <div className="ocorrencia-empty">
+          Nenhuma ocorrência de doença encontrada.
+        </div>
       ) : (
         <div className="ocorrencia-list">
           {pageItems.map((o) => (
@@ -182,6 +215,7 @@ const GerenciarOcorrenciasDoenca: React.FC = () => {
               confirmado={registroStatus[o.id ?? 0] ?? false}
               onView={() => setSelected(o)}
               onMarkCurado={() => handleMarkCurado(o)}
+              onConfirm={handleConfirm}
             />
           ))}
         </div>
@@ -204,14 +238,21 @@ const GerenciarOcorrenciasDoenca: React.FC = () => {
 
       {viewAll && filtered.length > PAGE_SIZE && (
         <div className="ocorrencia-pagination">
-          <Button type="button" variant="cardSecondary" onClick={() => setViewAll(false)}>
+          <Button
+            type="button"
+            variant="cardSecondary"
+            onClick={() => setViewAll(false)}
+          >
             Voltar à paginação
           </Button>
         </div>
       )}
 
       {selected && (
-        <OcorrenciaDoencaDetalhes ocorrencia={selected} onClose={() => setSelected(null)} />
+        <OcorrenciaDoencaDetalhes
+          ocorrencia={selected}
+          onClose={() => setSelected(null)}
+        />
       )}
     </div>
   );

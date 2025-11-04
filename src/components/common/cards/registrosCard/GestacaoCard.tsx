@@ -11,6 +11,7 @@ interface GestacaoCardProps {
   onView: () => void;
   onEdit?: () => void;
   confirmado: boolean;
+  onConfirm: (id: number) => void;
 }
 
 const GestacaoCard: React.FC<GestacaoCardProps> = ({
@@ -18,11 +19,13 @@ const GestacaoCard: React.FC<GestacaoCardProps> = ({
   onView,
   onEdit,
   confirmado = false,
+  onConfirm
 }) => {
      const handleToggleConfirmado = async () => {
         try {
           await updateRegistroToggle(gestacao.id, "isSugestao");
           toast.success("Registro atualizado como confirmado!");
+            if (onConfirm) onConfirm(gestacao.id);
         } catch (error) {
           console.error("Erro ao confirmar registro:", error);
           toast.error("Erro ao marcar como confirmado.");

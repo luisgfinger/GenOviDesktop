@@ -12,6 +12,7 @@ import type { DoencaResponseDTO } from "../../../api/dtos/doenca/DoencaResponseD
 import { useDoencas } from "../../../api/hooks/doenca/UseDoencas";
 import { formatDate } from "../../../utils/formatDate";
 import { createRegistroAuto } from "../../../utils/criarRegistro";
+import { useNavigate } from "react-router-dom";
 
 const CadastrarOcorrenciaDoenca: React.FC = () => {
   const { ovinos, loading: loadingOvinos, error: errorOvinos } = useOvinos();
@@ -26,6 +27,8 @@ const CadastrarOcorrenciaDoenca: React.FC = () => {
   const [ovinoId, setOvinoId] = useState<string>("");
   const [ovinoNome, setOvinoNome] = useState<string>("");
   const [dataInicio, setDataInicio] = useState<string>("");
+
+    const navigate = useNavigate();
 
   const [enviarSugestao, setEnviarSugestao] = useState<boolean>(false);
 
@@ -71,7 +74,35 @@ const CadastrarOcorrenciaDoenca: React.FC = () => {
 
       await createRegistroAuto("ocorrenciaDoenca", novaOcorrencia, enviarSugestao);
 
-      toast.success("Adoecimento cadastrada com sucesso!");
+      toast.success(
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "row",
+            gap: "16px",
+            alignItems: "center",
+          }}
+        >
+          <span>Adoecimento criado com sucesso!</span>
+          <Button
+            type="button"
+            variant="toast"
+            onClick={() => {
+              const destino = `/dashboard/ovinos/doencas/doentes?searchId=${novaOcorrencia.id}`
+              navigate(destino);
+              toast.dismiss();
+            }}
+          >
+            Visualizar agora
+          </Button>
+        </div>,
+        {
+          autoClose: 6000,
+          style: {
+            width: "440px",
+          },
+        }
+      );
       setOvinoId("");
       setDoencaId("");
       setDataInicio("");

@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import "./GerenciarAplicacoes.css";
 
 import Button from "../../common/buttons/Button";
@@ -35,7 +35,6 @@ const GerenciarAplicacoes: React.FC<GerenciarAplicacoesProps> = ({ isVacina }) =
   const [page, setPage] = useState(1);
   const [viewAll, setViewAll] = useState(false);
   const [selected, setSelected] = useState<AplicacaoResponseDTO | null>(null);
-
   const [registroStatus, setRegistroStatus] = useState<Record<number, boolean>>({});
 
   const items = useMemo<AplicacaoResponseDTO[]>(() => aplicacoes ?? [], [aplicacoes]);
@@ -44,6 +43,26 @@ const GerenciarAplicacoes: React.FC<GerenciarAplicacoesProps> = ({ isVacina }) =
     () => items.filter((a) => a.medicamento?.isVacina === isVacina),
     [items, isVacina]
   );
+
+  const handleConfirm = (id: number) => {
+  setRegistroStatus((prev) => ({
+    ...prev,
+    [id]: true,
+  }));
+};
+
+
+const location = useLocation();
+
+  useEffect(() => {
+  const params = new URLSearchParams(location.search);
+  const searchId = params.get("searchId");
+  if (searchId) {
+    setQ(searchId);
+    setPage(1);
+    setViewAll(false);
+  }
+}, [location.search]);
 
   useEffect(() => {
     if (!filteredByType.length) return;
@@ -80,6 +99,7 @@ const GerenciarAplicacoes: React.FC<GerenciarAplicacoesProps> = ({ isVacina }) =
         if (!query) return true;
 
         const campos = [
+          String(a.id ?? ""),            
           a.ovino?.nome ?? "",
           a.medicamento?.nome ?? "",
           a.medicamento?.fabricante ?? "",
@@ -120,7 +140,6 @@ const GerenciarAplicacoes: React.FC<GerenciarAplicacoesProps> = ({ isVacina }) =
   return (
     <div className="aplicacao-page">
       <div className="aplicacao-header flex">
-        <h2>{isVacina ? "Vacinas" : "Medicamentos"}</h2>
         <Link
           to={`/dashboard/ovinos/aplicacoes/cadastrar/${isVacina ? "vacina" : "medicamento"}`}
         >
@@ -140,7 +159,7 @@ const GerenciarAplicacoes: React.FC<GerenciarAplicacoesProps> = ({ isVacina }) =
         clearFilters={clearFilters}
         setPage={setPage}
         setViewAll={setViewAll}
-        placeholder={`Buscar por ovino, ${isVacina ? "vacina" : "medicamento"}, fabricante ou RFID...`}
+        placeholder={`Buscar por ID, ovino, ${isVacina ? "vacina" : "medicamento"}, fabricante ou RFID...`}
       />
 
       <div className="aplicacao-counter">
@@ -161,6 +180,7 @@ const GerenciarAplicacoes: React.FC<GerenciarAplicacoesProps> = ({ isVacina }) =
               confirmado={registroStatus[a.id ?? 0] ?? false}
               onView={() => setSelected(a)}
               onEdit={() => setSelected(a)}
+              onConfirm={handleConfirm}
             />
           ))}
         </div>

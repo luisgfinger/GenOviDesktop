@@ -40,6 +40,13 @@ const GerenciarPartos: React.FC = () => {
 
   const [registroStatus, setRegistroStatus] = useState<Record<number, boolean>>({});
 
+    const handleConfirm = (id: number) => {
+    setRegistroStatus((prev) => ({
+      ...prev,
+      [id]: true,
+    }));
+  };
+
   const partosHydrated: PartoUI[] = useMemo(() => {
     return (partos ?? []).map((p) => {
       const ovelhaPai =
@@ -167,6 +174,7 @@ const GerenciarPartos: React.FC = () => {
               parto={p}
               confirmado={registroStatus[p.id ?? 0] ?? false}
               onView={() => setSelectedParto(p)}
+              onConfirm={handleConfirm}
             />
           ))}
         </div>

@@ -3,7 +3,6 @@ import { RegistroService } from "../../services/registro/RegistroService";
 import type { RegistroRequestDTO } from "../../dtos/registro/RegistroRequestDTO";
 import type { RegistroResponseDTO } from "../../dtos/registro/RegistroResponseDTO";
 
-
 export function useRegistros() {
   const [registros, setRegistros] = useState<RegistroResponseDTO[]>([]);
   const [loading, setLoading] = useState(true);
@@ -25,7 +24,8 @@ export function useRegistros() {
     fetchData();
   }, []);
 
-  return { registros, loading, error };
+  // ✅ adiciona setRegistros no retorno
+  return { registros, setRegistros, loading, error };
 }
 
 export function useRegistro(id: number | null) {
@@ -61,7 +61,9 @@ export function useRegistro(id: number | null) {
 export function useCriarRegistro() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [novoRegistro, setNovoRegistro] = useState<RegistroResponseDTO | null>(null);
+  const [novoRegistro, setNovoRegistro] = useState<RegistroResponseDTO | null>(
+    null
+  );
 
   const criarRegistro = async (dto: RegistroRequestDTO) => {
     setLoading(true);
@@ -86,7 +88,8 @@ export function useCriarRegistro() {
 export function useEditarRegistro() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [registroEditado, setRegistroEditado] = useState<RegistroResponseDTO | null>(null);
+  const [registroEditado, setRegistroEditado] =
+    useState<RegistroResponseDTO | null>(null);
 
   const editarRegistro = async (id: number, dto: RegistroRequestDTO) => {
     setLoading(true);

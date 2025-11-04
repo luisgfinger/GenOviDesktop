@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import "./GerenciarGestacoes.css";
 
 import Button from "../../common/buttons/Button";
@@ -43,6 +43,13 @@ const GerenciarGestacoes: React.FC = () => {
   const [selectedGestacao, setSelectedGestacao] = useState<GestacaoUI | null>(null);
 
   const [registroStatus, setRegistroStatus] = useState<Record<number, boolean>>({});
+
+    const handleConfirm = (id: number) => {
+    setRegistroStatus((prev) => ({
+      ...prev,
+      [id]: true,
+    }));
+  };
 
   const gestacoesHydrated: GestacaoUI[] = useMemo(() => {
     return (gestacoes ?? []).map((g) => {
@@ -104,6 +111,7 @@ const GerenciarGestacoes: React.FC = () => {
         if (!query) return true;
 
         const campos = [
+          g.id ? String(g.id) : "",
           g.ovelhaPai?.nome ?? "",
           g.ovelhaMae?.nome ?? "",
           g.ovelhaPai?.fbb ?? "",
@@ -136,13 +144,23 @@ const GerenciarGestacoes: React.FC = () => {
     setViewAll(false);
   };
 
+   const location = useLocation();
+    useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const searchId = params.get("searchId");
+    if (searchId) {
+      setQ(searchId);
+      setPage(1);
+      setViewAll(false);
+    }
+  }, [location.search]);
+
   if (loading) return <p>Carregando gestações…</p>;
   if (error) return <p style={{ color: "red" }}>{error}</p>;
 
   return (
     <div className="gestacoes-page">
       <div className="gestacoes-header flex">
-        <h2>Gestações</h2>
         <Link to="/dashboard/ovinos/gestacoes/criar">
           <Button type="button" variant="cardPrimary">
             Nova Gestação
@@ -160,7 +178,7 @@ const GerenciarGestacoes: React.FC = () => {
         clearFilters={clearFilters}
         setPage={setPage}
         setViewAll={setViewAll}
-        placeholder="Buscar por pai/mãe, FBB, RFID…"
+        placeholder="Buscar por id, pai/mãe, FBB, RFID…"
         status={status}
         setStatus={setStatus}
         statusLabel="Status"
@@ -186,6 +204,7 @@ const GerenciarGestacoes: React.FC = () => {
               confirmado={registroStatus[g.id ?? 0] ?? false}
               onView={() => setSelectedGestacao(g)}
               onEdit={() => setSelectedGestacao(g)}
+              onConfirm={handleConfirm}
             />
           ))}
         </div>

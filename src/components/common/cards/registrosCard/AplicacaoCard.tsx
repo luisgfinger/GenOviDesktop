@@ -11,6 +11,7 @@ interface AplicacaoCardProps {
   onView: () => void;
   onEdit?: () => void;
   confirmado: boolean;
+  onConfirm: (id: number) => void;
 }
 
 const AplicacaoCard: React.FC<AplicacaoCardProps> = ({
@@ -18,16 +19,19 @@ const AplicacaoCard: React.FC<AplicacaoCardProps> = ({
   onView,
   onEdit,
   confirmado = false,
+  onConfirm,
 }) => {
-     const handleToggleConfirmado = async () => {
-        try {
-          await updateRegistroToggle(aplicacao.id, "isSugestao");
-          toast.success("Registro atualizado como confirmado!");
-        } catch (error) {
-          console.error("Erro ao confirmar registro:", error);
-          toast.error("Erro ao marcar como confirmado.");
-        }
-      };
+  const handleToggleConfirmado = async () => {
+    try {
+      await updateRegistroToggle(aplicacao.id, "isSugestao");
+      toast.success("Registro atualizado como confirmado!");
+      if (onConfirm) onConfirm(aplicacao.id);
+    } catch (error) {
+      console.error("Erro ao confirmar registro:", error);
+      toast.error("Erro ao marcar como confirmado.");
+    }
+  };
+
   const isVacina = aplicacao.medicamento?.isVacina === true;
   const titulo = isVacina ? "Vacinação" : "Medicação";
 

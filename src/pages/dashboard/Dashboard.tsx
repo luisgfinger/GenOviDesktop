@@ -43,10 +43,6 @@ const Dashboard: React.FC = () => {
             element={<CadastrarOvino/>}
           />
           <Route
-            path="funcionarios"
-            element={<Gerenciar type="funcionario"/>}
-          />
-          <Route
             path="funcionarios/gerenciar"
             element={<Gerenciar type="funcionario"/>}
           />

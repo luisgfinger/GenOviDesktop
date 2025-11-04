@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import "./CadastrarAplicacao.css";
 import Button from "../../common/buttons/Button";
 import { toast } from "react-toastify";
-
+import { useNavigate } from "react-router-dom";
 import { useOvinos } from "../../../api/hooks/ovino/UseOvinos";
 import { useMedicamentos } from "../../../api/hooks/medicamento/UseMedicamentos";
 import { useCriarAplicacao } from "../../../api/hooks/aplicacao/UseAplicacoes";
@@ -10,7 +10,7 @@ import { useCriarAplicacao } from "../../../api/hooks/aplicacao/UseAplicacoes";
 import type { AplicacaoRequestDTO } from "../../../api/dtos/aplicacao/AplicacaoRequestDTO";
 import { formatEnum } from "../../../utils/formatEnum";
 import { formatDate } from "../../../utils/formatDate";
-import { createRegistroAuto} from "../../../utils/criarRegistro";
+import { createRegistroAuto } from "../../../utils/criarRegistro";
 
 interface CadastrarAplicacaoProps {
   isVacina: boolean;
@@ -35,6 +35,7 @@ const CadastrarAplicacao: React.FC<CadastrarAplicacaoProps> = ({
   const [medicamentoId, setMedicamentoId] = useState<string>("");
   const [data, setData] = useState<string>("");
   const [enviarSugestao, setEnviarSugestao] = useState<boolean>(false);
+  const navigate = useNavigate();
 
   const medicamentosFiltrados = medicamentos.filter(
     (m) => m.isVacina === isVacina
@@ -55,16 +56,42 @@ const CadastrarAplicacao: React.FC<CadastrarAplicacaoProps> = ({
     };
 
     try {
-      console.log("DTO enviado:", dto);
-      console.log("Enviar como sugestão:", enviarSugestao);
-
       const novaAplicacao = await criarAplicacao(dto);
-
-      console.log("Nova aplicação criada:", novaAplicacao);
-
       await createRegistroAuto("aplicacao", novaAplicacao, enviarSugestao);
 
-      toast.success("Aplicação cadastrada com sucesso!");
+      toast.success(
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "row",
+            gap: "16px",
+            alignItems: "center",
+          }}
+        >
+          <span>Aplicação criada com sucesso!</span>
+          <Button
+            type="button"
+            variant="toast"
+            onClick={() => {
+              const destino = isVacina
+                ? `/dashboard/ovinos/vacinas/vacinacoes?searchId=${novaAplicacao.id}`
+                : `/dashboard/ovinos/medicamentos/medicacoes?searchId=${novaAplicacao.id}`;
+
+              navigate(destino);
+              toast.dismiss();
+            }}
+          >
+            Visualizar agora
+          </Button>
+        </div>,
+        {
+          autoClose: 6000,
+          style: {
+            width: "440px",
+          },
+        }
+      );
+
       setOvinoId("");
       setMedicamentoId("");
       setData("");

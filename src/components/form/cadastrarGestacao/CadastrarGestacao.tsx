@@ -14,6 +14,7 @@ import { createRegistroAuto } from "../../../utils/criarRegistro"; // ✅ adicio
 import { TypeSexo } from "../../../api/enums/typeSexo/TypeSexo";
 import type { GestacaoRequestDTO } from "../../../api/dtos/gestacao/GestacaoRequestDTO";
 import type { ReproducaoResponseDTO } from "../../../api/dtos/reproducao/ReproducaoResponseDTO";
+import { useNavigate } from "react-router-dom";
 
 function monthsBetween(iso?: string): number {
   if (!iso) return 0;
@@ -43,7 +44,9 @@ const CadastrarGestacao: React.FC = () => {
   const [ovelhaMaeId, setOvelhaMaeId] = useState<string>("");
   const [ovelhaPaiId, setOvelhaPaiId] = useState<string>("");
   const [dataGestacao, setDataGestacao] = useState<string>("");
-  const [enviarSugestao, setEnviarSugestao] = useState<boolean>(false); // ✅ nova checkbox
+  const [enviarSugestao, setEnviarSugestao] = useState<boolean>(false);
+
+  const navigate = useNavigate();
 
   const reproducoesById = useMemo(() => {
     const map = new Map<string, ReproducaoResponseDTO>();
@@ -121,7 +124,35 @@ const CadastrarGestacao: React.FC = () => {
       await createRegistroAuto("gestacao", novaGestacao as any, enviarSugestao);
 
 
-      toast.success("Gestação cadastrada com sucesso!");
+       toast.success(
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "row",
+            gap: "16px",
+            alignItems: "center",
+          }}
+        >
+          <span>Gestação criada com sucesso!</span>
+          <Button
+            type="button"
+            variant="toast"
+            onClick={() => {
+              const destino = `/dashboard/ovinos/gestacoes/gerenciar?searchId=${novaGestacao.id}`
+              navigate(destino);
+              toast.dismiss();
+            }}
+          >
+            Visualizar agora
+          </Button>
+        </div>,
+        {
+          autoClose: 6000,
+          style: {
+            width: "440px",
+          },
+        }
+      );
       setReproducaoId("");
       setOvelhaPaiId("");
       setOvelhaMaeId("");
