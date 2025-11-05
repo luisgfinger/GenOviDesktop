@@ -231,7 +231,7 @@ const OvinoFullInfo: React.FC = () => {
     const isDate = String(editField).toLowerCase().includes("data");
     return (
       <input
-        type={isDate ? "date" : "text"}
+        type={isDate ? "dateTime-local" : "text"}
         value={tempValue}
         onChange={(e) => setTempValue(e.target.value)}
       />

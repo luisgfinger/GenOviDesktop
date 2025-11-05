@@ -10,6 +10,8 @@ import { toast } from "react-toastify";
 import { TypeSexo } from "../../../api/enums/typeSexo/TypeSexo";
 import { TypeReproducao } from "../../../api/enums/typeReproducao/TypeReproducao";
 import { formatEnum } from "../../../utils/formatEnum";
+import { formatDate } from "../../../utils/formatDate";
+import { DateToIsoString } from "../../../utils/dateToIsoString";
 
 function monthsBetween(iso?: string): number {
   if (!iso) return 0;
@@ -25,15 +27,6 @@ function monthsBetween(iso?: string): number {
 
 const MIN_MALE_MONTHS = 7;
 const MIN_FEMALE_MONTHS = 8;
-
-function formatISODateTime(iso?: string) {
-  if (!iso) return "—";
-  const d = new Date(iso);
-  if (Number.isNaN(d.getTime())) return "—";
-  const dia = d.toLocaleDateString();
-  const hora = d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
-  return `${dia} ${hora}`;
-}
 
 interface GestacaoDetalhesProps {
   gestacao: GestacaoResponseDTO;
@@ -71,11 +64,11 @@ const GestacaoDetalhes: React.FC<GestacaoDetalhesProps> = ({
     {
       label: "Data da Gestação",
       key: "dataGestacao",
-      renderView: (valor) => formatISODateTime(valor),
+      renderView: (valor) => formatDate(valor, true),
       renderEdit: (valor, onChange) => (
         <input
           type="datetime-local"
-          value={valor ? new Date(valor).toISOString().slice(0, 16) : ""}
+          value={valor ? DateToIsoString(valor) : ""}
           onChange={(e) => onChange(e.target.value)}
         />
       ),

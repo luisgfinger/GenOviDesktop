@@ -13,6 +13,7 @@ import { createRegistroAuto } from "../../../utils/criarRegistro";
 import { TypeSexo } from "../../../api/enums/typeSexo/TypeSexo";
 import type { PartoRequestDTO } from "../../../api/dtos/parto/PartoRequestDTO";
 import type { GestacaoResponseDTO } from "../../../api/dtos/gestacao/GestacaoResponseDTO";
+import { DateToIsoString } from "../../../utils/dateToIsoString";
 
 function monthsBetween(iso?: string): number {
   if (!iso) return 0;
@@ -113,7 +114,7 @@ const CadastrarParto: React.FC<CadastrarPartoProps> = ({ onSuccess }) => {
       gestacaoId: gestacaoId ? Number(gestacaoId) : undefined,
       ovelhaMaeId: Number(ovelhaMaeId),
       ovelhaPaiId: Number(ovelhaPaiId),
-      dataParto: dataParto ? new Date(dataParto).toISOString() : "",
+      dataParto: dataParto ? DateToIsoString(dataParto) : "",
     };
 
     try {

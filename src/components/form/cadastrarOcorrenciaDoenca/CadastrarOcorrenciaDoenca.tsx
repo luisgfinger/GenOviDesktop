@@ -14,6 +14,8 @@ import { formatDate } from "../../../utils/formatDate";
 import { createRegistroAuto } from "../../../utils/criarRegistro";
 import { useNavigate } from "react-router-dom";
 
+import { DateToIsoString } from "../../../utils/dateToIsoString";
+
 const CadastrarOcorrenciaDoenca: React.FC = () => {
   const { ovinos, loading: loadingOvinos, error: errorOvinos } = useOvinos();
   const { doencas, loading: loadingDoenc, error: errorDoenc } = useDoencas();
@@ -63,9 +65,11 @@ const CadastrarOcorrenciaDoenca: React.FC = () => {
     const dto: OcorrenciaDoencaRequestDTO = {
       ovinoId: Number(ovinoId),
       doencaId: Number(doencaId),
-      dataInicio: new Date(dataInicio).toISOString(),
+      dataInicio: DateToIsoString((dataInicio)),
       curado: false,
     };
+
+    console.log("OcorrenciaDoenca DTO:", dto);
 
     try {
       const novaOcorrencia = await criarOcorrencia(dto);

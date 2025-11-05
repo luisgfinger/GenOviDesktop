@@ -24,7 +24,6 @@ const ReproducaoCard: React.FC<ReproducaoCardProps> = ({
   const handleToggleConfirmado = async () => {
         try {
           await updateRegistroToggle(reproducao.id, "isSugestao");
-          toast.success("Registro atualizado como confirmado!");
            if (onConfirm) onConfirm(reproducao.id);
         } catch (error) {
           console.error("Erro ao confirmar registro:", error);

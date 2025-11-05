@@ -1,6 +1,7 @@
 import React from "react";
 import "./FuncionarioCard.css";
 import Button from "../../buttons/Button";
+import { formatDate } from '../../../../utils/formatDate';
 
 interface FuncionarioCardProps {
   nome: string;
@@ -40,7 +41,7 @@ const FuncionarioCard: React.FC<FuncionarioCardProps> = ({
         </span>
         <span className="flex">
           <h3>Data de admissão:</h3>
-          <p>{dataAdmissao}</p>
+          <p>{formatDate(dataAdmissao, false)}</p>
         </span>
       </li>
       <li className="funcionarioCard-buttons flex-column">

@@ -13,6 +13,7 @@ import type { AplicacaoResponseDTO } from "../../../api/dtos/aplicacao/Aplicacao
 import type { Ovino } from "../../../api/models/ovino/OvinoModel";
 import type { MedicamentoResponseDTO } from "../../../api/dtos/medicamento/MedicamentoResponseDTO";
 import { formatDate } from "../../../utils/formatDate";
+import { DateToIsoString } from "../../../utils/dateToIsoString";
 
 interface AplicacaoDetalhesProps {
   aplicacao: AplicacaoResponseDTO;
@@ -97,7 +98,7 @@ const AplicacaoDetalhes: React.FC<AplicacaoDetalhesProps> = ({
         renderEdit: (valor, onChange) => (
           <input
             type="datetime-local"
-            value={valor ? new Date(valor).toISOString().slice(0, 16) : ""}
+            value={valor ? DateToIsoString(valor) : ""}
             onChange={(e) => onChange(e.target.value)}
           />
         ),

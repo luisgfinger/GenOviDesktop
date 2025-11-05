@@ -5,6 +5,6 @@ export interface UsuarioRequestDTO {
   senha?: string;
   ativo?: boolean;
   autenticacao2fa?: boolean | null;
-  roles?: Role[];
+  enumRoles: Role[];
   funcionarioId?: number; 
 }

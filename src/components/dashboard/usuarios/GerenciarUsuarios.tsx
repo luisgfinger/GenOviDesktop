@@ -42,7 +42,7 @@ const GerenciarUsuarios: React.FC = () => {
 
     if (role !== "TODOS") {
       result = result.filter((u) =>
-        u.roles?.some((r) => r.toLowerCase() === role.toLowerCase())
+        u.enumRoles?.some((r) => r.toLowerCase() === role.toLowerCase())
       );
     }
 
@@ -92,7 +92,7 @@ const GerenciarUsuarios: React.FC = () => {
               key={usuario.id}
               email={usuario.email}
               ativo={usuario.ativo}
-              roles={usuario.roles}
+              roles={usuario.enumRoles}
               funcionarioNome={usuario.funcionario?.nome}
               autenticacao2fa={usuario.autenticacao2fa}
             />

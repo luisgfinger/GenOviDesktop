@@ -13,6 +13,7 @@ import type { OcorrenciaDoencaResponseDTO } from "../../../api/dtos/ocorrendiaDo
 import type { Ovino } from "../../../api/models/ovino/OvinoModel";
 import type { Doenca } from "../../../api/models/doenca/DoencaModel";
 import { formatDate } from "../../../utils/formatDate";
+import { DateToIsoString } from "../../../utils/dateToIsoString";
 
 interface OcorrenciaDoencaDetalhesProps {
   ocorrencia: OcorrenciaDoencaResponseDTO;
@@ -89,7 +90,7 @@ const OcorrenciaDoencaDetalhes: React.FC<OcorrenciaDoencaDetalhesProps> = ({
         renderEdit: (valor, onChange) => (
           <input
             type="datetime-local"
-            value={valor ? new Date(valor).toISOString().slice(0, 16) : ""}
+            value={valor ? DateToIsoString(valor) : ""}
             onChange={(e) => onChange(e.target.value)}
           />
         ),
@@ -102,7 +103,7 @@ const OcorrenciaDoencaDetalhes: React.FC<OcorrenciaDoencaDetalhesProps> = ({
         renderEdit: (valor, onChange) => (
           <input
             type="datetime-local"
-            value={valor ? new Date(valor).toISOString().slice(0, 16) : ""}
+            value={valor ? DateToIsoString(valor) : ""}
             onChange={(e) => onChange(e.target.value)}
           />
         ),

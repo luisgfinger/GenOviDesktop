@@ -6,6 +6,8 @@ import { useOvinos } from "../../../api/hooks/ovino/UseOvinos";
 import { TypeReproducao } from "../../../api/enums/typeReproducao/TypeReproducao";
 import { formatEnum } from "../../../utils/formatEnum";
 import { TypeSexo } from "../../../api/enums/typeSexo/TypeSexo";
+import { DateToIsoString } from "../../../utils/dateToIsoString";
+import { formatDate } from "../../../utils/formatDate";
 
 interface ReproducaoDetalhesProps {
   reproducao: ReproducaoResponseDTO;
@@ -51,11 +53,11 @@ const ReproducaoDetalhes: React.FC<ReproducaoDetalhesProps> = ({
       label: "Data da Reprodução",
       key: "dataReproducao",
       renderView: (valor) =>
-        valor ? new Date(valor).toLocaleString() : "—",
+        valor ? formatDate(valor, true) : "—",
       renderEdit: (valor, onChange) => (
         <input
           type="datetime-local"
-          value={valor ? new Date(valor).toISOString().slice(0, 16) : ""}
+          value={valor ? DateToIsoString(valor) : ""}
           onChange={(e) => onChange(e.target.value)}
         />
       ),

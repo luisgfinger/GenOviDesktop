@@ -7,7 +7,7 @@ export interface Usuario {
   email: string;
   senha: string;
   autenticacao2fa?: boolean | null;
-  roles: Role[];
+  enumRoles: Role[];
  funcionario?: Partial<Funcionario>;
 
 }

@@ -57,8 +57,8 @@ export async function updateRegistroToggle(
     };
 
     await RegistroService.editar(registroAtual.idRegistro, dto);
-    console.log(`✅ Campo "${String(field)}" atualizado para ${novoValor} no registro ID ${registroAtual.idRegistro}.`);
+    console.log(`Campo "${String(field)}" atualizado para ${novoValor} no registro ID ${registroAtual.idRegistro}.`);
   } catch (error) {
-    console.error(`❌ Erro ao atualizar registro (entityId: ${entityId}):`, error);
+    console.error(`Erro ao atualizar registro (entityId: ${entityId}):`, error);
   }
 }

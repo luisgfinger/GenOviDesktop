@@ -8,7 +8,7 @@ export function toUsuarioRequestDTO(usuario: Usuario): UsuarioRequestDTO {
     senha: usuario.senha,
     ativo: usuario.ativo,
     autenticacao2fa: usuario.autenticacao2fa ?? null,
-    roles: usuario.roles,
+    enumRoles: usuario.enumRoles,
     funcionarioId: usuario.funcionario?.id,
   };
 }
@@ -20,7 +20,7 @@ export function fromUsuarioResponseDTO(dto: UsuarioResponseDTO): Usuario {
     ativo: dto.ativo,
     senha: "", 
     autenticacao2fa: dto.autenticacao2fa ?? null,
-    roles: dto.roles,
+    enumRoles: dto.enumRoles,
     funcionario: dto.funcionario ?? undefined,
   };
 }

@@ -6,6 +6,6 @@ export interface UsuarioResponseDTO {
   email: string;
   ativo: boolean;
   autenticacao2fa?: boolean | null;
-  roles: Role[];
+  enumRoles: Role[];
   funcionario: Funcionario;
 }

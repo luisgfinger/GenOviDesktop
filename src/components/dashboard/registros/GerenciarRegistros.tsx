@@ -78,7 +78,7 @@ const GerenciarRegistros: React.FC = () => {
         const entidade = r[tipo as keyof RegistroResponseDTO] as any;
         if (!entidade?.id) continue;
 
-        const status = await getRegistroStatusByEntityId(entidade.id);
+        const status = await getRegistroStatusByEntityId(entidade.id, tipo);
         statusMap[r.idRegistro] = status === false;
       }
       setRegistroStatus(statusMap);
@@ -152,7 +152,6 @@ const GerenciarRegistros: React.FC = () => {
     setViewAll(false);
   };
 
-  // ✅ Marcar ocorrência de doença como curada
   const handleMarkCurado = async (ocorrencia: OcorrenciaDoencaResponseDTO) => {
     if (!ocorrencia?.id) return;
     if (
@@ -246,6 +245,7 @@ const GerenciarRegistros: React.FC = () => {
                     reproducao={entidade}
                     confirmado={registroStatus[r.idRegistro] ?? !r.isSugestao}
                     onView={handleView}
+                    onConfirm={() => handleConfirm(r.idRegistro)}
                   />
                 );
               case "gestacao":
@@ -255,6 +255,7 @@ const GerenciarRegistros: React.FC = () => {
                     gestacao={entidade}
                     confirmado={registroStatus[r.idRegistro] ?? !r.isSugestao}
                     onView={handleView}
+                    onConfirm={() => handleConfirm(r.idRegistro)}
                   />
                 );
               case "parto":
@@ -264,6 +265,7 @@ const GerenciarRegistros: React.FC = () => {
                     parto={entidade}
                     confirmado={registroStatus[r.idRegistro] ?? !r.isSugestao}
                     onView={handleView}
+                    onConfirm={() => handleConfirm(r.idRegistro)}
                   />
                 );
               case "ocorrenciaDoenca":
@@ -274,6 +276,7 @@ const GerenciarRegistros: React.FC = () => {
                     confirmado={registroStatus[r.idRegistro] ?? !r.isSugestao}
                     onView={handleView}
                     onMarkCurado={() => handleMarkCurado(entidade)}
+                    onConfirm={() => handleConfirm(r.idRegistro)}
                   />
                 );
               default:

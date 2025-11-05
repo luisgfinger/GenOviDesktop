@@ -9,30 +9,44 @@ import type { Registro } from "../api/models/registro/RegistroModel";
  * @returns Retorna true/false se encontrado, ou null se não existir
  */
 export async function getRegistroStatusByEntityId(
-  entityId: number
+  entityId: number,
+  tipo:
+    | "aplicacao"
+    | "reproducao"
+    | "gestacao"
+    | "parto"
+    | "ocorrenciaDoenca"
 ): Promise<boolean | null> {
   try {
     const registros: Registro[] = await RegistroService.listarTodos();
 
-    const registro = registros.find(
-      (r) =>
-        r.idRegistro === entityId ||
-        r.aplicacao?.id === entityId ||
-        r.reproducao?.id === entityId ||
-        r.gestacao?.id === entityId ||
-        r.parto?.id === entityId ||
-        r.ocorrenciaDoenca?.id === entityId
-    );
+    const registro = registros.find((r) => {
+      switch (tipo) {
+        case "aplicacao":
+          return r.aplicacao?.id === entityId;
+        case "reproducao":
+          return r.reproducao?.id === entityId;
+        case "gestacao":
+          return r.gestacao?.id === entityId;
+        case "parto":
+          return r.parto?.id === entityId;
+        case "ocorrenciaDoenca":
+          return r.ocorrenciaDoenca?.id === entityId;
+        default:
+          return false;
+      }
+    });
 
     if (!registro) {
-      console.warn(`⚠️ Nenhum registro encontrado para a entidade com ID ${entityId}.`);
+      console.warn(`Nenhum registro encontrado para ${tipo} com ID ${entityId}.`);
       return null;
     }
 
-    console.log(`ℹ️ Registro encontrado (ID: ${registro.idRegistro}) — isSugestao: ${registro.isSugestao}`);
+    console.log(`Registro encontrado para ${tipo} ID ${entityId}:`, registro);
     return registro.isSugestao;
   } catch (error) {
-    console.error(`❌ Erro ao buscar status do registro (entityId: ${entityId}):`, error);
+    console.error(`Erro ao buscar status (${tipo}, entityId: ${entityId}):`, error);
     return null;
   }
 }
+

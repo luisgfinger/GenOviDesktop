@@ -4,6 +4,7 @@ import OvinoDefaultImg from "../../../../assets/images/ovinoImagem.png";
 import { formatEnum } from "../../../../utils/formatEnum";
 import type { Ovino } from "../../../../api/models/ovino/OvinoModel";
 import ActionButtons from "../../buttons/ActionButtons";
+import { formatDate } from "../../../../utils/formatDate";
 
 interface OvinoCardFullProps {
   ovino: Ovino;
@@ -73,14 +74,20 @@ const OvinoCardFull: React.FC<OvinoCardFullProps> = ({
         {renderField("Status", formatEnum(ovino.status), "status")}
         {renderField(
           "Data Nascimento",
-          ovino.dataNascimento?.split("T")[0],
+          ovino.dataNascimento
+            ? (formatDate(ovino.dataNascimento, true) ?? "Não informado")
+            : "Não informado",
           "dataNascimento"
         )}
+
         {renderField(
-          "Data Cadastro",
-          ovino.dataCadastro?.split("T")[0],
+          "Data de Cadastro",
+          ovino.dataCadastro
+            ? (formatDate(ovino.dataCadastro, true) ?? "Não informado")
+            : "Não informado",
           "dataCadastro"
         )}
+
         {renderField("Pai", ovino.ovinoPai?.nome, "ovinoPai")}
         {renderField("Mãe", ovino.ovinoMae?.nome, "ovinoMae")}
         {renderField("Compra", ovino.compra?.id, "compra")}

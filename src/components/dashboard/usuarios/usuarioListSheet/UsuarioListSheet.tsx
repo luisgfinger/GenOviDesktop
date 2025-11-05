@@ -32,7 +32,7 @@ const UsuarioListSheet: React.FC<UsuarioListSheetProps> = ({ usuarios }) => {
             <UsuarioCard
               email={selectedUsuario.email}
               ativo={selectedUsuario.ativo}
-              roles={selectedUsuario.roles}
+              roles={selectedUsuario.enumRoles}
               funcionarioNome={selectedUsuario.funcionario?.nome}
               autenticacao2fa={selectedUsuario.autenticacao2fa}
             />
@@ -62,7 +62,7 @@ const UsuarioListSheet: React.FC<UsuarioListSheetProps> = ({ usuarios }) => {
             <span className="flex">{usuario.email}</span>
             <span className="flex">{usuario.ativo ? "Ativo" : "Inativo"}</span>
             <span className="flex">
-              {usuario.roles.join(", ").replace(/ROLE_/g, "")}
+              {usuario.enumRoles.join(", ").replace(/ROLE_/g, "")}
             </span>
             <span className="flex">
               {usuario.funcionario?.nome || "-"}

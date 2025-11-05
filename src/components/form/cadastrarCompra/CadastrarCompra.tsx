@@ -5,6 +5,7 @@ import { toast } from "react-toastify";
 
 import { useCriarCompra } from "../../../api/hooks/compra/UseCompras";
 import type { CompraRequestDTO } from "../../../api/dtos/compra/CompraRequestDTO";
+import { DateToIsoString } from "../../../utils/dateToIsoString";
 
 interface CadastrarCompraProps {
   onSuccess?: (compraId: number, qtdOvinos: number, dataCompraISO: string) => void;
@@ -27,7 +28,7 @@ const CadastrarCompra: React.FC<CadastrarCompraProps> = ({ onSuccess }) => {
     }
 
     const dto: CompraRequestDTO = {
-      dataCompra: new Date(dataCompra).toISOString(),
+      dataCompra: DateToIsoString(dataCompra),
       valor: parseFloat(valor),
       vendedorId: vendedorId ? Number(vendedorId) : undefined,
     };

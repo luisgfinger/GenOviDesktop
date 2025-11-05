@@ -11,6 +11,7 @@ import type { AplicacaoRequestDTO } from "../../../api/dtos/aplicacao/AplicacaoR
 import { formatEnum } from "../../../utils/formatEnum";
 import { formatDate } from "../../../utils/formatDate";
 import { createRegistroAuto } from "../../../utils/criarRegistro";
+import { DateToIsoString } from "../../../utils/dateToIsoString";
 
 interface CadastrarAplicacaoProps {
   isVacina: boolean;
@@ -52,7 +53,7 @@ const CadastrarAplicacao: React.FC<CadastrarAplicacaoProps> = ({
     const dto: AplicacaoRequestDTO = {
       ovinoId: Number(ovinoId),
       medicamentoId: Number(medicamentoId),
-      dataAplicacao: new Date(data).toISOString(),
+      dataAplicacao: DateToIsoString(data),
     };
 
     try {

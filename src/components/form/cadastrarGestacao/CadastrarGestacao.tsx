@@ -15,6 +15,7 @@ import { TypeSexo } from "../../../api/enums/typeSexo/TypeSexo";
 import type { GestacaoRequestDTO } from "../../../api/dtos/gestacao/GestacaoRequestDTO";
 import type { ReproducaoResponseDTO } from "../../../api/dtos/reproducao/ReproducaoResponseDTO";
 import { useNavigate } from "react-router-dom";
+import { DateToIsoString } from "../../../utils/dateToIsoString";
 
 function monthsBetween(iso?: string): number {
   if (!iso) return 0;
@@ -115,7 +116,7 @@ const CadastrarGestacao: React.FC = () => {
       reproducaoId: reproducaoId ? Number(reproducaoId) : undefined,
       ovelhaMaeId: Number(ovelhaMaeId),
       ovelhaPaiId: Number(ovelhaPaiId),
-      dataGestacao: dataGestacao ? new Date(dataGestacao).toISOString() : "",
+      dataGestacao: dataGestacao ? DateToIsoString(dataGestacao) : "",
     };
 
     try {

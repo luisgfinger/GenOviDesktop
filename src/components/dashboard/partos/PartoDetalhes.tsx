@@ -5,6 +5,8 @@ import { PartoService } from "../../../api/services/parto/PartoService";
 import { useOvinos } from "../../../api/hooks/ovino/UseOvinos";
 import { useGestacoes } from "../../../api/hooks/gestacao/UseGestacoes";
 import { TypeSexo } from "../../../api/enums/typeSexo/TypeSexo";
+import { formatDate } from "../../../utils/formatDate";
+import { DateToIsoString } from "../../../utils/dateToIsoString";
 
 function monthsBetween(iso?: string): number {
   if (!iso) return 0;
@@ -20,15 +22,6 @@ function monthsBetween(iso?: string): number {
 
 const MIN_MALE_MONTHS = 7;
 const MIN_FEMALE_MONTHS = 8;
-
-function formatISODateTime(iso?: string) {
-  if (!iso) return "—";
-  const d = new Date(iso);
-  if (Number.isNaN(d.getTime())) return "—";
-  const dia = d.toLocaleDateString();
-  const hora = d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
-  return `${dia} ${hora}`;
-}
 
 interface PartoDetalhesProps {
   parto: PartoResponseDTO;
@@ -63,11 +56,11 @@ const PartoDetalhes: React.FC<PartoDetalhesProps> = ({ parto, onClose }) => {
     {
       label: "Data do Parto",
       key: "dataParto",
-      renderView: (valor) => formatISODateTime(valor),
+      renderView: (valor) => formatDate(valor, true),
       renderEdit: (valor, onChange) => (
         <input
           type="datetime-local"
-          value={valor ? new Date(valor).toISOString().slice(0, 16) : ""}
+          value={valor ? DateToIsoString(valor) : ""}
           onChange={(e) => onChange(e.target.value)}
         />
       ),
@@ -129,7 +122,7 @@ const PartoDetalhes: React.FC<PartoDetalhesProps> = ({ parto, onClose }) => {
       key: "gestacao",
       renderView: (valor) =>
         valor?.id
-          ? `#${valor.id} — ${formatISODateTime(valor.dataGestacao)}`
+          ? `#${valor.id} — ${formatDate(valor.dataGestacao)}`
           : "—",
       renderEdit: (_, onChange) =>
         loadingGestacoes ? (
@@ -147,7 +140,7 @@ const PartoDetalhes: React.FC<PartoDetalhesProps> = ({ parto, onClose }) => {
             <option value="">Selecione</option>
             {gestacoes.map((g) => (
               <option key={g.id} value={g.id}>
-                {`#${g.id}`} — {formatISODateTime(g.dataGestacao)}
+                {`#${g.id}`} — {formatDate(g.dataGestacao)}
               </option>
             ))}
           </select>

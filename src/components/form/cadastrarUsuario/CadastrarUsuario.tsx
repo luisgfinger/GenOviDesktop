@@ -22,37 +22,43 @@ const CadastrarUsuario: React.FC = () => {
   } = useFuncionarios();
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  e.preventDefault();
 
-    if (!email || !senha) {
-      toast.warn("Preencha todos os campos obrigatórios.");
-      return;
-    }
+  if (!email || !senha) {
+    toast.warn("Preencha todos os campos obrigatórios.");
+    return;
+  }
 
-    try {
-      const novoUsuario = {
-        id: 0,
-        email,
-        senha,
-        ativo,
-        autenticacao2fa,
-        roles: [role],
-        funcionario: funcionarioId ? { id: Number(funcionarioId) } : undefined,
-      };
+  try {
+    const rolesSelecionadas =
+      role === Role.ROLE_ADMIN
+        ? [Role.ROLE_USER, Role.ROLE_ADMIN]
+        : [Role.ROLE_USER];
 
-      await criarUsuario(novoUsuario);
-      toast.success("Usuário cadastrado com sucesso!");
+    const novoUsuario = {
+      id: 0,
+      email,
+      senha,
+      ativo,
+      autenticacao2fa,
+      enumRoles: rolesSelecionadas,
+      funcionario: funcionarioId ? { id: Number(funcionarioId) } : undefined,
+    };
 
-      setEmail("");
-      setSenha("");
-      setAtivo(true);
-      setAutenticacao2fa(false);
-      setRole(Role.ROLE_USER);
-      setFuncionarioId("");
-    } catch {
-      toast.error("Erro ao cadastrar usuário. Tente novamente.");
-    }
-  };
+    await criarUsuario(novoUsuario);
+    toast.success("Usuário cadastrado com sucesso!");
+
+    setEmail("");
+    setSenha("");
+    setAtivo(true);
+    setAutenticacao2fa(false);
+    setRole(Role.ROLE_USER);
+    setFuncionarioId("");
+  } catch {
+    toast.error("Erro ao cadastrar usuário. Tente novamente.");
+  }
+};
+
 
   return (
     <div className="cadastrar-usuario-bg">
