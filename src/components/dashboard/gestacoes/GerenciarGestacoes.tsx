@@ -82,7 +82,7 @@ const GerenciarGestacoes: React.FC = () => {
 
       for (const g of gestacoesHydrated) {
         if (!g.id) continue;
-        const status = await getRegistroStatusByEntityId(g.id);
+        const status = await getRegistroStatusByEntityId(g.id, "gestacao");
         statusMap[g.id] = status === false;
       }
 

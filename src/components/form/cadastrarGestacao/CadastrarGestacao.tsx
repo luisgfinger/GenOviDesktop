@@ -9,7 +9,7 @@ import { useCriarGestacao, useGestacoes } from "../../../api/hooks/gestacao/UseG
 import { usePartos } from "../../../api/hooks/parto/UsePartos";
 import { formatEnum } from "../../../utils/formatEnum";
 import { formatDate } from "../../../utils/formatDate";
-import { createRegistroAuto } from "../../../utils/criarRegistro"; // ✅ adicionada
+import { createRegistroAuto } from "../../../utils/criarRegistro"; 
 
 import { TypeSexo } from "../../../api/enums/typeSexo/TypeSexo";
 import type { GestacaoRequestDTO } from "../../../api/dtos/gestacao/GestacaoRequestDTO";

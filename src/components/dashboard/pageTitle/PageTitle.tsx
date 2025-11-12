@@ -63,6 +63,16 @@ const PageTitle: React.FC = () => {
         return "Gerenciar Compras";
       case "/dashboard/registros":
         return "Registros";
+      case "/dashboard/ovinos/pesagens/criar":
+        return "Registrar Pesagem";
+      case "/dashboard/ovinos/pesagens/gerenciar":
+        return "Gerenciar Pesagens";
+      case "/dashboard/ovinos/fullinfo":
+        return "Informações do Ovino";
+      case "/dashboard/usuarios":
+        return "Gerenciar Usuários";
+    case "/dashboard/usuarios/cadastrar":
+        return "Cadastrar Usuário";
       default:
         return "Dashboard";
     }

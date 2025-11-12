@@ -25,6 +25,8 @@ import CadastrarCompraComOvinos from "../../components/form/cadastrarCompra/Cada
 import GerenciarCompras from "../../components/dashboard/compra/GerenciarCompras";
 import CadastrarUsuario from "../../components/form/cadastrarUsuario/CadastrarUsuario";
 import GerenciarUsuarios from "../../components/dashboard/usuarios/GerenciarUsuarios";
+import CadastrarPesagem from "../../components/form/cadastrarPesagem/CadastrarPesagem";
+import GerenciarPesagens from "../../components/dashboard/pesagens/GerenciarPesagens";
 
 const Dashboard: React.FC = () => {
 
@@ -80,6 +82,8 @@ const Dashboard: React.FC = () => {
           <Route path="/registros" element={<GerenciarRegistros/>}/>
           <Route path="ovinos/compra/criar" element={<CadastrarCompraComOvinos/>}/>
           <Route path="ovinos/compra/gerenciar" element={<GerenciarCompras/>}/>
+          <Route path="ovinos/pesagens/criar" element={<CadastrarPesagem/>} />
+          <Route path="ovinos/pesagens/gerenciar" element={<GerenciarPesagens/>} />
         </Routes>
       </div>
     </div>

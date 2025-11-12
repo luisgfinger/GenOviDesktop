@@ -1,0 +1,84 @@
+.pesagens-page {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 90%;
+  align-self: center;
+  margin-top: 30px;
+  margin-bottom: 30px;
+}
+
+.pesagens-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.pesagens-header h2 {
+  margin: 0;
+  color: var(--full-black-color);
+}
+
+.pesagens-counter {
+  font-size: 14px;
+  opacity: 0.85;
+}
+
+.pesagens-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.pesagem-card {
+  background: var(--white-color);
+  border: 1px solid #f1f1f1;
+  border-radius: 8px;
+  padding: 14px 18px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  transition: all 0.2s ease;
+}
+
+.pesagem-card:hover {
+  background-color: #fafafa;
+  transform: translateY(-1px);
+}
+
+.pesagem-info h4 {
+  margin: 0 0 6px 0;
+  color: var(--full-black-color);
+}
+
+.pesagem-info p {
+  margin: 4px 0;
+  font-size: 14px;
+  color: #444;
+}
+
+.pesagem-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.pesagens-empty {
+  padding: 16px;
+  background: var(--white-color);
+  border-radius: 8px;
+  border: 1px solid #f1f1f1;
+  text-align: center;
+}
+
+.pesagens-pagination {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  justify-content: center;
+}
+
+.flex-between {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}

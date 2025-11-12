@@ -10,7 +10,13 @@
     color: var(--full-black-color);
 }
 
-.dashboardMenu-content-optionsLine{
-    gap: 30px;
-    padding-bottom: 50px;
+.dashboardMenu-content-optionsLine {
+  flex-wrap: wrap;
+  gap: 30px;
+}
+
+.dashboardMenu-content-optionsLine .optionCard {
+  flex: 1 1 calc(25% - 1rem);
+  min-width: 180px;
+  max-width: 250px;
 }

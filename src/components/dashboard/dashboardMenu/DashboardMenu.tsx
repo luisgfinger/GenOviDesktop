@@ -10,6 +10,7 @@ import Doenca from "../../../assets/icons/doencas.png";
 import Gestacao from "../../../assets/icons/gestacao.png";
 import Reproducao from "../../../assets/icons/reproducao.png";
 import Compra from "../../../assets/icons/buy.png";
+import Pesagem from "../../../assets/icons/balance.png";
 
 import "./DashboardMenu.css";
 
@@ -34,6 +35,7 @@ const DashboardMenu: React.FC = () => {
     { images: [{ src: Reproducao, alt: "reproducao" }], text: "Reproduções", href: "/", childrenCount: 2 },
     { images: [{ src: Gestacao, alt: "gestacao" }], text: "Gestações", href: "/", childrenCount: 2 },
     { images: [{ src: Amamentacao, alt: "amamentacao" }], text: "Partos", href: "/", childrenCount: 2 },
+    { images: [{ src: Pesagem, alt: "pesagem" }], text: "Pesagens", href: "/dashboard/ovinos/pesagens/gerenciar", childrenCount: 2 },
   ];
 
   const ovinoChildrenOptions = [
@@ -59,6 +61,9 @@ const DashboardMenu: React.FC = () => {
 
     { text: "Registrar parto", href: "/dashboard/ovinos/partos/criar" },
     { text: "Gerenciar partos", href: "/dashboard/ovinos/partos/gerenciar" },
+
+    { text: "Registrar pesagem", href: "/dashboard/ovinos/pesagens/criar" },
+    { text: "Gerenciar pesagens", href: "/dashboard/ovinos/pesagens/gerenciar" },
   ];
 
   let start = 0;
