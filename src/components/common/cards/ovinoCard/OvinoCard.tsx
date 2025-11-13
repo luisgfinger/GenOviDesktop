@@ -52,7 +52,9 @@ const OvinoCard: React.FC<OvinoCardProps> = ({
         <Button
           variant="cardPrimary"
           onClick={() =>
-            navigate(`/dashboard/ovinos/fullinfo`, { state: { ovino } })
+            navigate(`/dashboard/ovinos/fullinfo/${ovino.rfid}`, {
+              state: { ovino },
+            })
           }
         >
           Ver mais

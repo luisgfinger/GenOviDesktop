@@ -116,6 +116,8 @@ const OvinoFullInfo: React.FC = () => {
     setTempValue("");
   };
 
+  console.log("OvinoFullInfo render:", ovino);
+
   const renderInput = () => {
     if (!editField) return null;
     if (editField === "sexo") {

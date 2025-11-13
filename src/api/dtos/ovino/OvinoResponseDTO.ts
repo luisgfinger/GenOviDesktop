@@ -22,6 +22,6 @@ export interface OvinoResponseDTO {
   fotoOvino?: string;
   compra?: Compra;
   parto?: Parto;
-  pesagens?: Pesagem[];
+  pesos?: Pesagem[];
 }
 

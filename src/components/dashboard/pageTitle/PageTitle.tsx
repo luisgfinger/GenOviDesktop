@@ -8,6 +8,9 @@ const PageTitle: React.FC = () => {
   const location = useLocation();
 
   const typeName = useMemo(() => {
+    if (location.pathname.startsWith("/dashboard/ovinos/fullinfo/")) {
+      return "Informações do Ovino";
+    }
     switch (location.pathname) {
       case "/dashboard/ovinos":
         return "Gerenciar Rebanho";
@@ -67,11 +70,9 @@ const PageTitle: React.FC = () => {
         return "Registrar Pesagem";
       case "/dashboard/ovinos/pesagens/gerenciar":
         return "Gerenciar Pesagens";
-      case "/dashboard/ovinos/fullinfo":
-        return "Informações do Ovino";
       case "/dashboard/usuarios":
         return "Gerenciar Usuários";
-    case "/dashboard/usuarios/cadastrar":
+      case "/dashboard/usuarios/cadastrar":
         return "Cadastrar Usuário";
       default:
         return "Dashboard";

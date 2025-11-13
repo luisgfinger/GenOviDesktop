@@ -93,11 +93,10 @@ const OvinoCardFull: React.FC<OvinoCardFullProps> = ({
         {renderField("Compra", ovino.compra?.id, "compra")}
         {renderField("Parto", ovino.parto?.id, "parto")}
         {renderField(
-          "Pesagens",
+          "Peso",
           ovino.pesagens?.length
-            ? `${ovino.pesagens.length} registro(s)`
-            : "Nenhuma",
-          "pesagens"
+            ? `${ovino.pesagens[ovino.pesagens.length - 1].peso} kg`
+            : "Não informado"
         )}
       </div>
     </div>

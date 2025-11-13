@@ -19,7 +19,7 @@ export const responseToModel = (dto: OvinoResponseDTO): Ovino => ({
   fotoOvino: dto.fotoOvino,
   compra: dto.compra ? { id: dto.compra.id } : undefined,
   parto: dto.parto ? { id: dto.parto.id } : undefined,
-  pesagens: dto.pesagens ?? [],
+  pesagens: dto.pesos ?? [],
 });
 
 

@@ -15,7 +15,7 @@ const SideMenu: React.FC = () => {
   const menuItems = [
     { label: "OVINOS", icon: Ovinos, path: "/dashboard/ovinos" },    
     {label: "REGISTROS", icon: Register, path: "/dashboard/registros"},
-    { label: "IA", icon: Ia, path: "/ia" },
+    { label: "IA", icon: Ia, path: "/dashboard/ia" },
     { label: "FUNCIONARIOS", icon: Funcionarios, path: "/dashboard/funcionarios/gerenciar" },
     { label: "USUÁRIOS", icon: Users, path: "/dashboard/usuarios" },
   ];
