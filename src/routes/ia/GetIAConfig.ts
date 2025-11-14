@@ -1,13 +1,10 @@
 import { iaRouteConfig } from "./IARoutes";
 
-export function getIaConfig(path: string) {
+export function getIaConfig(path: string, contextoIA?: any) {
   for (const config of iaRouteConfig) {
     if (config.match(path)) {
       return {
-        promptPreDefinido:
-          typeof config.promptPreDefinido === "function"
-            ? config.promptPreDefinido(path)
-            : config.promptPreDefinido,
+        promptPreDefinido: config.buildPromptHeader?.(path, contextoIA),
         permitirInputUsuario: config.permitirInputUsuario ?? true,
         promptOptions: config.promptOptions ?? [],
       };

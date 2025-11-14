@@ -1,16 +1,16 @@
 import { useState } from "react";
-import { GenoviIAService } from "../../services/ia/GenoviIAService";
 import { mapChatResponse } from "../../mappers/ia/ChatMapper";
+import { GenoviIAService } from "../../services/ia/GenoviIAService";
 
 export function useGenoviIA() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  async function sendToIA(message: string) {
+  async function sendToIA(prompt: string) {
     setLoading(true);
     setError(null);
 
-    const result = await GenoviIAService.enviarMensagem({ message });
+    const result = await GenoviIAService.enviarMensagem(prompt);
 
     const mapped = mapChatResponse(result);
 
@@ -22,9 +22,5 @@ export function useGenoviIA() {
     return mapped;
   }
 
-  return {
-    sendToIA,
-    loading,
-    error
-  };
+  return { sendToIA, loading, error };
 }

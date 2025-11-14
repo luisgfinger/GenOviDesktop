@@ -1,3 +1,8 @@
+export interface ChatMessageDTO {
+  role: "user" | "model";
+  text: string;
+}
+
 export interface ChatRequestDTO {
-  message: string;
+  contents: ChatMessageDTO[];
 }

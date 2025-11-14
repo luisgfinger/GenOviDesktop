@@ -1,11 +1,13 @@
 import { useState } from "react";
 import { useGenoviIA } from "../../../api/hooks/ia/UseGenoviIA";
 import "./IA.css";
+import { gerarContextoIA } from "../../../utils/ia/GerarContextoIA";
 
 interface IAChatWidgetProps {
   promptPreDefinido?: string;
   permitirInputUsuario?: boolean;
   promptOptions?: string[];
+  contextoIA?: any;
   onClose: () => void;
 }
 
@@ -13,31 +15,44 @@ export default function IAChatWidget({
   promptPreDefinido,
   permitirInputUsuario = true,
   promptOptions = [],
+  contextoIA,
   onClose,
 }: IAChatWidgetProps) {
   const { sendToIA, loading } = useGenoviIA();
-
   const [messages, setMessages] = useState<any[]>([]);
   const [input, setInput] = useState("");
 
+  function construirPrompt(finalPergunta: string) {
+    let header = "";
+
+    if (contextoIA) {
+      header += gerarContextoIA(contextoIA) + "\n\n";
+    }
+
+    if (promptPreDefinido) {
+      header += promptPreDefinido + "\n";
+    }
+
+    return header ? `${header}${finalPergunta}` : finalPergunta;
+  }
+
   async function enviarPrompt(text: string) {
-    const finalPrompt =
-      promptPreDefinido && promptPreDefinido.trim().length > 0
-        ? `${promptPreDefinido} ${text}`
-        : text;
+    const userMsg = { text, sender: "user", timestamp: new Date() };
+    setMessages((prev) => [...prev, userMsg]);
 
-    const user = { text, sender: "user", timestamp: new Date() };
-    setMessages((prev) => [...prev, user]);
-
+    const finalPrompt = construirPrompt(text);
     const result = await sendToIA(finalPrompt);
 
-    const bot = {
+    console.log("PROMPT FINAL ENVIADO PARA IA:");
+    console.log(finalPrompt);
+
+    const iaMsg = {
       text: result.text,
       sender: result.success ? "bot" : "error",
       timestamp: result.timestamp,
     };
 
-    setMessages((prev) => [...prev, bot]);
+    setMessages((prev) => [...prev, iaMsg]);
   }
 
   return (
@@ -49,12 +64,8 @@ export default function IAChatWidget({
 
       {promptOptions.length > 0 && (
         <div className="ia-quick-prompts">
-          {promptOptions.slice(0, 5).map((opt, idx) => (
-            <button
-              key={idx}
-              className="ia-prompt-btn"
-              onClick={() => enviarPrompt(opt)}
-            >
+          {promptOptions.slice(0, 5).map((opt, i) => (
+            <button key={i} className="ia-prompt-btn" onClick={() => enviarPrompt(opt)}>
               {opt}
             </button>
           ))}

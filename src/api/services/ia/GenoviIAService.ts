@@ -1,19 +1,29 @@
 import Api from "../Api";
-import type { ChatRequestDTO } from "../../dtos/ia/ChatRequestDTO";
+import type { ChatRequestDTO} from "../../dtos/ia/ChatRequestDTO";
 import type { ChatResponseDTO } from "../../dtos/ia/ChatResponseDTO";
 
 export const GenoviIAService = {
-  async enviarMensagem(request: ChatRequestDTO): Promise<ChatResponseDTO> {
+  async enviarMensagem(message: string): Promise<ChatResponseDTO> {
+    console.log("Enviado: ", message);
+    const requestBody: ChatRequestDTO = {
+      contents: [
+        {
+          role: "user",
+          text: message
+        }
+      ]
+    };
+
     try {
       const response = await Api.post<ChatResponseDTO>(
         "/user/ia-agent/genovi/chat",
-        request
+        requestBody
       );
 
       return response.data;
 
     } catch (error: any) {
-      console.error("Erro na IA:", error);
+      console.error("Erro IA:", error);
 
       return {
         success: false,

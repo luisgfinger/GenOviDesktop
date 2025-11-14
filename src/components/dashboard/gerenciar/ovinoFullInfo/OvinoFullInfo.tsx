@@ -16,11 +16,12 @@ import { CompraService } from "../../../../api/services/compra/CompraService";
 
 const OvinoFullInfo: React.FC = () => {
   const { state } = useLocation();
-  const { id } = useParams();
   const navigate = useNavigate();
+
   const ovinoInicial = state?.ovino as Ovino | undefined;
 
   const [ovino, setOvino] = useState<Ovino | null>(ovinoInicial ?? null);
+
   const [editField, setEditField] = useState<keyof Ovino | null>(null);
   const [tempValue, setTempValue] = useState<any>("");
   const [loading, setLoading] = useState(false);
@@ -37,6 +38,7 @@ const OvinoFullInfo: React.FC = () => {
           PartoService.listar(),
           CompraService.listarTodos?.() ?? [],
         ]);
+
         setOvinos(ovinosData);
         setPartos(partosData);
         setCompras(comprasData);
@@ -47,18 +49,24 @@ const OvinoFullInfo: React.FC = () => {
   }, []);
 
   if (!ovino) {
-    return <p>Carregando dados do ovino {id}...</p>;
+    return (
+      <p style={{ padding: "20px" }}>
+        Nenhum ovino carregado.  
+        Volte para a lista de ovinos e selecione novamente.
+      </p>
+    );
   }
 
   const handleDisable = async () => {
     if (!ovino.id) return;
+
     if (!window.confirm("Tem certeza que deseja desativar este ovino?")) return;
 
     try {
       await OvinoService.desativar(ovino.id);
       toast.success("Ovino desativado com sucesso!");
       navigate("/dashboard/ovinos");
-    } catch (err: any) {
+    } catch (err) {
       console.error(err);
       toast.error("Erro ao desativar ovino.");
     }
@@ -90,13 +98,11 @@ const OvinoFullInfo: React.FC = () => {
         newValue = compras.find((c) => c.id === Number(tempValue)) ?? null;
       }
 
-      let finalValue = newValue;
-
       if (String(editField).toLowerCase().includes("data") && newValue) {
-        finalValue = newValue.includes("T") ? newValue : `${newValue}T00:00:00`;
+        newValue = newValue.includes("T") ? newValue : `${newValue}T00:00:00`;
       }
 
-      const updated = { ...ovino, [editField]: finalValue };
+      const updated = { ...ovino, [editField]: newValue };
 
       await OvinoService.editar(ovino.id, updated as any);
 
@@ -116,16 +122,12 @@ const OvinoFullInfo: React.FC = () => {
     setTempValue("");
   };
 
-  console.log("OvinoFullInfo render:", ovino);
-
   const renderInput = () => {
     if (!editField) return null;
+
     if (editField === "sexo") {
       return (
-        <select
-          value={tempValue}
-          onChange={(e) => setTempValue(e.target.value)}
-        >
+        <select value={tempValue} onChange={(e) => setTempValue(e.target.value)}>
           <option value="">Selecione</option>
           <option value="MACHO">Macho</option>
           <option value="FEMEA">Fêmea</option>
@@ -135,63 +137,46 @@ const OvinoFullInfo: React.FC = () => {
 
     if (editField === "raca") {
       return (
-        <select
-          value={tempValue}
-          onChange={(e) => setTempValue(e.target.value)}
-        >
+        <select value={tempValue} onChange={(e) => setTempValue(e.target.value)}>
           <option value="">Selecione</option>
           {Object.values(TypeRaca).map((r) => (
-            <option key={r} value={r}>
-              {r}
-            </option>
+            <option key={r} value={r}>{r}</option>
           ))}
         </select>
       );
     }
+
     if (editField === "status") {
       return (
-        <select
-          value={tempValue}
-          onChange={(e) => setTempValue(e.target.value)}
-        >
-          <option value="">Selecione</option>
+        <select value={tempValue} onChange={(e) => setTempValue(e.target.value)}>
           {Object.values(TypeStatus).map((s) => (
-            <option key={s} value={s}>
-              {s}
-            </option>
+            <option key={s} value={s}>{s}</option>
           ))}
         </select>
       );
     }
+
     if (editField === "grauPureza") {
       return (
-        <select
-          value={tempValue}
-          onChange={(e) => setTempValue(e.target.value)}
-        >
-          <option value="">Selecione</option>
+        <select value={tempValue} onChange={(e) => setTempValue(e.target.value)}>
           {Object.values(TypeGrauPureza).map((g) => (
-            <option key={g} value={g}>
-              {g}
-            </option>
+            <option key={g} value={g}>{g}</option>
           ))}
         </select>
       );
     }
 
     if (editField === "ovinoMae" || editField === "ovinoPai") {
-      const options = ovinos.filter((o) =>
-        editField === "ovinoMae" ? o.sexo === "Fêmea" : o.sexo === "Macho"
-      );
+      const options = ovinos.filter((o) => {
+        return editField === "ovinoMae" ? o.sexo === "Fêmea" : o.sexo === "Macho";
+      });
+
       return (
-        <select
-          value={tempValue}
-          onChange={(e) => setTempValue(e.target.value)}
-        >
+        <select value={tempValue} onChange={(e) => setTempValue(e.target.value)}>
           <option value="">Selecione</option>
           {options.map((o) => (
             <option key={o.id} value={o.id}>
-              {o.nome || `#${o.id}`} — RFID: {o.rfid ?? "—"}
+              {o.nome || `#${o.id}`} — RFID: {o.rfid}
             </option>
           ))}
         </select>
@@ -200,10 +185,7 @@ const OvinoFullInfo: React.FC = () => {
 
     if (editField === "parto") {
       return (
-        <select
-          value={tempValue}
-          onChange={(e) => setTempValue(e.target.value)}
-        >
+        <select value={tempValue} onChange={(e) => setTempValue(e.target.value)}>
           <option value="">Selecione</option>
           {partos.map((p) => (
             <option key={p.id} value={p.id}>
@@ -216,10 +198,7 @@ const OvinoFullInfo: React.FC = () => {
 
     if (editField === "compra") {
       return (
-        <select
-          value={tempValue}
-          onChange={(e) => setTempValue(e.target.value)}
-        >
+        <select value={tempValue} onChange={(e) => setTempValue(e.target.value)}>
           <option value="">Selecione</option>
           {compras.map((c) => (
             <option key={c.id} value={c.id}>
@@ -233,7 +212,7 @@ const OvinoFullInfo: React.FC = () => {
     const isDate = String(editField).toLowerCase().includes("data");
     return (
       <input
-        type={isDate ? "dateTime-local" : "text"}
+        type={isDate ? "datetime-local" : "text"}
         value={tempValue}
         onChange={(e) => setTempValue(e.target.value)}
       />
@@ -242,11 +221,7 @@ const OvinoFullInfo: React.FC = () => {
 
   return (
     <div className="ovinoFullInfo flex-column">
-      <OvinoCardFull
-        ovino={ovino}
-        onEdit={handleEdit}
-        onRemove={handleDisable}
-      />
+      <OvinoCardFull ovino={ovino} onEdit={handleEdit} onRemove={handleDisable} />
 
       {editField && (
         <div className="edit-overlay">
@@ -254,18 +229,10 @@ const OvinoFullInfo: React.FC = () => {
             <h3>Editando: {editField}</h3>
             {renderInput()}
             <div className="edit-buttons">
-              <Button
-                variant="cardPrimary"
-                onClick={handleSave}
-                disabled={loading}
-              >
+              <Button variant="cardPrimary" onClick={handleSave} disabled={loading}>
                 {loading ? "Salvando..." : "Salvar"}
               </Button>
-              <Button
-                variant="cardSecondary"
-                onClick={handleCancel}
-                disabled={loading}
-              >
+              <Button variant="cardSecondary" onClick={handleCancel} disabled={loading}>
                 Cancelar
               </Button>
             </div>

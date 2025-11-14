@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import "./CadastrarReproducao.css";
 import Button from "../../common/buttons/Button";
 import { toast } from "react-toastify";
@@ -16,6 +16,7 @@ import { usePartos } from "../../../api/hooks/parto/UsePartos";
 import type { ReproducaoRequestDTO } from "../../../api/dtos/reproducao/ReproducaoRequestDTO";
 import { formatDate } from "../../../utils/formatDate";
 import { createRegistroAuto } from "../../../utils/criarRegistro";
+import IAButton from "../../common/ia/IAButton";
 
 type Props = {
   minAgeMonths?: number;
@@ -56,6 +57,7 @@ const CadastrarReproducao: React.FC<Props> = ({ minAgeMonths = 12 }) => {
   const [observacoes, setObservacoes] = useState<string>("");
   const [query, setQuery] = useState<string>("");
   const [enviarSugestao, setEnviarSugestao] = useState<boolean>(false);
+  const [contextoIA, setContextoIA] = useState<any>(null);
 
   const isOvelhaGestando = (ovelhaId: number): boolean => {
     return (gestacoes ?? []).some((g) => {
@@ -192,6 +194,22 @@ const CadastrarReproducao: React.FC<Props> = ({ minAgeMonths = 12 }) => {
       toast.error("Erro ao cadastrar reproduções.");
     }
   };
+
+  useEffect(() => {
+    const macho = machosAdultos.find((m) => String(m.id) === carneiroId);
+    const femeaSelecionada = femeasAdultas.find(
+      (f) => String(f.id) === femeasIds[0]
+    );
+
+    if (macho && femeaSelecionada && femeasIds.length === 1) {
+      setContextoIA({
+        macho,
+        femea: femeaSelecionada,
+      });
+    } else {
+      setContextoIA(null);
+    }
+  }, [carneiroId, femeasIds, machosAdultos, femeasAdultas]);
 
   return (
     <div className="cadastrar-reproducao-bg flex-column">
@@ -389,6 +407,18 @@ const CadastrarReproducao: React.FC<Props> = ({ minAgeMonths = 12 }) => {
           {errorSalvar && <p style={{ color: "red" }}>{errorSalvar}</p>}
         </ul>
       </form>
+      <IAButton
+        promptPreDefinido="Avaliação da reprodução:"
+        permitirInputUsuario={true}
+        promptOptions={[
+          "Esta combinação genética é boa?",
+          "A fêmea pode reproduzir neste momento?",
+          "Existe risco nessa reprodução?",
+          "O macho é adequado para cobertura?",
+          "Previsão de características dos cordeiros",
+        ]}
+        contextoIA={contextoIA}
+      />
     </div>
   );
 };

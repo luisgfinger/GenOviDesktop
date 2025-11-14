@@ -1,6 +1,6 @@
 export interface IARouteConfig {
   match: (path: string) => boolean;
-  promptPreDefinido?: string | ((path: string) => string);
+  buildPromptHeader?: (path: string, contextoIA?: any) => string | undefined;
   permitirInputUsuario?: boolean;
   promptOptions?: string[];
 }
@@ -10,35 +10,37 @@ export const iaRouteConfig: IARouteConfig[] = [
     match: (path) => path === "/dashboard/ovinos/gerenciar",
     permitirInputUsuario: true,
     promptOptions: [
-      "Quais raças são melhores para produção de carne?",
-      "Quais são os principais sinais de doenças em ovinos?",
-      "Como melhorar a produtividade do rebanho?",
-      "Como avaliar a condição corporal de ovinos?",
-      "Quais são os cuidados essenciais com cordeiros?",
+      "Quais raças são melhores para carne?",
+      "Principais sinais de doenças?",
+      "Como melhorar a produtividade?",
+      "Como avaliar a condição corporal?",
+      "Cuidados essenciais com cordeiros",
     ],
   },
 
   {
     match: (path) => path.startsWith("/dashboard/ovinos/fullinfo/"),
-
     permitirInputUsuario: true,
-
-    promptPreDefinido: (path, perguntaUsuario?: string) => {
-      const rfid = path.split("/").pop();
-      const pergunta = perguntaUsuario ?? "";
-      return `Para o ovino de RFID ${rfid}: ${pergunta}`;
-    },
-
+    buildPromptHeader: () => "Pergunta:",
     promptOptions: [
       "Analise o peso deste ovino",
-      "Este ovino está acima ou abaixo do ideal?",
+      "Ele está acima ou abaixo do ideal?",
       "Quais doenças ele já teve?",
-      "Avaliação genética e pureza",
-      "Este ovino serve para reprodução?",
-      "Quais cuidados esse ovino precisa?",
-      "O estado corporal está adequado?",
-      "Historico de saúde",
-      "Nutrição recomendada",
+      "Avaliação genética",
+      "Serve para reprodução?",
+    ],
+  },
+
+  {
+    match: (path) => path === "/dashboard/ovinos/reproducoes/criar",
+    permitirInputUsuario: true,
+    buildPromptHeader: () => "Pergunta:",
+    promptOptions: [
+      "Esta combinação genética é boa?",
+      "A fêmea pode reproduzir neste momento?",
+      "Existe risco nessa reprodução?",
+      "O macho é adequado para cobertura?",
+      "Previsão de características dos cordeiros",
     ],
   },
 ];
