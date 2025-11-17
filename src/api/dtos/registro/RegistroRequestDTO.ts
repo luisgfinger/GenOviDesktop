@@ -7,4 +7,5 @@ export interface RegistroRequestDTO {
   idParto?: number;
   idAplicacoes?: number;
   idOcorrenciaDoencas?: number;
+  idPesagem?: number;
 }

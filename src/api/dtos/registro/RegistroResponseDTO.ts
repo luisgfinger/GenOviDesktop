@@ -4,6 +4,7 @@ import type { Gestacao } from "../../models/gestacao/GestacaoModel";
 import type { Parto } from "../../models/parto/PartoModel";
 import type { Aplicacao } from "../../models/aplicacao/AplicacaoModel";
 import type { OcorrenciaDoenca } from "../../models/ocorrenciaDoenca/ocorrenciaDoencaModel";
+import type { Pesagem } from "../../models/pesagem/PesagemModel";
 
 export interface RegistroResponseDTO {
   idRegistro: number;
@@ -15,4 +16,5 @@ export interface RegistroResponseDTO {
   parto?: Parto | null;
   aplicacao?: Aplicacao | null;
   ocorrenciaDoenca?: OcorrenciaDoenca | null;
+  pesagem?: Pesagem | null;
 }

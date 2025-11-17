@@ -64,7 +64,7 @@ const GerenciarReproducoes: React.FC = () => {
 
       for (const r of reprosHydrated) {
         if (!r.id) continue;
-        const status = await getRegistroStatusByEntityId(r.id);
+        const status = await getRegistroStatusByEntityId(r.id, "reproducao");
         statusMap[r.id] = status === false;
       }
 

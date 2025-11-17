@@ -71,7 +71,7 @@ const GerenciarPartos: React.FC = () => {
 
       for (const p of partosHydrated) {
         if (!p.id) continue;
-        const status = await getRegistroStatusByEntityId(p.id);
+        const status = await getRegistroStatusByEntityId(p.id, "parto");
         statusMap[p.id] = status === false;
       }
 

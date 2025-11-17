@@ -24,7 +24,6 @@ export function useRegistros() {
     fetchData();
   }, []);
 
-  // ✅ adiciona setRegistros no retorno
   return { registros, setRegistros, loading, error };
 }
 

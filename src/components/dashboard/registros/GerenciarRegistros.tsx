@@ -7,11 +7,13 @@ import FilterBar from "../../common/filter-bar/FilterBar";
 
 import { useRegistros } from "../../../api/hooks/registro/UseRegistros";
 import { useEditarOcorrenciaDoenca } from "../../../api/hooks/ocorrenciaDoencas/UseOcorrenciaDoencas";
+import { useOvinos } from "../../../api/hooks/ovino/UseOvinos";
 
 import type { RegistroResponseDTO } from "../../../api/dtos/registro/RegistroResponseDTO";
 import type { OcorrenciaDoencaResponseDTO } from "../../../api/dtos/ocorrendiaDoenca/OcorrenciaDoencaResponseDTO";
 
 import { formatDate } from "../../../utils/formatDate";
+import { formatEnum } from "../../../utils/formatEnum";
 import { getRegistroStatusByEntityId } from "../../../utils/getRegistroStatusById";
 import { toast } from "react-toastify";
 
@@ -20,12 +22,15 @@ import ReproducaoCard from "../../common/cards/registrosCard/ReproducaoCard";
 import GestacaoCard from "../../common/cards/registrosCard/GestacaoCard";
 import PartoCard from "../../common/cards/registrosCard/PartoCard";
 import OcorrenciaDoencaCard from "../../common/cards/registrosCard/OcorrenciaDoencaCard";
+import PesagemCard from "../../common/cards/registrosCard/PesagemCard";
 
 import AplicacaoDetalhes from "../aplicacoes/AplicacaoDetalhes";
 import ReproducaoDetalhes from "../reproducoes/ReproducoesDetalhes";
 import GestacaoDetalhes from "../gestacoes/GestacaoDetalhes";
 import PartoDetalhes from "../partos/PartoDetalhes";
 import OcorrenciaDoencaDetalhes from "../ocorrenciaDoencas/OcorrenciaDoencaDetalhes";
+import PesagemDetalhes from "../pesagens/PesagemDetalhes";
+
 import NovoRegistroMenu from "./NovoRegistroMenu";
 
 function normalize(s?: string) {
@@ -40,6 +45,7 @@ const PAGE_SIZE = 6;
 const GerenciarRegistros: React.FC = () => {
   const { registros, setRegistros, loading, error } = useRegistros();
   const { editarOcorrencia } = useEditarOcorrenciaDoenca();
+  const { ovinos } = useOvinos();
 
   const [q, setQ] = useState("");
   const [dateFrom, setDateFrom] = useState("");
@@ -50,7 +56,7 @@ const GerenciarRegistros: React.FC = () => {
   const [viewAll, setViewAll] = useState(false);
   const [selected, setSelected] = useState<RegistroResponseDTO | null>(null);
   const [selectedTipo, setSelectedTipo] = useState<
-    "aplicacao" | "reproducao" | "gestacao" | "parto" | "ocorrenciaDoenca" | null
+    "aplicacao" | "reproducao" | "gestacao" | "parto" | "ocorrenciaDoenca" | "pesagem" | null
   >(null);
   const [menuAberto, setMenuAberto] = useState(false);
   const [registroStatus, setRegistroStatus] = useState<Record<number, boolean>>({});
@@ -59,12 +65,13 @@ const GerenciarRegistros: React.FC = () => {
 
   const getTipoRegistro = (
     r: RegistroResponseDTO
-  ): "aplicacao" | "reproducao" | "gestacao" | "parto" | "ocorrenciaDoenca" => {
+  ): "aplicacao" | "reproducao" | "gestacao" | "parto" | "ocorrenciaDoenca" | "pesagem" => {
     if (r.aplicacao) return "aplicacao";
     if (r.reproducao) return "reproducao";
     if (r.gestacao) return "gestacao";
     if (r.parto) return "parto";
     if (r.ocorrenciaDoenca) return "ocorrenciaDoenca";
+    if (r.pesagem) return "pesagem";
     return "aplicacao";
   };
 
@@ -73,6 +80,7 @@ const GerenciarRegistros: React.FC = () => {
 
     const fetchStatuses = async () => {
       const statusMap: Record<number, boolean> = {};
+
       for (const r of items) {
         const tipo = getTipoRegistro(r);
         const entidade = r[tipo as keyof RegistroResponseDTO] as any;
@@ -114,10 +122,12 @@ const GerenciarRegistros: React.FC = () => {
 
         if (funcionario !== "TODOS" && r.funcionario?.nome !== funcionario)
           return false;
+
         if (status === "CONFIRMADO" && r.isSugestao) return false;
         if (status === "NAO_CONFIRMADO" && !r.isSugestao) return false;
 
         if (!query) return true;
+
         const campos = [
           r.funcionario?.nome ?? "",
           formatDate(r.dataRegistro, true),
@@ -126,6 +136,7 @@ const GerenciarRegistros: React.FC = () => {
           r.gestacao?.id ?? "",
           r.parto?.id ?? "",
           r.ocorrenciaDoenca?.id ?? "",
+          r.pesagem?.id ?? "",
         ].map((x) => normalize(String(x)));
 
         return campos.some((c) => c.includes(query));
@@ -154,11 +165,8 @@ const GerenciarRegistros: React.FC = () => {
 
   const handleMarkCurado = async (ocorrencia: OcorrenciaDoencaResponseDTO) => {
     if (!ocorrencia?.id) return;
-    if (
-      !window.confirm(
-        `Deseja marcar a ocorrência do ovino "${ocorrencia.ovino?.nome}" como curada?`
-      )
-    )
+
+    if (!window.confirm(`Deseja marcar a ocorrência do ovino "${ocorrencia.ovino?.nome}" como curada?`))
       return;
 
     try {
@@ -219,8 +227,19 @@ const GerenciarRegistros: React.FC = () => {
         <div className="registro-list">
           {pageItems.map((r) => {
             const tipo = getTipoRegistro(r);
-            const entidade = r[tipo as keyof RegistroResponseDTO] as any;
+            let entidade = r[tipo as keyof RegistroResponseDTO] as any;
             if (!entidade) return null;
+
+            // 🔥 HIDRATA PESAGEM EXATAMENTE COMO EM GerenciarPesagens
+            if (tipo === "pesagem") {
+              const ov = ovinos?.find(o => o.id === entidade.ovino?.id) ?? entidade.ovino;
+
+              entidade = {
+                ...entidade,
+                ovinoNome: ov?.nome ?? `#${ov?.id ?? "-"}`,
+                racaNome: ov?.raca ? formatEnum(ov.raca) : "—",
+              };
+            }
 
             const handleView = () => {
               setSelected(r);
@@ -238,6 +257,7 @@ const GerenciarRegistros: React.FC = () => {
                     onConfirm={() => handleConfirm(r.idRegistro)}
                   />
                 );
+
               case "reproducao":
                 return (
                   <ReproducaoCard
@@ -248,6 +268,7 @@ const GerenciarRegistros: React.FC = () => {
                     onConfirm={() => handleConfirm(r.idRegistro)}
                   />
                 );
+
               case "gestacao":
                 return (
                   <GestacaoCard
@@ -258,6 +279,7 @@ const GerenciarRegistros: React.FC = () => {
                     onConfirm={() => handleConfirm(r.idRegistro)}
                   />
                 );
+
               case "parto":
                 return (
                   <PartoCard
@@ -268,6 +290,7 @@ const GerenciarRegistros: React.FC = () => {
                     onConfirm={() => handleConfirm(r.idRegistro)}
                   />
                 );
+
               case "ocorrenciaDoenca":
                 return (
                   <OcorrenciaDoencaCard
@@ -279,6 +302,18 @@ const GerenciarRegistros: React.FC = () => {
                     onConfirm={() => handleConfirm(r.idRegistro)}
                   />
                 );
+
+              case "pesagem":
+                return (
+                  <PesagemCard
+                    key={r.idRegistro}
+                    pesagem={entidade}
+                    confirmado={registroStatus[r.idRegistro] ?? !r.isSugestao}
+                    onView={handleView}
+                    onConfirm={() => handleConfirm(r.idRegistro)}
+                  />
+                );
+
               default:
                 return null;
             }
@@ -309,36 +344,48 @@ const GerenciarRegistros: React.FC = () => {
         </div>
       )}
 
-      {selected &&
-        selectedTipo &&
-        (() => {
-          const entidade = selected[selectedTipo as keyof RegistroResponseDTO] as any;
-          switch (selectedTipo) {
-            case "aplicacao":
-              return (
-                <AplicacaoDetalhes
-                  aplicacao={entidade}
-                  isVacina={!!entidade.medicamento?.isVacina}
-                  onClose={() => setSelected(null)}
-                />
-              );
-            case "reproducao":
-              return <ReproducaoDetalhes reproducao={entidade} onClose={() => setSelected(null)} />;
-            case "gestacao":
-              return <GestacaoDetalhes gestacao={entidade} onClose={() => setSelected(null)} />;
-            case "parto":
-              return <PartoDetalhes parto={entidade} onClose={() => setSelected(null)} />;
-            case "ocorrenciaDoenca":
-              return (
-                <OcorrenciaDoencaDetalhes
-                  ocorrencia={entidade}
-                  onClose={() => setSelected(null)}
-                />
-              );
-            default:
-              return null;
-          }
-        })()}
+      {selected && selectedTipo && (() => {
+        const entidade = selected[selectedTipo as keyof RegistroResponseDTO] as any;
+
+        switch (selectedTipo) {
+          case "aplicacao":
+            return (
+              <AplicacaoDetalhes
+                aplicacao={entidade}
+                isVacina={!!entidade.medicamento?.isVacina}
+                onClose={() => setSelected(null)}
+              />
+            );
+
+          case "reproducao":
+            return <ReproducaoDetalhes reproducao={entidade} onClose={() => setSelected(null)} />;
+
+          case "gestacao":
+            return <GestacaoDetalhes gestacao={entidade} onClose={() => setSelected(null)} />;
+
+          case "parto":
+            return <PartoDetalhes parto={entidade} onClose={() => setSelected(null)} />;
+
+          case "ocorrenciaDoenca":
+            return (
+              <OcorrenciaDoencaDetalhes
+                ocorrencia={entidade}
+                onClose={() => setSelected(null)}
+              />
+            );
+
+          case "pesagem":
+            return (
+              <PesagemDetalhes
+                pesagem={entidade}
+                onClose={() => setSelected(null)}
+              />
+            );
+
+          default:
+            return null;
+        }
+      })()}
 
       {menuAberto && <NovoRegistroMenu onClose={() => setMenuAberto(false)} />}
     </div>

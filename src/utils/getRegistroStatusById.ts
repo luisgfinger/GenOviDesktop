@@ -16,6 +16,7 @@ export async function getRegistroStatusByEntityId(
     | "gestacao"
     | "parto"
     | "ocorrenciaDoenca"
+    | "pesagem"
 ): Promise<boolean | null> {
   try {
     const registros: Registro[] = await RegistroService.listarTodos();
@@ -32,6 +33,8 @@ export async function getRegistroStatusByEntityId(
           return r.parto?.id === entityId;
         case "ocorrenciaDoenca":
           return r.ocorrenciaDoenca?.id === entityId;
+        case "pesagem":
+          return r.pesagem?.id === entityId;
         default:
           return false;
       }

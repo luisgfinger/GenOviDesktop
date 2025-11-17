@@ -72,7 +72,7 @@ const location = useLocation();
 
       for (const a of filteredByType) {
         if (!a.id) continue;
-        const status = await getRegistroStatusByEntityId(a.id);
+        const status = await getRegistroStatusByEntityId(a.id, "aplicacao");
         statusMap[a.id] = status === false;
       }
 

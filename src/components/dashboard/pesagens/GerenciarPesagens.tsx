@@ -4,13 +4,18 @@ import "./GerenciarPesagens.css";
 
 import Button from "../../common/buttons/Button";
 import PaginationMenu from "../../common/paginationMenu/PaginationMenu";
+import FilterBar from "../../common/filter-bar/FilterBar";
+
 import { usePesagens } from "../../../api/hooks/pesagem/UsePesagens";
 import { useOvinos } from "../../../api/hooks/ovino/UseOvinos";
-import type { PesagemResponseDTO } from "../../../api/dtos/pesagem/PesagemResponseDTO";
-import FilterBar from "../../common/filter-bar/FilterBar";
+
 import PesagemDetalhes from "./PesagemDetalhes";
-import { formatDate } from "../../../utils/formatDate";
+import PesagemCard from "../../common/cards/registrosCard/PesagemCard";
+
+import type { PesagemResponseDTO } from "../../../api/dtos/pesagem/PesagemResponseDTO";
+
 import { formatEnum } from "../../../utils/formatEnum";
+import { formatDate } from "../../../utils/formatDate";
 import { getRegistroStatusByEntityId } from "../../../utils/getRegistroStatusById";
 
 function normalize(s?: string) {
@@ -20,12 +25,12 @@ function normalize(s?: string) {
     .toLowerCase();
 }
 
+const PAGE_SIZE = 5;
+
 type PesagemUI = PesagemResponseDTO & {
   ovinoNome?: string;
   racaNome?: string;
 };
-
-const PAGE_SIZE = 5;
 
 const GerenciarPesagens: React.FC = () => {
   const { pesagens, loading, error } = usePesagens();
@@ -36,31 +41,69 @@ const GerenciarPesagens: React.FC = () => {
   const [dateTo, setDateTo] = useState("");
   const [page, setPage] = useState(1);
   const [viewAll, setViewAll] = useState(false);
-  const [selectedPesagem, setSelectedPesagem] = useState<PesagemUI | null>(null);
+  const [selected, setSelected] = useState<PesagemUI | null>(null);
 
+  const [registroStatus, setRegistroStatus] = useState<Record<number, boolean>>(
+    {}
+  );
 
-  const pesagensHydrated: PesagemUI[] = useMemo(() => {
-    return (pesagens ?? []).map((p) => {
-      const ovino =
-        p.ovino?.id && ovinos
-          ? (ovinos.find((o) => o.id === p.ovino?.id) ?? p.ovino)
-          : p.ovino;
+  const hydrated: PesagemUI[] = useMemo(() => {
+    if (!pesagens || !ovinos) return [];
+
+    return pesagens.map((p) => {
+      const ov = ovinos.find((o) => o.id === p.ovino?.id) ?? p.ovino;
 
       return {
         ...p,
-        ovinoNome: ovino?.nome ?? `#${ovino?.id ?? "-"}`,
-        racaNome: ovino?.raca ? formatEnum(ovino.raca) : "—",
+        ovinoNome: ov?.nome ?? `#${ov?.id ?? "-"}`,
+        racaNome: ov?.raca ? formatEnum(ov.raca) : "—",
       };
     });
   }, [pesagens, ovinos]);
 
+  const location = useLocation();
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const searchId = params.get("searchId");
+    if (searchId) {
+      setQ(searchId);
+      setPage(1);
+      setViewAll(false);
+    }
+  }, [location.search]);
+
+  useEffect(() => {
+    if (!hydrated.length) return;
+
+    const fetchStatuses = async () => {
+      const map: Record<number, boolean> = {};
+
+      for (const p of hydrated) {
+        if (!p.id) continue;
+
+        const status = await getRegistroStatusByEntityId(p.id, "pesagem");
+        map[p.id] = status === false; 
+      }
+
+      setRegistroStatus(map);
+    };
+
+    fetchStatuses();
+  }, [hydrated]);
+
+  const handleConfirm = (id: number) => {
+    setRegistroStatus((prev) => ({
+      ...prev,
+      [id]: true,
+    }));
+  };
 
   const filtered: PesagemUI[] = useMemo(() => {
     const query = normalize(q.trim());
     const df = dateFrom ? new Date(`${dateFrom}T00:00:00`) : null;
     const dt = dateTo ? new Date(`${dateTo}T23:59:59`) : null;
 
-    return pesagensHydrated
+    return hydrated
       .filter((p) => {
         if (df || dt) {
           const d = new Date(p.dataPesagem ?? "");
@@ -72,7 +115,7 @@ const GerenciarPesagens: React.FC = () => {
         if (!query) return true;
 
         const campos = [
-          p.id ? String(p.id) : "",
+          String(p.id ?? ""),
           p.ovinoNome ?? "",
           p.racaNome ?? "",
           formatDate(p.dataPesagem, true),
@@ -86,12 +129,19 @@ const GerenciarPesagens: React.FC = () => {
         const db = new Date(b.dataPesagem ?? "").getTime();
         return (db || 0) - (da || 0);
       });
-  }, [pesagensHydrated, q, dateFrom, dateTo]);
+  }, [hydrated, q, dateFrom, dateTo]);
 
-  const totalPages = viewAll ? 1 : Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+  const totalPages = viewAll
+    ? 1
+    : Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+
   const currentPage = viewAll ? 1 : Math.min(page, totalPages);
+
   const startIdx = (currentPage - 1) * PAGE_SIZE;
-  const pageItems = viewAll ? filtered : filtered.slice(startIdx, startIdx + PAGE_SIZE);
+
+  const pageItems = viewAll
+    ? filtered
+    : filtered.slice(startIdx, startIdx + PAGE_SIZE);
 
   const clearFilters = () => {
     setQ("");
@@ -100,17 +150,6 @@ const GerenciarPesagens: React.FC = () => {
     setPage(1);
     setViewAll(false);
   };
-
-  const location = useLocation();
-  useEffect(() => {
-    const params = new URLSearchParams(location.search);
-    const searchId = params.get("searchId");
-    if (searchId) {
-      setQ(searchId);
-      setPage(1);
-      setViewAll(false);
-    }
-  }, [location.search]);
 
   if (loading) return <p>Carregando pesagens…</p>;
   if (error) return <p style={{ color: "red" }}>{error}</p>;
@@ -135,7 +174,7 @@ const GerenciarPesagens: React.FC = () => {
         clearFilters={clearFilters}
         setPage={setPage}
         setViewAll={setViewAll}
-        placeholder="Buscar por id, ovino, raça, peso…"
+        placeholder="Buscar por ID, ovino, raça, peso…"
       />
 
       <div className="pesagens-counter">
@@ -148,24 +187,14 @@ const GerenciarPesagens: React.FC = () => {
       ) : (
         <div className="pesagens-list">
           {pageItems.map((p) => (
-            <div key={p.id} className="pesagem-card flex-between">
-              <div className="pesagem-info">
-                <h4>#{p.id} — {p.ovinoNome}</h4>
-                <p><strong>Raça:</strong> {p.racaNome}</p>
-                <p><strong>Peso:</strong> {p.peso.toFixed(2)} kg</p>
-                <p><strong>Data:</strong> {formatDate(p.dataPesagem, true)}</p>
-              </div>
-
-              <div className="pesagem-actions flex-column">
-                <Button
-                  type="button"
-                  variant="cardSecondary"
-                  onClick={() => setSelectedPesagem(p)}
-                >
-                  Ver mais
-                </Button>
-              </div>
-            </div>
+            <PesagemCard
+              key={p.id}
+              pesagem={p}
+              confirmado={registroStatus[p.id ?? 0] ?? false}
+              onView={() => setSelected(p)}
+              onEdit={() => setSelected(p)}
+              onConfirm={handleConfirm}
+            />
           ))}
         </div>
       )}
@@ -197,10 +226,10 @@ const GerenciarPesagens: React.FC = () => {
         </div>
       )}
 
-      {selectedPesagem && (
+      {selected && (
         <PesagemDetalhes
-          pesagem={selectedPesagem}
-          onClose={() => setSelectedPesagem(null)}
+          pesagem={selected}
+          onClose={() => setSelected(null)}
         />
       )}
     </div>

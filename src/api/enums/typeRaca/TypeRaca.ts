@@ -1,5 +1,5 @@
 export enum TypeRaca {
-  ILLE_DE_FRANCE = "Ille de France",
+  ILE_DE_FRANCE = "Ile de France",
   MERINO = "Merino",
   SUFFOLK = "Suffolk",
   HAMPSHIRE = "Hampshire",

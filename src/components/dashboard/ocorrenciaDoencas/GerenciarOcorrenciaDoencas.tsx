@@ -73,7 +73,7 @@ const GerenciarOcorrenciasDoenca: React.FC = () => {
 
       for (const o of items) {
         if (!o.id) continue;
-        const status = await getRegistroStatusByEntityId(o.id);
+        const status = await getRegistroStatusByEntityId(o.id, "ocorrenciaDoenca");
         statusMap[o.id] = status === false;
       }
 

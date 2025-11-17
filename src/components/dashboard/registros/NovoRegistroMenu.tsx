@@ -17,6 +17,7 @@ const NovoRegistroMenu: React.FC<NovoRegistroMenuProps> = ({ onClose }) => {
     { label: "Gestação", rota: "/dashboard/ovinos/gestacoes/criar" },
     { label: "Parto", rota: "/dashboard/ovinos/partos/criar" },
     { label: "Adoecimento", rota: "/dashboard/ovinos/doencas/adoecimento" },
+    {label: "Pesagem", rota: "/dashboard/ovinos/pesagem/criar"},
   ];
 
   const handleSelect = (rota: string) => {

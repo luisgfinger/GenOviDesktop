@@ -4,14 +4,16 @@ import type { Gestacao } from "../api/models/gestacao/GestacaoModel";
 import type { Parto } from "../api/models/parto/PartoModel";
 import type { OcorrenciaDoenca } from "../api/models/ocorrenciaDoenca/ocorrenciaDoencaModel";
 import type { RegistroRequestDTO } from "../api/dtos/registro/RegistroRequestDTO";
+import type { Pesagem } from "../api/models/pesagem/PesagemModel";
 
 import { RegistroService } from "../api/services/registro/RegistroService";
 import { getUsuarioIdByEmail } from "./getUsuarioIdByEmail";
 import { getFuncionarioIdByUsuarioId } from "./getFuncionarioIdByUsuarioId";
 
+
 export async function createRegistroAuto(
-  tipo: "aplicacao" | "reproducao" | "gestacao" | "parto" | "ocorrenciaDoenca",
-  entidade: Aplicacao | Reproducao | Gestacao | Parto | OcorrenciaDoenca,
+  tipo: "aplicacao" | "reproducao" | "gestacao" | "parto" | "ocorrenciaDoenca" | "pesagem",
+  entidade: Aplicacao | Reproducao | Gestacao | Parto | OcorrenciaDoenca | Pesagem,
   isSugestao = false
 ) {
   try {
@@ -50,6 +52,7 @@ export async function createRegistroAuto(
       idGestacao: undefined,
       idParto: undefined,
       idOcorrenciaDoencas: undefined,
+      idPesagem: undefined,
     };
 
     switch (tipo) {
@@ -68,13 +71,15 @@ export async function createRegistroAuto(
       case "ocorrenciaDoenca":
         dto.idOcorrenciaDoencas = (entidade as OcorrenciaDoenca).id;
         break;
+      case "pesagem":
+        dto.idPesagem = (entidade as Pesagem).id;
     }
 
     console.log("DTO enviado para RegistroService:", dto);
     await RegistroService.criar(dto);
 
-    console.log(`✅ Registro automático criado para ${tipo} (funcionário ID: ${funcionarioId}).`);
+    console.log(`Registro automático criado para ${tipo} (funcionário ID: ${funcionarioId}).`);
   } catch (error) {
-    console.error(`❌ Erro ao criar registro automático (${tipo}):`, error);
+    console.error(`Erro ao criar registro automático (${tipo}):`, error);
   }
 }

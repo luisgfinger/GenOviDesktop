@@ -5,12 +5,14 @@ import { toast } from "react-toastify";
 
 import { useOvinos } from "../../../api/hooks/ovino/UseOvinos";
 import { useCriarPesagem } from "../../../api/hooks/pesagem/UsePesagens";
+
 import { formatEnum } from "../../../utils/formatEnum";
 import { formatDate } from "../../../utils/formatDate";
 import { DateToIsoString } from "../../../utils/dateToIsoString";
 
 import type { PesagemRequestDTO } from "../../../api/dtos/pesagem/PesagemRequestDTO";
 import { useNavigate } from "react-router-dom";
+import { createRegistroAuto } from "../../../utils/criarRegistro";
 
 const CadastrarPesagem: React.FC = () => {
   const { ovinos, loading: loadingOvinos, error: errorOvinos } = useOvinos();
@@ -19,6 +21,7 @@ const CadastrarPesagem: React.FC = () => {
   const [ovinoId, setOvinoId] = useState<string>("");
   const [peso, setPeso] = useState<string>("");
   const [dataPesagem, setDataPesagem] = useState<string>("");
+  const [enviarSugestao, setEnviarSugestao] = useState<boolean>(false);
 
   const navigate = useNavigate();
 
@@ -36,11 +39,10 @@ const CadastrarPesagem: React.FC = () => {
       peso: Number(peso),
     };
 
-    console.log("DTO enviado:", dto);
-
     try {
       const novaPesagem = await criarPesagem(dto);
 
+      await createRegistroAuto("pesagem", novaPesagem, enviarSugestao);
       toast.success(
         <div
           style={{
@@ -51,6 +53,7 @@ const CadastrarPesagem: React.FC = () => {
           }}
         >
           <span>Pesagem registrada com sucesso!</span>
+
           <Button
             type="button"
             variant="toast"
@@ -72,6 +75,7 @@ const CadastrarPesagem: React.FC = () => {
       setOvinoId("");
       setPeso("");
       setDataPesagem("");
+      setEnviarSugestao(false);
     } catch (err) {
       console.error(err);
       toast.error("Erro ao registrar pesagem.");
@@ -128,6 +132,16 @@ const CadastrarPesagem: React.FC = () => {
               onChange={(e) => setDataPesagem(e.target.value)}
               required
             />
+          </li>
+
+          <li className="checkbox-sugestao">
+            <input
+              type="checkbox"
+              id="enviarSugestao"
+              checked={enviarSugestao}
+              onChange={(e) => setEnviarSugestao(e.target.checked)}
+            />
+            <label htmlFor="enviarSugestao">Enviar como solicitação</label>
           </li>
 
           <div className="cadastrarPesagem-form-navigation">

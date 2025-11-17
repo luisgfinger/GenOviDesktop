@@ -17,6 +17,7 @@ export class RegistroService {
   static async criar(dto: RegistroRequestDTO): Promise<RegistroResponseDTO> {
     const payload = registroMapper.toRequest(dto);
     const { data } = await Api.post<any>("/user/registros", payload);
+    console.log("DTO enviado pra registro: ", payload);
     return registroMapper.fromResponse(data);
   }
 
