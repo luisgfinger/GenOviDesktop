@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import "./Gerenciar.css";
 
 import PaginationMenu from "../../common/paginationMenu/PaginationMenu";
@@ -33,7 +33,7 @@ const Gerenciar: React.FC<GerenciarProps> = ({ type }) => {
   const [dateFrom, setDateFrom] = useState("");
   const [dateTo, setDateTo] = useState("");
 
-  const itemsPerPage = 8;
+  const itemsPerPage = 7;
   const loading = type === "ovino" ? loadingOvinos : loadingFuncionarios;
 
   const clearFilters = () => {
@@ -43,7 +43,6 @@ const Gerenciar: React.FC<GerenciarProps> = ({ type }) => {
     setDateFrom("");
     setDateTo("");
     setCurrentPage(1);
-    setViewAll(false);
   };
 
   const filteredOvinos = useMemo(() => {
@@ -53,9 +52,7 @@ const Gerenciar: React.FC<GerenciarProps> = ({ type }) => {
       result = result.filter((o) =>
         [o.id.toString(), o.fbb, o.nome, o.raca, o.sexo]
           .filter(Boolean)
-          .some((field) =>
-            field!.toLowerCase().includes(q.toLowerCase())
-          )
+          .some((field) => field!.toLowerCase().includes(q.toLowerCase()))
       );
     }
 
@@ -74,15 +71,13 @@ const Gerenciar: React.FC<GerenciarProps> = ({ type }) => {
     if (dateFrom) {
       result = result.filter(
         (o) =>
-          o.dataNascimento &&
-          new Date(o.dataNascimento) >= new Date(dateFrom)
+          o.dataNascimento && new Date(o.dataNascimento) >= new Date(dateFrom)
       );
     }
     if (dateTo) {
       result = result.filter(
         (o) =>
-          o.dataNascimento &&
-          new Date(o.dataNascimento) <= new Date(dateTo)
+          o.dataNascimento && new Date(o.dataNascimento) <= new Date(dateTo)
       );
     }
 
@@ -96,24 +91,18 @@ const Gerenciar: React.FC<GerenciarProps> = ({ type }) => {
       result = result.filter((f) =>
         [f.id.toString(), f.cpfCnpj, f.endereco, f.nome, f.telefone]
           .filter(Boolean)
-          .some((field) =>
-            field!.toLowerCase().includes(q.toLowerCase())
-          )
+          .some((field) => field!.toLowerCase().includes(q.toLowerCase()))
       );
     }
 
     if (dateFrom) {
       result = result.filter(
-        (f) =>
-          f.dataAdmissao &&
-          new Date(f.dataAdmissao) >= new Date(dateFrom)
+        (f) => f.dataAdmissao && new Date(f.dataAdmissao) >= new Date(dateFrom)
       );
     }
     if (dateTo) {
       result = result.filter(
-        (f) =>
-          f.dataAdmissao &&
-          new Date(f.dataAdmissao) <= new Date(dateTo)
+        (f) => f.dataAdmissao && new Date(f.dataAdmissao) <= new Date(dateTo)
       );
     }
 
@@ -144,19 +133,22 @@ const Gerenciar: React.FC<GerenciarProps> = ({ type }) => {
         setDateTo={setDateTo}
         clearFilters={clearFilters}
         setPage={setCurrentPage}
-        setViewAll={setViewAll}
         placeholder={
           type === "ovino"
             ? "Buscar por nome, raça, sexo..."
             : "Buscar por nome, CPF/CNPJ..."
         }
-        typeOptions={type === "ovino" ? ["Macho", "Femea"] : undefined}
+        typeOptions={type === "ovino" ? ["Macho", "Fêmea"] : undefined}
         typeLabel={type === "ovino" ? "Sexo" : undefined}
         statusOptions={type === "ovino" ? Object.values(TypeStatus) : undefined}
         statusLabel="Status"
         allOptionLabel="Todos"
         allOptionValue="TODOS"
       />
+      <div className="gerenciar-counter">
+        Mostrando <strong>{viewAll ? data.length : currentData.length}</strong>{" "}
+        de <strong>{data.length}</strong> resultado(s).
+      </div>
 
       {viewAll ? (
         type === "ovino" ? (
@@ -204,7 +196,6 @@ const Gerenciar: React.FC<GerenciarProps> = ({ type }) => {
           )}
         </div>
       )}
-
       {!viewAll && data.length > itemsPerPage && (
         <PaginationMenu
           currentPage={currentPage}

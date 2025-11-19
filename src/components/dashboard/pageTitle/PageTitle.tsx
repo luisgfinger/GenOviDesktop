@@ -84,7 +84,7 @@ const PageTitle: React.FC = () => {
       <ul className="flex">
         <li className="pageTitle-line flex">
           <img src={Ovelha} alt="ovelha" />
-          <h2>{typeName}</h2>
+          <h3>{typeName}</h3>
         </li>
       </ul>
     </div>

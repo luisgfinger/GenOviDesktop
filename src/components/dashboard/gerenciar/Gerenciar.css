@@ -4,10 +4,17 @@
   align-items: center;
   gap: 26px;
   padding-bottom: 30px;
+  
 }
 
 .gerenciar-container-inside {
   display: grid;
   grid-template-columns: repeat(4, max-content);
   gap: 26px;
+}
+
+.gerenciar-counter {
+  margin: 10px 0;
+  font-size: 14px;
+  color: #555;
 }

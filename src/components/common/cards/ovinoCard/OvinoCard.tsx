@@ -5,6 +5,7 @@ import Button from "../../buttons/Button";
 import { formatEnum } from "../../../../utils/formatEnum";
 import type { Ovino } from "../../../../api/models/ovino/OvinoModel";
 import { useNavigate } from "react-router-dom";
+import { abbreviateGrauPureza } from '../../../../utils/abbreviateGrauPureza';
 
 interface OvinoCardProps {
   ovino: Ovino;
@@ -32,20 +33,20 @@ const OvinoCard: React.FC<OvinoCardProps> = ({
           <p>{ovino.fbb}</p>
         </span>
         <span className="flex">
-          <h3>RAÇA:</h3>
+          <h3>Raça:</h3>
           <p>{formatEnum(ovino.raca)}</p>
         </span>
         <span className="flex">
-          <h3>PAI:</h3>
+          <h3>Pai:</h3>
           <p>{ovino.ovinoPai?.nome ?? "Não informado"}</p>
         </span>
         <span className="flex">
-          <h3>MÃE:</h3>
+          <h3>Mãe:</h3>
           <p>{ovino.ovinoMae?.nome ?? "Não informado"}</p>
         </span>
         <span className="flex">
-          <h3>PUREZA:</h3>
-          <p>{formatEnum(ovino.grauPureza)}</p>
+          <h3>Pureza:</h3>
+          <p>{abbreviateGrauPureza(formatEnum(ovino.grauPureza))}</p>
         </span>
       </li>
       <li className="ovinoCard-buttons flex-column">

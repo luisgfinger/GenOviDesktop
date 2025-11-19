@@ -66,12 +66,7 @@ const OvinoCardFull: React.FC<OvinoCardFullProps> = ({
         {renderField("RFID", ovino.rfid, "rfid")}
         {renderField("FBB", ovino.fbb, "fbb")}
         {renderField("Raça", formatEnum(ovino.raca), "raca")}
-        {renderField(
-          "Grau de Pureza",
-          formatEnum(ovino.grauPureza),
-          "grauPureza"
-        )}
-        {renderField("Status", formatEnum(ovino.status), "status")}
+
         {renderField(
           "Data Nascimento",
           ovino.dataNascimento
@@ -79,19 +74,26 @@ const OvinoCardFull: React.FC<OvinoCardFullProps> = ({
             : "Não informado",
           "dataNascimento"
         )}
-
-        {renderField(
+        {renderField("Status", formatEnum(ovino.status), "status")}
+         {renderField(
           "Data de Cadastro",
           ovino.dataCadastro
             ? (formatDate(ovino.dataCadastro, true) ?? "Não informado")
             : "Não informado",
           "dataCadastro"
         )}
+        {renderField(
+          "Grau de Pureza",
+          formatEnum(ovino.grauPureza),
+          "grauPureza"
+        )}
 
-        {renderField("Pai", ovino.ovinoPai?.nome, "ovinoPai")}
+       
+
+        {renderField("Parto", ovino.parto?.id, "parto")}
         {renderField("Mãe", ovino.ovinoMae?.nome, "ovinoMae")}
         {renderField("Compra", ovino.compra?.id, "compra")}
-        {renderField("Parto", ovino.parto?.id, "parto")}
+        {renderField("Pai", ovino.ovinoPai?.nome, "ovinoPai")}
         {renderField(
           "Peso",
           ovino.pesagens?.length

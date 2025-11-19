@@ -229,8 +229,6 @@ const GerenciarRegistros: React.FC = () => {
             const tipo = getTipoRegistro(r);
             let entidade = r[tipo as keyof RegistroResponseDTO] as any;
             if (!entidade) return null;
-
-            // 🔥 HIDRATA PESAGEM EXATAMENTE COMO EM GerenciarPesagens
             if (tipo === "pesagem") {
               const ov = ovinos?.find(o => o.id === entidade.ovino?.id) ?? entidade.ovino;
 

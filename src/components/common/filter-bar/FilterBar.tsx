@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React from "react";
 import { TypeReproducao } from "../../../api/enums/typeReproducao/TypeReproducao";
 import { formatEnum } from "../../../utils/formatEnum";
 import Button from "../buttons/Button";
@@ -26,7 +26,7 @@ interface FilterBarProps<TStatus extends string = string> {
 
   clearFilters: () => void;
   setPage: (page: number) => void;
-  setViewAll: (value: boolean) => void;
+  setViewAll?: (value: boolean) => void;
 
   placeholder?: string;
 
@@ -68,6 +68,7 @@ const FilterBar = <TStatus extends string = string>({
   allOptionLabel = "Todos",
   allOptionValue = "TODOS",
 }: FilterBarProps<TStatus>) => {
+
   const normalizedTypeOptions: TypeOption[] =
     typeOptions && typeOptions.length > 0
       ? typeOptions.map((opt) =>
@@ -97,6 +98,7 @@ const FilterBar = <TStatus extends string = string>({
 
   return (
     <div className="filters flex">
+      {/* BUSCA */}
       <div className="filter-group flex-column">
         <label htmlFor="busca">Buscar</label>
         <input
@@ -108,11 +110,12 @@ const FilterBar = <TStatus extends string = string>({
           onChange={(e) => {
             setQ(e.target.value);
             setPage(1);
-            setViewAll(false);
+            setViewAll?.(false);
           }}
         />
       </div>
 
+      {/* FUNCIONÁRIO */}
       {setFuncionario && normalizedFuncionarioOptions.length > 0 && (
         <div className="filter-group flex-column">
           <label htmlFor="funcionario">{funcionarioLabel}</label>
@@ -123,7 +126,7 @@ const FilterBar = <TStatus extends string = string>({
             onChange={(e) => {
               setFuncionario(e.target.value);
               setPage(1);
-              setViewAll(false);
+              setViewAll?.(false);
             }}
           >
             <option value={allOptionValue}>{allOptionLabel}</option>
@@ -136,6 +139,7 @@ const FilterBar = <TStatus extends string = string>({
         </div>
       )}
 
+      {/* TIPO */}
       {setTipo && (
         <div className="filter-group flex-column">
           <label htmlFor="tipo">{typeLabel}</label>
@@ -146,7 +150,7 @@ const FilterBar = <TStatus extends string = string>({
             onChange={(e) => {
               setTipo(e.target.value);
               setPage(1);
-              setViewAll(false);
+              setViewAll?.(false);
             }}
           >
             <option value={allOptionValue}>{allOptionLabel}</option>
@@ -159,6 +163,7 @@ const FilterBar = <TStatus extends string = string>({
         </div>
       )}
 
+      {/* STATUS */}
       {setStatus && (
         <div className="filter-group flex-column">
           <label htmlFor="status">{statusLabel}</label>
@@ -169,7 +174,7 @@ const FilterBar = <TStatus extends string = string>({
             onChange={(e) => {
               setStatus(e.target.value as TStatus);
               setPage(1);
-              setViewAll(false);
+              setViewAll?.(false);
             }}
           >
             <option value={allOptionValue}>{allOptionLabel}</option>
@@ -182,6 +187,7 @@ const FilterBar = <TStatus extends string = string>({
         </div>
       )}
 
+      {/* DATA DE */}
       {setDateFrom && (
         <div className="filter-group flex-column">
           <label htmlFor="de">De</label>
@@ -193,12 +199,13 @@ const FilterBar = <TStatus extends string = string>({
             onChange={(e) => {
               setDateFrom(e.target.value);
               setPage(1);
-              setViewAll(false);
+              setViewAll?.(false);
             }}
           />
         </div>
       )}
 
+      {/* DATA ATÉ */}
       {setDateTo && (
         <div className="filter-group flex-column">
           <label htmlFor="ate">Até</label>
@@ -210,7 +217,7 @@ const FilterBar = <TStatus extends string = string>({
             onChange={(e) => {
               setDateTo(e.target.value);
               setPage(1);
-              setViewAll(false);
+              setViewAll?.(false);
             }}
           />
         </div>
