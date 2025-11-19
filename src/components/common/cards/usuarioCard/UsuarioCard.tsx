@@ -18,11 +18,13 @@ const UsuarioCard: React.FC<UsuarioCardProps> = ({
   funcionarioNome,
   autenticacao2fa,
 }) => {
+  const emailPrefix = email.split("@")[0];
+
   return (
     <ul className="usuarioCard-container flex-column">
       <li className="flex">
         <div className="flex-column">
-          <h3>{email}</h3>
+          <h3>{emailPrefix}</h3>
         </div>
       </li>
 
