@@ -12,7 +12,6 @@ export class ReproducaoService {
       ovelha: r.ovelha ?? null,
       enumReproducao: r.enumReproducao,
       dataReproducao: r.dataReproducao,
-      observacoes: r.observacoes ?? null,
     }));
   }
 
@@ -27,7 +26,6 @@ export class ReproducaoService {
       ovelha: data.ovelha ?? null,
       enumReproducao: data.enumReproducao,
       dataReproducao: data.dataReproducao,
-      observacoes: data.observacoes ?? null,
     };
   }
 
@@ -42,7 +40,6 @@ export class ReproducaoService {
       ovelha: data.ovelha ?? null,
       enumReproducao: data.enumReproducao,
       dataReproducao: data.dataReproducao,
-      observacoes: data.observacoes ?? null,
     };
   }
 
@@ -57,7 +54,6 @@ export class ReproducaoService {
       ovelha: data.ovelha ?? null,
       enumReproducao: data.enumReproducao,
       dataReproducao: data.dataReproducao,
-      observacoes: data.observacoes ?? null,
     };
   }
 

@@ -110,22 +110,6 @@ const ReproducaoDetalhes: React.FC<ReproducaoDetalhesProps> = ({
           </select>
         ),
     },
-    {
-      label: "Observações",
-      key: "observacoes",
-      renderView: (valor) => (
-        <span className="text-breaker">{valor ?? "—"}</span>
-      ),
-      renderEdit: (valor, onChange) => (
-        <textarea
-          value={valor ?? ""}
-          onChange={(e) => onChange(e.target.value)}
-          rows={4}
-          placeholder="Anotações adicionais"
-          maxLength={255}
-        />
-      ),
-    },
   ];
 
 
@@ -137,7 +121,6 @@ const ReproducaoDetalhes: React.FC<ReproducaoDetalhesProps> = ({
       ovelhaId: atualizado.ovelha?.id ?? null,
       enumReproducao: atualizado.enumReproducao ?? "",
       dataReproducao: atualizado.dataReproducao ?? "",
-      observacoes: atualizado.observacoes ?? "",
     });
   };
 

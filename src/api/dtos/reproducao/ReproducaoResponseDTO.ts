@@ -6,5 +6,4 @@ export interface ReproducaoResponseDTO {
   ovelha: Ovino;
   enumReproducao: string;
   dataReproducao: string;
-  observacoes?: string | null;
 }

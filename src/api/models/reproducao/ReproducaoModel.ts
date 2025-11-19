@@ -6,6 +6,5 @@ export interface Reproducao {
   carneiro: Ovino;
   ovelha: Ovino;
   enumReproducao: TypeReproducao;
-  dataReproducao: string;
-  observacoes?: string;  
+  dataReproducao: string; 
 }

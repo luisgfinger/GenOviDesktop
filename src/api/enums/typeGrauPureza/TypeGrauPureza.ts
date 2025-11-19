@@ -1,6 +1,7 @@
 export enum TypeGrauPureza {
-  PURO_ORIGEM = "PURO_ORIGEM",
-  PURO_POR_CRUZA = "PURO_POR_CRUZA",
-  CRUZADO_CONTROLADO = "CRUZADO_CONTROLADO",
-  CRUZADO_INDETERMINADO = "CRUZADO_INDETERMINADO"
+  PURO_ORIGEM = "Puro por Origem",
+  PURO_POR_CRUZA = "Puro por Cruza",
+  CRUZADO_CONTROLADO = "Cruzado controlado",
+  CRUZADO_INDETERMINADO = "Cruzado indeterminado"
 }
+
