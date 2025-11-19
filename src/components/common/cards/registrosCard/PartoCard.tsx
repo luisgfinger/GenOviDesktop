@@ -1,45 +1,35 @@
 import React from "react";
 import Button from "../../../common/buttons/Button";
 import "./BaseCard.css";
-
 import { formatDate } from "../../../../utils/formatDate";
 import type { PartoResponseDTO } from "../../../../api/dtos/parto/PartoResponseDTO";
-import { updateRegistroToggle } from "../../../../utils/updateRegistroToggle";
-import { toast } from "react-toastify";
 
 interface PartoCardProps {
   parto: PartoResponseDTO;
   onView: () => void;
   onEdit?: () => void;
   confirmado: boolean;
-  onConfirm: (id: number) => void;
+  onConfirm: () => void;
 }
 
 const PartoCard: React.FC<PartoCardProps> = ({
   parto,
   onView,
   onEdit,
-  confirmado = false,
+  confirmado,
   onConfirm,
 }) => {
-   const handleToggleConfirmado = async () => {
-      try {
-        await updateRegistroToggle(parto.id, "isSugestao");
-        if (onConfirm) onConfirm(parto.id);
-      } catch (error) {
-        console.error("Erro ao confirmar registro:", error);
-        toast.error("Erro ao marcar como confirmado.");
-      }
-    };
   return (
     <div className="card">
       <span className="card-type">
         <div className="card-header-info flex">
-          <strong>Parto(#{parto.id})</strong>
+          <strong>Parto (#{parto.id})</strong>
+
           <span>
             <strong>Responsável:</strong>{" "}
             {localStorage.getItem("funcionarioNome") ?? "—"}
           </span>
+
           <span>
             <strong>Confirmado:</strong> {confirmado ? "Sim" : "Não"}
           </span>
@@ -58,9 +48,9 @@ const PartoCard: React.FC<PartoCardProps> = ({
         <div className="card-col-title">
           <strong>Carneiro (pai)</strong>
         </div>
-        <div className="card-col-main">{parto.mae?.nome ?? "—"}</div>
+        <div className="card-col-main">{parto.pai?.nome ?? "—"}</div>
         <div className="card-meta">
-          FBB: {parto.mae?.fbb ?? "—"} • RFID: {parto.mae?.rfid ?? "—"}
+          FBB: {parto.pai?.fbb ?? "—"} • RFID: {parto.pai?.rfid ?? "—"}
         </div>
       </div>
       <div>
@@ -73,9 +63,16 @@ const PartoCard: React.FC<PartoCardProps> = ({
         <Button variant="cardSecondary" onClick={onView}>
           Ver mais
         </Button>
+
         {!confirmado && (
-          <Button variant="cardPrimary" onClick={handleToggleConfirmado}>
+          <Button variant="cardPrimary" onClick={onConfirm}>
             Confirmar
+          </Button>
+        )}
+
+        {onEdit && (
+          <Button variant="cardSecondary" onClick={onEdit}>
+            Editar
           </Button>
         )}
       </div>

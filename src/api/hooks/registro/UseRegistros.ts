@@ -133,3 +133,26 @@ export function useRemoverRegistro() {
 
   return { removerRegistro, removido, loading, error };
 }
+
+export function useAtualizarSugestaoRegistro() {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const atualizarSugestao = async (idRegistro: number, isSugestao: boolean) => {
+    setLoading(true);
+    setError(null);
+
+    try {
+      await RegistroService.atualizarSugestao(idRegistro, isSugestao);
+    } catch (err) {
+      console.error("Erro ao atualizar isSugestao:", err);
+      setError("Não foi possível atualizar o status do registro.");
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return { atualizarSugestao, loading, error };
+}
+

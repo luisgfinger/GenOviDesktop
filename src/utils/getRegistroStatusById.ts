@@ -44,8 +44,6 @@ export async function getRegistroStatusByEntityId(
       console.warn(`Nenhum registro encontrado para ${tipo} com ID ${entityId}.`);
       return null;
     }
-
-    console.log(`Registro encontrado para ${tipo} ID ${entityId}:`, registro);
     return registro.isSugestao;
   } catch (error) {
     console.error(`Erro ao buscar status (${tipo}, entityId: ${entityId}):`, error);

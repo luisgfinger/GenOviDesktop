@@ -7,7 +7,6 @@ import { responseToModel } from "../../mappers/ovino/OvinoMapper";
 export const OvinoService = {
   listarTodos: async (): Promise<Ovino[]> => {
     const { data } = await Api.get<OvinoResponseDTO[]>("/user/ovinos");
-    console.log("Ovinos listados:", data);
     return data.map(responseToModel);
   },
 
@@ -18,7 +17,6 @@ export const OvinoService = {
 
   findById: async (id: number): Promise<Ovino> => {
     const { data } = await Api.get<OvinoResponseDTO>(`/user/ovinos/${id}`);
-    console.log("Ovino encontrado:", data);
     return responseToModel(data);
   },
 
@@ -31,8 +29,6 @@ editar: async (id: number, payload: OvinoRequestDTO): Promise<Ovino> => {
     paiId: (payload as any).paiId?.id ?? payload.paiId,
   };
 
-  console.log("Payload enviado:", formatado);
-
   const { data } = await Api.put<OvinoResponseDTO>(`/user/ovinos/${id}`, formatado);
   return responseToModel(data);
 },
@@ -41,6 +37,5 @@ editar: async (id: number, payload: OvinoRequestDTO): Promise<Ovino> => {
 
   desativar: async (id: number): Promise<void> => {
     await Api.patch(`/user/ovinos/${id}/disable`);
-    console.log("Ovino desativado:", id);
   },
 };

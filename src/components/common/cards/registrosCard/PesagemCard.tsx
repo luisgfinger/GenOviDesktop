@@ -3,10 +3,7 @@ import Button from "../../../common/buttons/Button";
 import "./BaseCard.css";
 
 import type { PesagemResponseDTO } from "../../../../api/dtos/pesagem/PesagemResponseDTO";
-
 import { formatDate } from "../../../../utils/formatDate";
-import { updateRegistroToggle } from "../../../../utils/updateRegistroToggle";
-import { toast } from "react-toastify";
 
 interface PesagemCardProps {
   pesagem: PesagemResponseDTO & {
@@ -16,7 +13,7 @@ interface PesagemCardProps {
   confirmado: boolean;
   onView: () => void;
   onEdit?: () => void;
-  onConfirm: (id: number) => void;
+  onConfirm: () => void;
 }
 
 const PesagemCard: React.FC<PesagemCardProps> = ({
@@ -26,16 +23,6 @@ const PesagemCard: React.FC<PesagemCardProps> = ({
   onEdit,
   onConfirm,
 }) => {
-  const handleToggleConfirmado = async () => {
-    try {
-      await updateRegistroToggle(pesagem.id, "isSugestao");
-      if (onConfirm) onConfirm(pesagem.id);
-    } catch (error) {
-      console.error("Erro ao confirmar registro:", error);
-      toast.error("Erro ao marcar como confirmado.");
-    }
-  };
-
   return (
     <div className="card">
       <span className="card-type aplicacao">
@@ -52,7 +39,6 @@ const PesagemCard: React.FC<PesagemCardProps> = ({
           </span>
         </div>
       </span>
-
       <div>
         <div className="card-col-title">
           <strong>Ovino</strong>
@@ -62,7 +48,6 @@ const PesagemCard: React.FC<PesagemCardProps> = ({
           FBB: {pesagem.ovino?.fbb ?? "—"} • RFID: {pesagem.ovino?.rfid ?? "—"}
         </div>
       </div>
-
       <div>
         <div className="card-meta">
           <strong>Peso:</strong> {pesagem.peso?.toFixed(2)} kg
@@ -72,15 +57,20 @@ const PesagemCard: React.FC<PesagemCardProps> = ({
           <strong>Data:</strong> {formatDate(pesagem.dataPesagem, true)}
         </div>
       </div>
-
       <div className="card-actions">
         <Button variant="cardSecondary" onClick={onView}>
           Ver mais
         </Button>
 
         {!confirmado && (
-          <Button variant="cardPrimary" onClick={handleToggleConfirmado}>
+          <Button variant="cardPrimary" onClick={onConfirm}>
             Confirmar
+          </Button>
+        )}
+
+        {onEdit && (
+          <Button variant="cardSecondary" onClick={onEdit}>
+            Editar
           </Button>
         )}
       </div>

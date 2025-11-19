@@ -17,7 +17,6 @@ export class RegistroService {
   static async criar(dto: RegistroRequestDTO): Promise<RegistroResponseDTO> {
     const payload = registroMapper.toRequest(dto);
     const { data } = await Api.post<any>("/user/registros", payload);
-    console.log("DTO enviado pra registro: ", payload);
     return registroMapper.fromResponse(data);
   }
 
@@ -29,5 +28,12 @@ export class RegistroService {
 
   static async remover(id: number): Promise<void> {
     await Api.delete(`/user/registros/${id}`);
+  }
+
+  // 🔥 AGORA CORRETO — PATCH (não PUT)
+  static async atualizarSugestao(id: number, isSugestao: boolean): Promise<void> {
+    await Api.patch(`/user/registros/${id}/sugestao`, isSugestao, {
+      headers: { "Content-Type": "application/json" }
+    });
   }
 }

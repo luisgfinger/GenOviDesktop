@@ -32,6 +32,7 @@ import OcorrenciaDoencaDetalhes from "../ocorrenciaDoencas/OcorrenciaDoencaDetal
 import PesagemDetalhes from "../pesagens/PesagemDetalhes";
 
 import NovoRegistroMenu from "./NovoRegistroMenu";
+import { updateRegistroSugestao } from "../../../utils/updateRegistroSugestao";
 
 function normalize(s?: string) {
   return (s ?? "")
@@ -75,6 +76,7 @@ const GerenciarRegistros: React.FC = () => {
     return "aplicacao";
   };
 
+  // Buscar status de cada registro
   useEffect(() => {
     if (!items.length) return;
 
@@ -95,17 +97,23 @@ const GerenciarRegistros: React.FC = () => {
     fetchStatuses();
   }, [items]);
 
-  const handleConfirm = (idRegistro: number) => {
-    toast.success("Registro confirmado com sucesso!");
-    setRegistroStatus((prev) => ({ ...prev, [idRegistro]: true }));
+  // CONFIRMAR SUGESTÃO
+  const handleConfirm = async (r: RegistroResponseDTO) => {
+    const ok = await updateRegistroSugestao(r);
+    if (!ok) return;
+
+    toast.success("Registro confirmado!");
+
+    setRegistroStatus((prev) => ({ ...prev, [r.idRegistro]: true }));
 
     setRegistros((prev) =>
-      prev.map((r) =>
-        r.idRegistro === idRegistro ? { ...r, isSugestao: false } : r
+      prev.map((x) =>
+        x.idRegistro === r.idRegistro ? { ...x, isSugestao: false } : x
       )
     );
   };
 
+  // FILTRO
   const filtered: RegistroResponseDTO[] = useMemo(() => {
     const query = normalize(q.trim());
     const df = dateFrom ? new Date(`${dateFrom}T00:00:00`) : null;
@@ -193,7 +201,6 @@ const GerenciarRegistros: React.FC = () => {
   return (
     <div className="registro-page">
       <div className="registro-header flex">
-        <h2>Registros</h2>
         <Button type="button" variant="cardPrimary" onClick={() => setMenuAberto(true)}>
           Novo Registro
         </Button>
@@ -229,6 +236,7 @@ const GerenciarRegistros: React.FC = () => {
             const tipo = getTipoRegistro(r);
             let entidade = r[tipo as keyof RegistroResponseDTO] as any;
             if (!entidade) return null;
+
             if (tipo === "pesagem") {
               const ov = ovinos?.find(o => o.id === entidade.ovino?.id) ?? entidade.ovino;
 
@@ -244,6 +252,8 @@ const GerenciarRegistros: React.FC = () => {
               setSelectedTipo(tipo);
             };
 
+            const confirm = () => handleConfirm(r);
+
             switch (tipo) {
               case "aplicacao":
                 return (
@@ -252,7 +262,7 @@ const GerenciarRegistros: React.FC = () => {
                     aplicacao={entidade}
                     confirmado={registroStatus[r.idRegistro] ?? !r.isSugestao}
                     onView={handleView}
-                    onConfirm={() => handleConfirm(r.idRegistro)}
+                    onConfirm={confirm}
                   />
                 );
 
@@ -263,7 +273,7 @@ const GerenciarRegistros: React.FC = () => {
                     reproducao={entidade}
                     confirmado={registroStatus[r.idRegistro] ?? !r.isSugestao}
                     onView={handleView}
-                    onConfirm={() => handleConfirm(r.idRegistro)}
+                    onConfirm={confirm}
                   />
                 );
 
@@ -274,7 +284,7 @@ const GerenciarRegistros: React.FC = () => {
                     gestacao={entidade}
                     confirmado={registroStatus[r.idRegistro] ?? !r.isSugestao}
                     onView={handleView}
-                    onConfirm={() => handleConfirm(r.idRegistro)}
+                    onConfirm={confirm}
                   />
                 );
 
@@ -285,7 +295,7 @@ const GerenciarRegistros: React.FC = () => {
                     parto={entidade}
                     confirmado={registroStatus[r.idRegistro] ?? !r.isSugestao}
                     onView={handleView}
-                    onConfirm={() => handleConfirm(r.idRegistro)}
+                    onConfirm={confirm}
                   />
                 );
 
@@ -297,7 +307,7 @@ const GerenciarRegistros: React.FC = () => {
                     confirmado={registroStatus[r.idRegistro] ?? !r.isSugestao}
                     onView={handleView}
                     onMarkCurado={() => handleMarkCurado(entidade)}
-                    onConfirm={() => handleConfirm(r.idRegistro)}
+                    onConfirm={confirm}
                   />
                 );
 
@@ -308,7 +318,7 @@ const GerenciarRegistros: React.FC = () => {
                     pesagem={entidade}
                     confirmado={registroStatus[r.idRegistro] ?? !r.isSugestao}
                     onView={handleView}
-                    onConfirm={() => handleConfirm(r.idRegistro)}
+                    onConfirm={confirm}
                   />
                 );
 
