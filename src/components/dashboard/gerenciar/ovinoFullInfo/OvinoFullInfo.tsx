@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useLocation, useParams, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import OvinoCardFull from "../../../common/cards/ovinoCard/OvinoCardFull";
 import type { Ovino } from "../../../../api/models/ovino/OvinoModel";
 import { OvinoService } from "../../../../api/services/ovino/OvinoService";

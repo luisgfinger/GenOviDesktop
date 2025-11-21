@@ -8,7 +8,6 @@ import type { GestacaoResponseDTO } from "../../../../api/dtos/gestacao/Gestacao
 interface GestacaoCardProps {
   gestacao: GestacaoResponseDTO;
   onView: () => void;
-  onEdit?: () => void;
   confirmado: boolean;
   onConfirm: () => void; 
 }
@@ -16,7 +15,6 @@ interface GestacaoCardProps {
 const GestacaoCard: React.FC<GestacaoCardProps> = ({
   gestacao,
   onView,
-  onEdit,
   confirmado,
   onConfirm
 }) => {

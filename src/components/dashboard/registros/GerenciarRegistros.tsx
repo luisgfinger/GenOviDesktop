@@ -76,7 +76,6 @@ const GerenciarRegistros: React.FC = () => {
     return "aplicacao";
   };
 
-  // Buscar status de cada registro
   useEffect(() => {
     if (!items.length) return;
 
@@ -97,7 +96,6 @@ const GerenciarRegistros: React.FC = () => {
     fetchStatuses();
   }, [items]);
 
-  // CONFIRMAR SUGESTÃO
   const handleConfirm = async (r: RegistroResponseDTO) => {
     const ok = await updateRegistroSugestao(r);
     if (!ok) return;
@@ -113,7 +111,6 @@ const GerenciarRegistros: React.FC = () => {
     );
   };
 
-  // FILTRO
   const filtered: RegistroResponseDTO[] = useMemo(() => {
     const query = normalize(q.trim());
     const df = dateFrom ? new Date(`${dateFrom}T00:00:00`) : null;

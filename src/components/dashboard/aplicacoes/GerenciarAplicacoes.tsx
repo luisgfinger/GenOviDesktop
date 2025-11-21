@@ -11,7 +11,9 @@ import { useAplicacoes } from "../../../api/hooks/aplicacao/UseAplicacoes";
 import type { AplicacaoResponseDTO } from "../../../api/dtos/aplicacao/AplicacaoResponseDTO";
 import { formatDate } from "../../../utils/formatDate";
 import AplicacaoCard from "../../common/cards/registrosCard/AplicacaoCard";
-import { getRegistroStatusByEntityId } from "../../../utils/getRegistroStatusById";
+import { updateRegistroSugestao } from "../../../utils/updateRegistroSugestao";
+import { toast } from "react-toastify";
+import { useRegistros } from "../../../api/hooks/registro/UseRegistros";
 
 function normalize(s?: string) {
   return (s ?? "")
@@ -26,8 +28,19 @@ interface GerenciarAplicacoesProps {
   isVacina: boolean;
 }
 
-const GerenciarAplicacoes: React.FC<GerenciarAplicacoesProps> = ({ isVacina }) => {
-  const { aplicacoes, loading, error } = useAplicacoes();
+const GerenciarAplicacoes: React.FC<GerenciarAplicacoesProps> = ({
+  isVacina,
+}) => {
+  const {
+    aplicacoes,
+    loading: loadingAplicacoes,
+    error: errorAplicacoes,
+  } = useAplicacoes();
+
+  const {
+    registros,
+    setRegistros,
+  } = useRegistros();
 
   const [q, setQ] = useState("");
   const [dateFrom, setDateFrom] = useState("");
@@ -35,52 +48,78 @@ const GerenciarAplicacoes: React.FC<GerenciarAplicacoesProps> = ({ isVacina }) =
   const [page, setPage] = useState(1);
   const [viewAll, setViewAll] = useState(false);
   const [selected, setSelected] = useState<AplicacaoResponseDTO | null>(null);
-  const [registroStatus, setRegistroStatus] = useState<Record<number, boolean>>({});
 
-  const items = useMemo<AplicacaoResponseDTO[]>(() => aplicacoes ?? [], [aplicacoes]);
+  const [registroStatus, setRegistroStatus] = useState<Record<number, boolean>>(
+    {}
+  );
+
+  const items = useMemo<AplicacaoResponseDTO[]>(
+    () => aplicacoes ?? [],
+    [aplicacoes]
+  );
 
   const filteredByType = useMemo(
     () => items.filter((a) => a.medicamento?.isVacina === isVacina),
     [items, isVacina]
   );
 
-  const handleConfirm = (id: number) => {
-  setRegistroStatus((prev) => ({
-    ...prev,
-    [id]: true,
-  }));
-};
+  const handleConfirm = async (aplicacao: AplicacaoResponseDTO) => {
+    if (!registros) return;
 
+    const registro = registros.find(
+      (r) => r.aplicacao?.id === aplicacao.id
+    );
 
-const location = useLocation();
+    if (!registro) {
+      toast.error("Registro não encontrado para esta aplicação.");
+      return;
+    }
+
+    const ok = await updateRegistroSugestao(registro);
+    if (!ok) return;
+
+    toast.success("Registro confirmado!");
+
+    setRegistroStatus((prev) => ({
+      ...prev,
+      [registro.idRegistro]: true,
+    }));
+    setRegistros((prev) =>
+      prev.map((x) =>
+        x.idRegistro === registro.idRegistro
+          ? { ...x, isSugestao: false }
+          : x
+      )
+    );
+  };
 
   useEffect(() => {
-  const params = new URLSearchParams(location.search);
-  const searchId = params.get("searchId");
-  if (searchId) {
-    setQ(searchId);
-    setPage(1);
-    setViewAll(false);
-  }
-}, [location.search]);
+    if (!filteredByType.length || !registros) return;
+
+    const statusMap: Record<number, boolean> = {};
+
+    for (const a of filteredByType) {
+      const reg = registros.find((r) => r.aplicacao?.id === a.id);
+      if (!reg) continue;
+
+      statusMap[a.id!] = !reg.isSugestao;
+    }
+
+    setRegistroStatus(statusMap);
+  }, [filteredByType, registros]);
+
+  const location = useLocation();
 
   useEffect(() => {
-    if (!filteredByType.length) return;
+    const params = new URLSearchParams(location.search);
+    const searchId = params.get("searchId");
+    if (searchId) {
+      setQ(searchId);
+      setPage(1);
+      setViewAll(false);
+    }
+  }, [location.search]);
 
-    const fetchStatuses = async () => {
-      const statusMap: Record<number, boolean> = {};
-
-      for (const a of filteredByType) {
-        if (!a.id) continue;
-        const status = await getRegistroStatusByEntityId(a.id, "aplicacao");
-        statusMap[a.id] = status === false;
-      }
-
-      setRegistroStatus(statusMap);
-    };
-
-    fetchStatuses();
-  }, [filteredByType]);
 
   const filtered: AplicacaoResponseDTO[] = useMemo(() => {
     const query = normalize(q.trim());
@@ -99,7 +138,7 @@ const location = useLocation();
         if (!query) return true;
 
         const campos = [
-          String(a.id ?? ""),            
+          String(a.id ?? ""),
           a.ovino?.nome ?? "",
           a.medicamento?.nome ?? "",
           a.medicamento?.fabricante ?? "",
@@ -133,15 +172,18 @@ const location = useLocation();
     setViewAll(false);
   };
 
-  if (loading)
+  if (loadingAplicacoes)
     return <p>Carregando {isVacina ? "vacinas…" : "medicamentos…"} </p>;
-  if (error) return <p style={{ color: "red" }}>{error}</p>;
+  if (errorAplicacoes)
+    return <p style={{ color: "red" }}>{errorAplicacoes}</p>;
 
   return (
     <div className="aplicacao-page">
       <div className="aplicacao-header flex">
         <Link
-          to={`/dashboard/ovinos/aplicacoes/cadastrar/${isVacina ? "vacina" : "medicamento"}`}
+          to={`/dashboard/ovinos/aplicacoes/cadastrar/${
+            isVacina ? "vacina" : "medicamento"
+          }`}
         >
           <Button type="button" variant="cardPrimary">
             Nova {isVacina ? "Vacinação" : "Aplicação"}
@@ -159,7 +201,9 @@ const location = useLocation();
         clearFilters={clearFilters}
         setPage={setPage}
         setViewAll={setViewAll}
-        placeholder={`Buscar por ID, ovino, ${isVacina ? "vacina" : "medicamento"}, fabricante ou RFID...`}
+        placeholder={`Buscar por ID, ovino, ${
+          isVacina ? "vacina" : "medicamento"
+        }, fabricante ou RFID...`}
       />
 
       <div className="aplicacao-counter">
@@ -179,8 +223,7 @@ const location = useLocation();
               aplicacao={a}
               confirmado={registroStatus[a.id ?? 0] ?? false}
               onView={() => setSelected(a)}
-              onEdit={() => setSelected(a)}
-              onConfirm={handleConfirm}
+              onConfirm={() => handleConfirm(a)}
             />
           ))}
         </div>

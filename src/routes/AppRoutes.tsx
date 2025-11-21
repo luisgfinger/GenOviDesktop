@@ -60,7 +60,7 @@ const AppRoutes: React.FC = () => {
           />
         </Routes>
 
-        {!esconderIAButtonGlobal && (
+        {!esconderIAButtonGlobal && isLoggedIn &&(
           <IAButton
             promptPreDefinido={iaConfig.promptPreDefinido}
             permitirInputUsuario={iaConfig.permitirInputUsuario}

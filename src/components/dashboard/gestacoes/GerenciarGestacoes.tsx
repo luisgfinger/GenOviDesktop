@@ -4,15 +4,21 @@ import "./GerenciarGestacoes.css";
 
 import Button from "../../common/buttons/Button";
 import PaginationMenu from "../../common/paginationMenu/PaginationMenu";
+
 import { useGestacoes } from "../../../api/hooks/gestacao/UseGestacoes";
 import { useOvinos } from "../../../api/hooks/ovino/UseOvinos";
 import { usePartos } from "../../../api/hooks/parto/UsePartos";
+import { useRegistros } from "../../../api/hooks/registro/UseRegistros";
+
 import type { GestacaoResponseDTO } from "../../../api/dtos/gestacao/GestacaoResponseDTO";
+
 import FilterBar from "../../common/filter-bar/FilterBar";
 import GestacaoDetalhes from "./GestacaoDetalhes";
 import GestacaoCard from "../../common/cards/registrosCard/GestacaoCard";
 import { formatDate } from "../../../utils/formatDate";
-import { getRegistroStatusByEntityId } from "../../../utils/getRegistroStatusById";
+
+import { updateRegistroSugestao } from "../../../utils/updateRegistroSugestao";
+import { toast } from "react-toastify";
 
 function normalize(s?: string) {
   return (s ?? "")
@@ -34,6 +40,8 @@ const GerenciarGestacoes: React.FC = () => {
   const { ovinos } = useOvinos();
   const { partos } = usePartos();
 
+  const { registros, setRegistros } = useRegistros();
+
   const [q, setQ] = useState("");
   const [dateFrom, setDateFrom] = useState("");
   const [dateTo, setDateTo] = useState("");
@@ -44,23 +52,16 @@ const GerenciarGestacoes: React.FC = () => {
 
   const [registroStatus, setRegistroStatus] = useState<Record<number, boolean>>({});
 
-    const handleConfirm = (id: number) => {
-    setRegistroStatus((prev) => ({
-      ...prev,
-      [id]: true,
-    }));
-  };
-
   const gestacoesHydrated: GestacaoUI[] = useMemo(() => {
     return (gestacoes ?? []).map((g) => {
       const ovelhaPai =
         g.ovelhaPai?.id && ovinos
-          ? (ovinos.find((o) => o.id === g.ovelhaPai?.id) ?? g.ovelhaPai)
+          ? ovinos.find((o) => o.id === g.ovelhaPai?.id) ?? g.ovelhaPai
           : g.ovelhaPai;
 
       const ovelhaMae =
         g.ovelhaMae?.id && ovinos
-          ? (ovinos.find((o) => o.id === g.ovelhaMae?.id) ?? g.ovelhaMae)
+          ? ovinos.find((o) => o.id === g.ovelhaMae?.id) ?? g.ovelhaMae
           : g.ovelhaMae;
 
       const concluida = partos?.some((p) => p.gestacao?.id === g.id) ?? false;
@@ -75,22 +76,45 @@ const GerenciarGestacoes: React.FC = () => {
   }, [gestacoes, ovinos, partos]);
 
   useEffect(() => {
-    if (!gestacoesHydrated.length) return;
+    if (!gestacoesHydrated.length || !registros) return;
 
-    const fetchStatuses = async () => {
-      const statusMap: Record<number, boolean> = {};
+    const map: Record<number, boolean> = {};
 
-      for (const g of gestacoesHydrated) {
-        if (!g.id) continue;
-        const status = await getRegistroStatusByEntityId(g.id, "gestacao");
-        statusMap[g.id] = status === false;
-      }
+    for (const g of gestacoesHydrated) {
+      const reg = registros.find((r) => r.gestacao?.id === g.id);
+      if (!reg) continue;
 
-      setRegistroStatus(statusMap);
-    };
+      map[reg.idRegistro] = !reg.isSugestao;
+    }
 
-    fetchStatuses();
-  }, [gestacoesHydrated]);
+    setRegistroStatus(map);
+  }, [gestacoesHydrated, registros]);
+
+  const handleConfirm = async (gestacao: GestacaoUI) => {
+    if (!registros) return;
+
+    const reg = registros.find((r) => r.gestacao?.id === gestacao.id);
+    if (!reg) {
+      toast.error("Registro não encontrado para esta gestação.");
+      return;
+    }
+
+    const ok = await updateRegistroSugestao(reg);
+    if (!ok) return;
+
+    toast.success("Registro confirmado!");
+
+    setRegistroStatus((prev) => ({
+      ...prev,
+      [reg.idRegistro]: true,
+    }));
+
+    setRegistros((prev) =>
+      prev.map((x) =>
+        x.idRegistro === reg.idRegistro ? { ...x, isSugestao: false } : x
+      )
+    );
+  };
 
   const filtered: GestacaoUI[] = useMemo(() => {
     const query = normalize(q.trim());
@@ -144,8 +168,8 @@ const GerenciarGestacoes: React.FC = () => {
     setViewAll(false);
   };
 
-   const location = useLocation();
-    useEffect(() => {
+  const location = useLocation();
+  useEffect(() => {
     const params = new URLSearchParams(location.search);
     const searchId = params.get("searchId");
     if (searchId) {
@@ -197,16 +221,23 @@ const GerenciarGestacoes: React.FC = () => {
         <div className="gestacoes-empty">Nenhuma gestação encontrada.</div>
       ) : (
         <div className="gestacoes-list">
-          {pageItems.map((g) => (
-            <GestacaoCard
-              key={g.id}
-              gestacao={g}
-              confirmado={registroStatus[g.id ?? 0] ?? false}
-              onView={() => setSelectedGestacao(g)}
-              onEdit={() => setSelectedGestacao(g)}
-              onConfirm={handleConfirm}
-            />
-          ))}
+          {pageItems.map((g) => {
+            const reg = registros?.find((r) => r.gestacao?.id === g.id);
+
+            const confirmado = reg
+              ? (registroStatus[reg.idRegistro] ?? !reg.isSugestao)
+              : false;
+
+            return (
+              <GestacaoCard
+                key={g.id}
+                gestacao={g}
+                confirmado={confirmado}
+                onView={() => setSelectedGestacao(g)}
+                onConfirm={() => handleConfirm(g)}
+              />
+            );
+          })}
         </div>
       )}
 

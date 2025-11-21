@@ -2,22 +2,21 @@ import type { Reproducao } from "../../models/reproducao/ReproducaoModel";
 import type { ReproducaoRequestDTO } from "../../dtos/reproducao/ReproducaoRequestDTO";
 import type { ReproducaoResponseDTO } from "../../dtos/reproducao/ReproducaoResponseDTO";
 import type { TypeReproducao } from "../../enums/typeReproducao/TypeReproducao";
-import type { Ovino } from "../../models/ovino/OvinoModel"; // se já existir
+import type { Ovino } from "../../models/ovino/OvinoModel";
 
 export class ReproducaoMapper {
   static toEntity(
     dto: ReproducaoRequestDTO,
     carneiro: Ovino,
     ovelha: Ovino,
-    typeReproducao: TypeReproducao
+    enumReproducao: TypeReproducao
   ): Reproducao {
     return {
       id: dto.id ?? 0,
       carneiro,
       ovelha,
-      typeReproducao,
+      enumReproducao,
       dataReproducao: dto.dataReproducao,
-      observacoes: dto.observacoes,
     };
   }
 
@@ -26,9 +25,8 @@ export class ReproducaoMapper {
       id: entity.id,
       carneiro: entity.carneiro,
       ovelha: entity.ovelha,
-      typeReproducao: entity.typeReproducao,
+      enumReproducao: entity.enumReproducao,
       dataReproducao: entity.dataReproducao,
-      observacoes: entity.observacoes,
     };
   }
 }

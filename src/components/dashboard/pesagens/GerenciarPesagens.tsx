@@ -8,6 +8,7 @@ import FilterBar from "../../common/filter-bar/FilterBar";
 
 import { usePesagens } from "../../../api/hooks/pesagem/UsePesagens";
 import { useOvinos } from "../../../api/hooks/ovino/UseOvinos";
+import { useRegistros } from "../../../api/hooks/registro/UseRegistros";
 
 import PesagemDetalhes from "./PesagemDetalhes";
 import PesagemCard from "../../common/cards/registrosCard/PesagemCard";
@@ -16,7 +17,8 @@ import type { PesagemResponseDTO } from "../../../api/dtos/pesagem/PesagemRespon
 
 import { formatEnum } from "../../../utils/formatEnum";
 import { formatDate } from "../../../utils/formatDate";
-import { getRegistroStatusByEntityId } from "../../../utils/getRegistroStatusById";
+import { updateRegistroSugestao } from "../../../utils/updateRegistroSugestao";
+import { toast } from "react-toastify";
 
 function normalize(s?: string) {
   return (s ?? "")
@@ -35,6 +37,7 @@ type PesagemUI = PesagemResponseDTO & {
 const GerenciarPesagens: React.FC = () => {
   const { pesagens, loading, error } = usePesagens();
   const { ovinos } = useOvinos();
+  const { registros, setRegistros } = useRegistros();
 
   const [q, setQ] = useState("");
   const [dateFrom, setDateFrom] = useState("");
@@ -43,9 +46,7 @@ const GerenciarPesagens: React.FC = () => {
   const [viewAll, setViewAll] = useState(false);
   const [selected, setSelected] = useState<PesagemUI | null>(null);
 
-  const [registroStatus, setRegistroStatus] = useState<Record<number, boolean>>(
-    {}
-  );
+  const [registroStatus, setRegistroStatus] = useState<Record<number, boolean>>({});
 
   const hydrated: PesagemUI[] = useMemo(() => {
     if (!pesagens || !ovinos) return [];
@@ -73,32 +74,48 @@ const GerenciarPesagens: React.FC = () => {
   }, [location.search]);
 
   useEffect(() => {
-    if (!hydrated.length) return;
+    if (!hydrated.length || !registros) return;
 
-    const fetchStatuses = async () => {
-      const map: Record<number, boolean> = {};
+    const map: Record<number, boolean> = {};
 
-      for (const p of hydrated) {
-        if (!p.id) continue;
+    for (const p of hydrated) {
+      const reg = registros.find((r) => r.pesagem?.id === p.id);
+      if (!reg) continue;
 
-        const status = await getRegistroStatusByEntityId(p.id, "pesagem");
-        map[p.id] = status === false; 
-      }
+      map[reg.idRegistro] = !reg.isSugestao;
+    }
 
-      setRegistroStatus(map);
-    };
+    setRegistroStatus(map);
+  }, [hydrated, registros]);
 
-    fetchStatuses();
-  }, [hydrated]);
 
-  const handleConfirm = (id: number) => {
+  const handleConfirm = async (pesagem: PesagemResponseDTO) => {
+    if (!registros) return;
+
+    const reg = registros.find((r) => r.pesagem?.id === pesagem.id);
+    if (!reg) {
+      toast.error("Registro não encontrado para esta pesagem.");
+      return;
+    }
+
+    const ok = await updateRegistroSugestao(reg);
+    if (!ok) return;
+
+    toast.success("Registro confirmado!");
+
     setRegistroStatus((prev) => ({
       ...prev,
-      [id]: true,
+      [reg.idRegistro]: true,
     }));
+
+    setRegistros((prev) =>
+      prev.map((x) =>
+        x.idRegistro === reg.idRegistro ? { ...x, isSugestao: false } : x
+      )
+    );
   };
 
-  const filtered: PesagemUI[] = useMemo(() => {
+  const filtered = useMemo(() => {
     const query = normalize(q.trim());
     const df = dateFrom ? new Date(`${dateFrom}T00:00:00`) : null;
     const dt = dateTo ? new Date(`${dateTo}T23:59:59`) : null;
@@ -118,8 +135,8 @@ const GerenciarPesagens: React.FC = () => {
           String(p.id ?? ""),
           p.ovinoNome ?? "",
           p.racaNome ?? "",
-          formatDate(p.dataPesagem, true),
           String(p.peso ?? ""),
+          formatDate(p.dataPesagem, true),
         ].map((x) => normalize(x));
 
         return campos.some((c) => c.includes(query));
@@ -131,17 +148,10 @@ const GerenciarPesagens: React.FC = () => {
       });
   }, [hydrated, q, dateFrom, dateTo]);
 
-  const totalPages = viewAll
-    ? 1
-    : Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
-
+  const totalPages = viewAll ? 1 : Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
   const currentPage = viewAll ? 1 : Math.min(page, totalPages);
-
   const startIdx = (currentPage - 1) * PAGE_SIZE;
-
-  const pageItems = viewAll
-    ? filtered
-    : filtered.slice(startIdx, startIdx + PAGE_SIZE);
+  const pageItems = viewAll ? filtered : filtered.slice(startIdx, startIdx + PAGE_SIZE);
 
   const clearFilters = () => {
     setQ("");
@@ -186,16 +196,23 @@ const GerenciarPesagens: React.FC = () => {
         <div className="pesagens-empty">Nenhuma pesagem encontrada.</div>
       ) : (
         <div className="pesagens-list">
-          {pageItems.map((p) => (
-            <PesagemCard
-              key={p.id}
-              pesagem={p}
-              confirmado={registroStatus[p.id ?? 0] ?? false}
-              onView={() => setSelected(p)}
-              onEdit={() => setSelected(p)}
-              onConfirm={handleConfirm}
-            />
-          ))}
+          {pageItems.map((p) => {
+            const reg = registros?.find((r) => r.pesagem?.id === p.id);
+
+            const confirmado = reg
+              ? (registroStatus[reg.idRegistro] ?? !reg.isSugestao)
+              : false;
+
+            return (
+              <PesagemCard
+                key={p.id}
+                pesagem={p}
+                confirmado={confirmado}
+                onView={() => setSelected(p)}
+                onConfirm={() => handleConfirm(p)}
+              />
+            );
+          })}
         </div>
       )}
 
@@ -227,10 +244,7 @@ const GerenciarPesagens: React.FC = () => {
       )}
 
       {selected && (
-        <PesagemDetalhes
-          pesagem={selected}
-          onClose={() => setSelected(null)}
-        />
+        <PesagemDetalhes pesagem={selected} onClose={() => setSelected(null)} />
       )}
     </div>
   );

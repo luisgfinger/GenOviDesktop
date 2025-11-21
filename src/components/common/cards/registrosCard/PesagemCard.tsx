@@ -12,7 +12,6 @@ interface PesagemCardProps {
   };
   confirmado: boolean;
   onView: () => void;
-  onEdit?: () => void;
   onConfirm: () => void;
 }
 
@@ -20,7 +19,6 @@ const PesagemCard: React.FC<PesagemCardProps> = ({
   pesagem,
   confirmado,
   onView,
-  onEdit,
   onConfirm,
 }) => {
   return (
@@ -65,12 +63,6 @@ const PesagemCard: React.FC<PesagemCardProps> = ({
         {!confirmado && (
           <Button variant="cardPrimary" onClick={onConfirm}>
             Confirmar
-          </Button>
-        )}
-
-        {onEdit && (
-          <Button variant="cardSecondary" onClick={onEdit}>
-            Editar
           </Button>
         )}
       </div>

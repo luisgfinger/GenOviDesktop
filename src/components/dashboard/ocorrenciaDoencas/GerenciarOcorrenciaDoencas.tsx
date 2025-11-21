@@ -1,3 +1,4 @@
+
 import React, { useEffect, useMemo, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import "./GerenciarOcorrenciaDoencas.css";
@@ -10,10 +11,13 @@ import OcorrenciaDoencaCard from "../../common/cards/registrosCard/OcorrenciaDoe
 
 import { useOcorrenciasDoenca } from "../../../api/hooks/ocorrenciaDoencas/UseOcorrenciaDoencas";
 import { useEditarOcorrenciaDoenca } from "../../../api/hooks/ocorrenciaDoencas/UseOcorrenciaDoencas";
+import { useRegistros } from "../../../api/hooks/registro/UseRegistros";
+
 import type { OcorrenciaDoencaResponseDTO } from "../../../api/dtos/ocorrendiaDoenca/OcorrenciaDoencaResponseDTO";
 import { formatDate } from "../../../utils/formatDate";
 import { toast } from "react-toastify";
-import { getRegistroStatusByEntityId } from "../../../utils/getRegistroStatusById";
+
+import { updateRegistroSugestao } from "../../../utils/updateRegistroSugestao";
 
 function normalize(s?: string) {
   return (s ?? "")
@@ -28,22 +32,18 @@ const GerenciarOcorrenciasDoenca: React.FC = () => {
   const { ocorrencias, loading, error } = useOcorrenciasDoenca();
   const { editarOcorrencia } = useEditarOcorrenciaDoenca();
 
+  const { registros, setRegistros } = useRegistros();
+
   const [q, setQ] = useState("");
   const [dateFrom, setDateFrom] = useState("");
   const [dateTo, setDateTo] = useState("");
   const [statusCurado, setStatusCurado] = useState("TODOS");
   const [page, setPage] = useState(1);
   const [viewAll, setViewAll] = useState(false);
-  const [selected, setSelected] = useState<OcorrenciaDoencaResponseDTO | null>(
-    null
-  );
 
-  const handleConfirm = (id: number) => {
-    setRegistroStatus((prev) => ({
-      ...prev,
-      [id]: true,
-    }));
-  };
+  const [selected, setSelected] = useState<OcorrenciaDoencaResponseDTO | null>(null);
+
+  const [registroStatus, setRegistroStatus] = useState<Record<number, boolean>>({});
 
   const location = useLocation();
   useEffect(() => {
@@ -56,34 +56,53 @@ const GerenciarOcorrenciasDoenca: React.FC = () => {
     }
   }, [location.search]);
 
-  const [registroStatus, setRegistroStatus] = useState<Record<number, boolean>>(
-    {}
-  );
-
-  const items = useMemo<OcorrenciaDoencaResponseDTO[]>(
+  const items = useMemo(
     () => ocorrencias ?? [],
     [ocorrencias]
   );
 
   useEffect(() => {
-    if (!items.length) return;
+    if (!items.length || !registros) return;
 
-    const fetchStatuses = async () => {
-      const statusMap: Record<number, boolean> = {};
+    const map: Record<number, boolean> = {};
 
-      for (const o of items) {
-        if (!o.id) continue;
-        const status = await getRegistroStatusByEntityId(o.id, "ocorrenciaDoenca");
-        statusMap[o.id] = status === false;
-      }
+    for (const o of items) {
+      const reg = registros.find((r) => r.ocorrenciaDoenca?.id === o.id);
+      if (!reg) continue;
 
-      setRegistroStatus(statusMap);
-    };
+      map[reg.idRegistro] = !reg.isSugestao;
+    }
 
-    fetchStatuses();
-  }, [items]);
+    setRegistroStatus(map);
+  }, [items, registros]);
 
-  const filtered: OcorrenciaDoencaResponseDTO[] = useMemo(() => {
+  const handleConfirm = async (ocorrencia: OcorrenciaDoencaResponseDTO) => {
+    if (!registros) return;
+
+    const reg = registros.find((r) => r.ocorrenciaDoenca?.id === ocorrencia.id);
+    if (!reg) {
+      toast.error("Registro não encontrado para esta ocorrência.");
+      return;
+    }
+
+    const ok = await updateRegistroSugestao(reg);
+    if (!ok) return;
+
+    toast.success("Registro confirmado!");
+
+    setRegistroStatus((prev) => ({
+      ...prev,
+      [reg.idRegistro]: true,
+    }));
+
+    setRegistros((prev) =>
+      prev.map((x) =>
+        x.idRegistro === reg.idRegistro ? { ...x, isSugestao: false } : x
+      )
+    );
+  };
+
+  const filtered = useMemo(() => {
     const query = normalize(q.trim());
     const df = dateFrom ? new Date(`${dateFrom}T00:00:00`) : null;
     const dt = dateTo ? new Date(`${dateTo}T23:59:59`) : null;
@@ -103,7 +122,7 @@ const GerenciarOcorrenciasDoenca: React.FC = () => {
         if (!query) return true;
 
         const campos = [
-          String(o.id ?? ""),
+          o.id ? String(o.id) : "",
           o.ovino?.nome ?? "",
           o.doenca?.nome ?? "",
           o.doenca?.descricao ?? "",
@@ -120,14 +139,10 @@ const GerenciarOcorrenciasDoenca: React.FC = () => {
       });
   }, [items, q, dateFrom, dateTo, statusCurado]);
 
-  const totalPages = viewAll
-    ? 1
-    : Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+  const totalPages = viewAll ? 1 : Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
   const currentPage = viewAll ? 1 : Math.min(page, totalPages);
   const startIdx = (currentPage - 1) * PAGE_SIZE;
-  const pageItems = viewAll
-    ? filtered
-    : filtered.slice(startIdx, startIdx + PAGE_SIZE);
+  const pageItems = viewAll ? filtered : filtered.slice(startIdx, startIdx + PAGE_SIZE);
 
   const clearFilters = () => {
     setQ("");
@@ -140,11 +155,8 @@ const GerenciarOcorrenciasDoenca: React.FC = () => {
 
   const handleMarkCurado = async (ocorrencia: OcorrenciaDoencaResponseDTO) => {
     if (!ocorrencia.id) return;
-    if (
-      !window.confirm(
-        `Deseja marcar a ocorrência do ovino "${ocorrencia.ovino?.nome}" como curada?`
-      )
-    )
+
+    if (!window.confirm(`Deseja marcar a ocorrência do ovino "${ocorrencia.ovino?.nome}" como curada?`))
       return;
 
     try {
@@ -203,21 +215,27 @@ const GerenciarOcorrenciasDoenca: React.FC = () => {
       </div>
 
       {pageItems.length === 0 ? (
-        <div className="ocorrencia-empty">
-          Nenhuma ocorrência de doença encontrada.
-        </div>
+        <div className="ocorrencia-empty">Nenhuma ocorrência de doença encontrada.</div>
       ) : (
         <div className="ocorrencia-list">
-          {pageItems.map((o) => (
-            <OcorrenciaDoencaCard
-              key={o.id}
-              ocorrencia={o}
-              confirmado={registroStatus[o.id ?? 0] ?? false}
-              onView={() => setSelected(o)}
-              onMarkCurado={() => handleMarkCurado(o)}
-              onConfirm={handleConfirm}
-            />
-          ))}
+          {pageItems.map((o) => {
+            const reg = registros?.find((r) => r.ocorrenciaDoenca?.id === o.id);
+
+            const confirmado = reg
+              ? (registroStatus[reg.idRegistro] ?? !reg.isSugestao)
+              : false;
+
+            return (
+              <OcorrenciaDoencaCard
+                key={o.id}
+                ocorrencia={o}
+                confirmado={confirmado}
+                onView={() => setSelected(o)}
+                onMarkCurado={() => handleMarkCurado(o)}
+                onConfirm={() => handleConfirm(o)}
+              />
+            );
+          })}
         </div>
       )}
 

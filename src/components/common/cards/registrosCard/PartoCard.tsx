@@ -7,7 +7,6 @@ import type { PartoResponseDTO } from "../../../../api/dtos/parto/PartoResponseD
 interface PartoCardProps {
   parto: PartoResponseDTO;
   onView: () => void;
-  onEdit?: () => void;
   confirmado: boolean;
   onConfirm: () => void;
 }
@@ -15,7 +14,6 @@ interface PartoCardProps {
 const PartoCard: React.FC<PartoCardProps> = ({
   parto,
   onView,
-  onEdit,
   confirmado,
   onConfirm,
 }) => {
@@ -67,12 +65,6 @@ const PartoCard: React.FC<PartoCardProps> = ({
         {!confirmado && (
           <Button variant="cardPrimary" onClick={onConfirm}>
             Confirmar
-          </Button>
-        )}
-
-        {onEdit && (
-          <Button variant="cardSecondary" onClick={onEdit}>
-            Editar
           </Button>
         )}
       </div>

@@ -14,7 +14,6 @@ const Navbar: React.FC = () => {
         { label: "Dashboard", href: "/dashboard/ovinos" },
         { label: "Perfil", href: "/profile" },
       ]
-      
     : [
         { label: "Sobre nós", href: "#home" },
         { label: "Suporte", href: "#about" },
@@ -42,9 +41,16 @@ const Navbar: React.FC = () => {
             </h3>
           </li>
         ))}
-        <li>Usuário: {localStorage.getItem("funcionarioNome")}</li>
+
+        {isLoggedIn && (
+          <li>Usuário: {localStorage.getItem("funcionarioNome")}</li>
+        )}
       </ul>
-      {isLoggedIn && <a><Button onClick={handleLogout}>Logout</Button></a>}
+      {isLoggedIn && (
+        <a>
+          <Button onClick={handleLogout}>Logout</Button>
+        </a>
+      )}
     </nav>
   );
 };

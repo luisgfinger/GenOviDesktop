@@ -17,7 +17,7 @@ import { useNavigate } from "react-router-dom";
 import { DateToIsoString } from "../../../utils/dateToIsoString";
 
 const CadastrarOcorrenciaDoenca: React.FC = () => {
-  const { ovinos, loading: loadingOvinos, error: errorOvinos } = useOvinos();
+  const { ovinos} = useOvinos();
   const { doencas, loading: loadingDoenc, error: errorDoenc } = useDoencas();
   const {
     criarOcorrencia,
@@ -27,7 +27,7 @@ const CadastrarOcorrenciaDoenca: React.FC = () => {
 
   const [doencaId, setDoencaId] = useState<string>("");
   const [ovinoId, setOvinoId] = useState<string>("");
-  const [ovinoNome, setOvinoNome] = useState<string>("");
+  const [, setOvinoNome] = useState<string>("");
   const [dataInicio, setDataInicio] = useState<string>("");
 
     const navigate = useNavigate();

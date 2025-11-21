@@ -11,7 +11,7 @@ export const registroMapper = {
     idParto: dto.idParto ?? undefined,
     idAplicacoes: dto.idAplicacoes ?? undefined,
     idOcorrenciaDoencas: dto.idOcorrenciaDoencas ?? undefined,
-    idPesagem: dto.idPesagem ?? undefined,
+    idPessagem: dto.idPesagem ?? undefined,
   }),
 
   fromResponse: (data: any): RegistroResponseDTO => ({

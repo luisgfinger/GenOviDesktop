@@ -1,17 +1,23 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import "./GerenciarReproducoes.css";
 
 import Button from "../../common/buttons/Button";
 import PaginationMenu from "../../common/paginationMenu/PaginationMenu";
 import { useReproducoes } from "../../../api/hooks/reproducao/UseReproducoes";
+import { useRegistros } from "../../../api/hooks/registro/UseRegistros";
+
 import type { ReproducaoResponseDTO } from "../../../api/dtos/reproducao/ReproducaoResponseDTO";
 import { TypeReproducao } from "../../../api/enums/typeReproducao/TypeReproducao";
+
 import FilterBar from "../../common/filter-bar/FilterBar";
 import ReproducaoDetalhes from "./ReproducoesDetalhes";
-import { formatDate } from "../../../utils/formatDate";
 import ReproducaoCard from "../../common/cards/registrosCard/ReproducaoCard";
-import { getRegistroStatusByEntityId } from "../../../utils/getRegistroStatusById";
+
+import { formatDate } from "../../../utils/formatDate";
+import { updateRegistroSugestao } from "../../../utils/updateRegistroSugestao";
+import { toast } from "react-toastify";
+
 function normalize(s?: string) {
   return (s ?? "")
     .normalize("NFD")
@@ -19,12 +25,20 @@ function normalize(s?: string) {
     .toLowerCase();
 }
 
-type ReproducaoUI = ReproducaoResponseDTO;
-
 const PAGE_SIZE = 5;
+
+type ReproducaoUI = ReproducaoResponseDTO & {
+  carneiroNome: string;
+  carneiroFbb: string;
+  carneiroRfid: string | number;
+  ovelhaNome: string;
+  ovelhaFbb: string;
+  ovelhaRfid: string | number;
+};
 
 const GerenciarReproducoes: React.FC = () => {
   const { reproducoes, loading, error } = useReproducoes();
+  const { registros, setRegistros } = useRegistros();
 
   const [q, setQ] = useState("");
   const [tipo, setTipo] = useState<string>("TODOS");
@@ -34,17 +48,13 @@ const GerenciarReproducoes: React.FC = () => {
   const [viewAll, setViewAll] = useState(false);
   const [selectedRepro, setSelectedRepro] = useState<ReproducaoUI | null>(null);
 
-  const [registroStatus, setRegistroStatus] = useState<Record<number, boolean>>({});
+  const [registroStatus, setRegistroStatus] = useState<Record<number, boolean>>(
+    {}
+  );
 
-    const handleConfirm = (id: number) => {
-    setRegistroStatus((prev) => ({
-      ...prev,
-      [id]: true,
-    }));
-  };
-
-  const reprosHydrated: any[] = useMemo(() => {
+  const reprosHydrated: ReproducaoUI[] = useMemo(() => {
     if (!reproducoes) return [];
+
     return reproducoes.map((r) => ({
       ...r,
       carneiroNome: r.carneiro?.nome ?? "—",
@@ -56,23 +66,57 @@ const GerenciarReproducoes: React.FC = () => {
     }));
   }, [reproducoes]);
 
+  const location = useLocation();
   useEffect(() => {
-    if (!reprosHydrated.length) return;
+    const params = new URLSearchParams(location.search);
+    const searchId = params.get("searchId");
+    if (searchId) {
+      setQ(searchId);
+      setPage(1);
+      setViewAll(false);
+    }
+  }, [location.search]);
 
-    const fetchStatuses = async () => {
-      const statusMap: Record<number, boolean> = {};
+  useEffect(() => {
+    if (!reprosHydrated.length || !registros) return;
 
-      for (const r of reprosHydrated) {
-        if (!r.id) continue;
-        const status = await getRegistroStatusByEntityId(r.id, "reproducao");
-        statusMap[r.id] = status === false;
-      }
+    const map: Record<number, boolean> = {};
 
-      setRegistroStatus(statusMap);
-    };
+    for (const r of reprosHydrated) {
+      const reg = registros.find((x) => x.reproducao?.id === r.id);
+      if (!reg) continue;
 
-    fetchStatuses();
-  }, [reprosHydrated]);
+      map[reg.idRegistro] = !reg.isSugestao;
+    }
+
+    setRegistroStatus(map);
+  }, [reprosHydrated, registros]);
+
+  const handleConfirm = async (reproducao: ReproducaoUI) => {
+    if (!registros) return;
+
+    const reg = registros.find((r) => r.reproducao?.id === reproducao.id);
+    if (!reg) {
+      toast.error("Registro não encontrado para esta reprodução.");
+      return;
+    }
+
+    const ok = await updateRegistroSugestao(reg);
+    if (!ok) return;
+
+    toast.success("Registro confirmado!");
+
+    setRegistroStatus((prev) => ({
+      ...prev,
+      [reg.idRegistro]: true,
+    }));
+
+    setRegistros((prev) =>
+      prev.map((x) =>
+        x.idRegistro === reg.idRegistro ? { ...x, isSugestao: false } : x
+      )
+    );
+  };
 
   const filtered = useMemo(() => {
     const query = normalize(q.trim());
@@ -81,7 +125,7 @@ const GerenciarReproducoes: React.FC = () => {
 
     return reprosHydrated
       .filter((r) => {
-        if (tipo !== "TODOS" && r.typeReproducao !== (tipo as TypeReproducao))
+        if (tipo !== "TODOS" && r.enumReproducao !== (tipo as TypeReproducao))
           return false;
 
         if (df || dt) {
@@ -94,9 +138,8 @@ const GerenciarReproducoes: React.FC = () => {
         if (!query) return true;
 
         const campos = [
-          r.id ? String(r.id) : "",
-          r.observacoes ?? "",
-          r.typeReproducao ?? "",
+          String(r.id),
+          r.enumReproducao,
           r.carneiroNome,
           r.carneiroFbb,
           String(r.carneiroRfid),
@@ -118,7 +161,9 @@ const GerenciarReproducoes: React.FC = () => {
   const totalPages = viewAll
     ? 1
     : Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+
   const currentPage = viewAll ? 1 : Math.min(page, totalPages);
+
   const startIdx = (currentPage - 1) * PAGE_SIZE;
   const pageItems = viewAll
     ? filtered
@@ -170,15 +215,23 @@ const GerenciarReproducoes: React.FC = () => {
         <div className="repros-empty">Nenhuma reprodução encontrada.</div>
       ) : (
         <div className="repros-list">
-          {pageItems.map((r) => (
-            <ReproducaoCard
-              key={r.id}
-              reproducao={r}
-              confirmado={registroStatus[r.id ?? 0] ?? false}
-              onView={() => setSelectedRepro(r)}
-              onConfirm={handleConfirm}
-            />
-          ))}
+          {pageItems.map((r) => {
+            const reg = registros?.find((x) => x.reproducao?.id === r.id);
+
+            const confirmado = reg
+              ? registroStatus[reg.idRegistro] ?? !reg.isSugestao
+              : false;
+
+            return (
+              <ReproducaoCard
+                key={r.id}
+                reproducao={r}
+                confirmado={confirmado}
+                onView={() => setSelectedRepro(r)}
+                onConfirm={() => handleConfirm(r)}
+              />
+            );
+          })}
         </div>
       )}
 

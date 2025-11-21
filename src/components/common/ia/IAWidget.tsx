@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useGenoviIA } from "../../../api/hooks/ia/UseGenoviIA";
 import "./IA.css";
-import { gerarContextoIA } from "../../../utils/ia/GerarContextoIA";
+import { gerarContextoIA } from "../../../utils/ia/gerarContextoIA";
 
 interface IAChatWidgetProps {
   promptPreDefinido?: string;

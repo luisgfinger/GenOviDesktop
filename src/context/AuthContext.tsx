@@ -12,7 +12,9 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [loading, setLoading] = useState(true);
 
@@ -44,21 +46,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const usuarioId = await getUsuarioIdByEmail();
       if (!usuarioId) return;
 
-      if (usuarioId === 1) {
+      const funcionarioId = await getFuncionarioIdByUsuarioId(usuarioId);
+      if (!funcionarioId) {
         localStorage.setItem("funcionarioNome", "Admin");
-        localStorage.setItem("usuarioId", "1");
-        console.log("Usuário admin detectado — nome definido como 'Admin'.");
         return;
       }
-
-      const funcionarioId = await getFuncionarioIdByUsuarioId(usuarioId);
-      if (!funcionarioId) return;
-
       const usuario = await UsuarioService.buscarPorId(usuarioId);
       const nomeFuncionario = usuario.funcionario?.nome ?? null;
 
       if (nomeFuncionario) {
-        console.log("Salvando nome do funcionário no localStorage:", nomeFuncionario);
+        console.log(
+          "Salvando nome do funcionário no localStorage:",
+          nomeFuncionario
+        );
         localStorage.setItem("funcionarioNome", nomeFuncionario);
       }
     } catch (error) {

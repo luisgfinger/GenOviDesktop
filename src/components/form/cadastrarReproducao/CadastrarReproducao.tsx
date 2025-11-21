@@ -34,7 +34,7 @@ function diffMonthsFromNow(iso?: string): number {
 }
 
 const CadastrarReproducao: React.FC<Props> = ({ minAgeMonths = 12 }) => {
-  const { ovinos, loading: loadingOvinos, error: errorOvinos } = useOvinos();
+  const { ovinos } = useOvinos();
   const { criarReproducao, loading: saving, error: errorSalvar } = useCriarReproducao();
   const { gestacoes } = useGestacoes();
   const { partos } = usePartos();

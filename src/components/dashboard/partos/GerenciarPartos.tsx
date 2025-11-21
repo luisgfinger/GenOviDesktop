@@ -4,14 +4,20 @@ import "./GerenciarPartos.css";
 
 import Button from "../../common/buttons/Button";
 import PaginationMenu from "../../common/paginationMenu/PaginationMenu";
+
 import { usePartos } from "../../../api/hooks/parto/UsePartos";
 import { useOvinos } from "../../../api/hooks/ovino/UseOvinos";
+import { useRegistros } from "../../../api/hooks/registro/UseRegistros";
+
 import type { PartoResponseDTO } from "../../../api/dtos/parto/PartoResponseDTO";
+
 import FilterBar from "../../common/filter-bar/FilterBar";
 import PartoDetalhes from "./PartoDetalhes";
-import { formatDate } from "../../../utils/formatDate";
 import PartoCard from "../../common/cards/registrosCard/PartoCard";
-import { getRegistroStatusByEntityId } from "../../../utils/getRegistroStatusById";
+
+import { formatDate } from "../../../utils/formatDate";
+import { toast } from "react-toastify";
+import { updateRegistroSugestao } from "../../../utils/updateRegistroSugestao";
 
 function normalize(s?: string) {
   return (s ?? "")
@@ -31,6 +37,8 @@ const GerenciarPartos: React.FC = () => {
   const { partos, loading, error } = usePartos();
   const { ovinos } = useOvinos();
 
+  const { registros, setRegistros } = useRegistros();
+
   const [q, setQ] = useState("");
   const [dateFrom, setDateFrom] = useState("");
   const [dateTo, setDateTo] = useState("");
@@ -38,14 +46,9 @@ const GerenciarPartos: React.FC = () => {
   const [viewAll, setViewAll] = useState(false);
   const [selectedParto, setSelectedParto] = useState<PartoUI | null>(null);
 
-  const [registroStatus, setRegistroStatus] = useState<Record<number, boolean>>({});
-
-    const handleConfirm = (id: number) => {
-    setRegistroStatus((prev) => ({
-      ...prev,
-      [id]: true,
-    }));
-  };
+  const [registroStatus, setRegistroStatus] = useState<Record<number, boolean>>(
+    {}
+  );
 
   const partosHydrated: PartoUI[] = useMemo(() => {
     return (partos ?? []).map((p) => {
@@ -56,7 +59,7 @@ const GerenciarPartos: React.FC = () => {
 
       const ovelhaMae =
         p.mae?.id && ovinos
-          ? (ovinos.find((o) => o.id === p.mae.id) ?? p.mae)
+          ? (ovinos.find((o) => o.id === p.mae?.id) ?? p.mae)
           : p.mae;
 
       return { ...p, ovelhaPai, ovelhaMae };
@@ -64,22 +67,45 @@ const GerenciarPartos: React.FC = () => {
   }, [partos, ovinos]);
 
   useEffect(() => {
-    if (!partosHydrated.length) return;
+    if (!partosHydrated.length || !registros) return;
 
-    const fetchStatuses = async () => {
-      const statusMap: Record<number, boolean> = {};
+    const map: Record<number, boolean> = {};
 
-      for (const p of partosHydrated) {
-        if (!p.id) continue;
-        const status = await getRegistroStatusByEntityId(p.id, "parto");
-        statusMap[p.id] = status === false;
-      }
+    for (const p of partosHydrated) {
+      const reg = registros.find((r) => r.parto?.id === p.id);
+      if (!reg) continue;
 
-      setRegistroStatus(statusMap);
-    };
+      map[reg.idRegistro] = !reg.isSugestao;
+    }
 
-    fetchStatuses();
-  }, [partosHydrated]);
+    setRegistroStatus(map);
+  }, [partosHydrated, registros]);
+
+  const handleConfirm = async (parto: PartoUI) => {
+    if (!registros) return;
+
+    const reg = registros.find((r) => r.parto?.id === parto.id);
+    if (!reg) {
+      toast.error("Registro não encontrado para este parto.");
+      return;
+    }
+
+    const ok = await updateRegistroSugestao(reg);
+    if (!ok) return;
+
+    toast.success("Registro confirmado!");
+
+    setRegistroStatus((prev) => ({
+      ...prev,
+      [reg.idRegistro]: true,
+    }));
+
+    setRegistros((prev) =>
+      prev.map((x) =>
+        x.idRegistro === reg.idRegistro ? { ...x, isSugestao: false } : x
+      )
+    );
+  };
 
   const filtered: PartoUI[] = useMemo(() => {
     const query = normalize(q.trim());
@@ -96,6 +122,7 @@ const GerenciarPartos: React.FC = () => {
         }
 
         if (!query) return true;
+
         const campos = [
           p.ovelhaPai?.nome ?? "",
           p.ovelhaMae?.nome ?? "",
@@ -111,15 +138,18 @@ const GerenciarPartos: React.FC = () => {
       .sort((a, b) => {
         const da = new Date(a.dataParto ?? "").getTime();
         const db = new Date(b.dataParto ?? "").getTime();
-        return (db || 0) - (da || 0);
+        return db - da;
       });
   }, [partosHydrated, q, dateFrom, dateTo]);
 
   const totalPages = viewAll
     ? 1
     : Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+
   const currentPage = viewAll ? 1 : Math.min(page, totalPages);
+
   const startIdx = (currentPage - 1) * PAGE_SIZE;
+
   const pageItems = viewAll
     ? filtered
     : filtered.slice(startIdx, startIdx + PAGE_SIZE);
@@ -139,6 +169,7 @@ const GerenciarPartos: React.FC = () => {
     <div className="partos-page">
       <div className="partos-header flex">
         <h2>Partos</h2>
+
         <Link to="/dashboard/ovinos/partos/criar">
           <Button type="button" variant="cardPrimary">
             Novo Parto
@@ -168,15 +199,23 @@ const GerenciarPartos: React.FC = () => {
         <div className="partos-empty">Nenhum parto encontrado.</div>
       ) : (
         <div className="partos-list">
-          {pageItems.map((p) => (
-            <PartoCard
-              key={p.id}
-              parto={p}
-              confirmado={registroStatus[p.id ?? 0] ?? false}
-              onView={() => setSelectedParto(p)}
-              onConfirm={handleConfirm}
-            />
-          ))}
+          {pageItems.map((p) => {
+            const reg = registros?.find((r) => r.parto?.id === p.id);
+
+            const confirmado = reg
+              ? registroStatus[reg.idRegistro] ?? !reg.isSugestao
+              : false;
+
+            return (
+              <PartoCard
+                key={p.id}
+                parto={p}
+                confirmado={confirmado}
+                onView={() => setSelectedParto(p)}
+                onConfirm={() => handleConfirm(p)}
+              />
+            );
+          })}
         </div>
       )}
 
@@ -185,7 +224,7 @@ const GerenciarPartos: React.FC = () => {
           <PaginationMenu
             currentPage={currentPage}
             totalPages={totalPages}
-            onPageChange={(p) => setPage(p)}
+            onPageChange={setPage}
             showViewAll={filtered.length > PAGE_SIZE}
             onViewAll={() => {
               setViewAll(true);

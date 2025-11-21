@@ -34,6 +34,7 @@
   flex-direction: column;
   z-index: 9999;
   overflow: hidden;
+  resize: both;
 }
 
 .ia-header {

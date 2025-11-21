@@ -71,7 +71,7 @@ const CadastrarOvino: React.FC<CadastrarOvinoProps> = ({
   const [idCompra, setIdCompra] = useState(compraId ? String(compraId) : "");
 
   const { compras, loading, error } = useCompras();
-  const { ovinos, loading: loadingOvinos, error: errorOvinos } = useOvinos();
+  const { ovinos } = useOvinos();
   const { salvar, loading: saving, error: errorSalvar } = useSalvarOvino();
   const { partos, loading: loadingPartos, error: errorPartos } = usePartos();
 

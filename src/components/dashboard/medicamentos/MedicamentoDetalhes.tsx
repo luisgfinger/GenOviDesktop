@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import { toast } from "react-toastify";
 import DetalhesBase, { type CampoConfig } from "../../common/detalhesBase/DetalhesBase";
 import { MedicamentoService } from "../../../api/services/medicamento/MedicamentoService";
 import type { MedicamentoResponseDTO } from "../../../api/dtos/medicamento/MedicamentoResponseDTO";
@@ -116,7 +115,7 @@ const MedicamentoDetalhes: React.FC<MedicamentoDetalhesProps> = ({
           "—"
         ),
 
-      renderEdit: (valor, onChange) => (
+      renderEdit: (onChange) => (
         <li className="medicamento-doencas2 flex-column">
           {loadingDoenc ? (
             <p>Carregando doenças...</p>

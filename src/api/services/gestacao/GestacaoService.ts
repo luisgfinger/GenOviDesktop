@@ -13,7 +13,6 @@ function mapReproducao(r: any): ReproducaoResponseDTO | undefined {
     ovelha: r.ovelhaId ?? r.ovelhaMae?.id ?? null,
     enumReproducao: r.enumReproducao ?? "",
     dataReproducao: r.dataReproducao ?? "",
-    observacoes: r.observacoes ?? null,
   };
 }
 
@@ -49,7 +48,7 @@ export class GestacaoService {
       const { data } = await Api.get<any[]>("/user/gestacoes");
       return data.map(mapGestacao);
     } catch (err: any) {
-      console.error("❌ Erro ao carregar gestações:", err.response?.data || err);
+      console.error("Erro ao carregar gestações:", err.response?.data || err);
       throw new Error("Não foi possível carregar as gestações.");
     }
   }

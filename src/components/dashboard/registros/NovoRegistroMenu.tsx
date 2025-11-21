@@ -13,11 +13,11 @@ const NovoRegistroMenu: React.FC<NovoRegistroMenuProps> = ({ onClose }) => {
   const opcoes = [
     { label: "Vacinação", rota: "/dashboard/ovinos/aplicacoes/cadastrar/vacina" },
     { label: "Medicação", rota: "/dashboard/ovinos/aplicacoes/cadastrar/medicamento" },
-    { label: "Reprodução", rota: "//dashboard/ovinos/reproducoes/criar" },
+    { label: "Reprodução", rota: "/dashboard/ovinos/reproducoes/criar" },
     { label: "Gestação", rota: "/dashboard/ovinos/gestacoes/criar" },
     { label: "Parto", rota: "/dashboard/ovinos/partos/criar" },
     { label: "Adoecimento", rota: "/dashboard/ovinos/doencas/adoecimento" },
-    {label: "Pesagem", rota: "/dashboard/ovinos/pesagem/criar"},
+    {label: "Pesagem", rota: "/dashboard/ovinos/pesagens/criar"},
   ];
 
   const handleSelect = (rota: string) => {

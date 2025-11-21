@@ -8,7 +8,6 @@ import type { AplicacaoResponseDTO } from "../../../../api/dtos/aplicacao/Aplica
 interface AplicacaoCardProps {
   aplicacao: AplicacaoResponseDTO;
   onView: () => void;
-  onEdit?: () => void;
   confirmado: boolean;
   onConfirm: () => void;
 }
@@ -16,7 +15,6 @@ interface AplicacaoCardProps {
 const AplicacaoCard: React.FC<AplicacaoCardProps> = ({
   aplicacao,
   onView,
-  onEdit,
   confirmado,
   onConfirm,
 }) => {

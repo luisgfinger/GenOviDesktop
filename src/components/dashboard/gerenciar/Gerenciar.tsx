@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useMemo, useState } from "react";
 import "./Gerenciar.css";
 
 import PaginationMenu from "../../common/paginationMenu/PaginationMenu";
