@@ -29,7 +29,7 @@ function normalize(s?: string) {
 const PAGE_SIZE = 5;
 
 const GerenciarOcorrenciasDoenca: React.FC = () => {
-  const { ocorrencias, loading, error } = useOcorrenciasDoenca();
+  const { ocorrencias, loading, error, setOcorrencias } = useOcorrenciasDoenca();
   const { editarOcorrencia } = useEditarOcorrenciaDoenca();
 
   const { registros, setRegistros } = useRegistros();
@@ -154,28 +154,37 @@ const GerenciarOcorrenciasDoenca: React.FC = () => {
   };
 
   const handleMarkCurado = async (ocorrencia: OcorrenciaDoencaResponseDTO) => {
-    if (!ocorrencia.id) return;
+  if (!ocorrencia.id) return;
 
-    if (!window.confirm(`Deseja marcar a ocorrência do ovino "${ocorrencia.ovino?.nome}" como curada?`))
-      return;
+  if (!window.confirm(`Deseja marcar a ocorrência do ovino "${ocorrencia.ovino?.nome}" como curada?`))
+    return;
 
-    try {
-      const dataFinalAtual = new Date().toISOString();
+  try {
+    const dataFinalAtual = new Date().toISOString();
 
-      await editarOcorrencia(ocorrencia.id, {
-        ovinoId: ocorrencia.ovino?.id ?? null,
-        doencaId: ocorrencia.doenca?.id ?? null,
-        dataInicio: ocorrencia.dataInicio ?? "",
-        dataFinal: dataFinalAtual,
-        curado: true,
-      });
+    await editarOcorrencia(ocorrencia.id, {
+      ovinoId: ocorrencia.ovino?.id ?? null,
+      doencaId: ocorrencia.doenca?.id ?? null,
+      dataInicio: ocorrencia.dataInicio ?? "",
+      dataFinal: dataFinalAtual,
+      curado: true,
+    });
 
-      toast.success("Ocorrência marcada como curada!");
-    } catch (err) {
-      console.error(err);
-      toast.error("Erro ao marcar ocorrência como curada.");
-    }
-  };
+    setOcorrencias(prev =>
+      prev.map(o =>
+        o.id === ocorrencia.id
+          ? { ...o, curado: true, dataFinal: dataFinalAtual }
+          : o
+      )
+    );
+
+    toast.success("Ocorrência marcada como curada!");
+  } catch (err) {
+    console.error(err);
+    toast.error("Erro ao marcar ocorrência como curada.");
+  }
+};
+
 
   if (loading) return <p>Carregando ocorrências de doenças…</p>;
   if (error) return <p style={{ color: "red" }}>{error}</p>;
