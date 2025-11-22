@@ -1,6 +1,6 @@
 .usuarioCard-container {
   background-color: var(--primary-color);
-  height: 310px;
+  height: 280px;
   width: 250px;
   border-radius: 10px;
   transition: transform 0.3s ease;

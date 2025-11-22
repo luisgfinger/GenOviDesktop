@@ -23,11 +23,10 @@ export const iaRouteConfig: IARouteConfig[] = [
     permitirInputUsuario: true,
     buildPromptHeader: () => "Pergunta:",
     promptOptions: [
-      "Analise o peso deste ovino",
-      "Ele está acima ou abaixo do ideal?",
-      "Quais doenças ele já teve?",
-      "Avaliação genética",
-      "Serve para reprodução?",
+      "Quais doenças já teve?",
+      "Alguma doença que impeça reprodução?",
+      "Alguma doença geneticamente transmissível?",
+      "Está em idade reprodutiva?",
     ],
   },
 
@@ -37,10 +36,8 @@ export const iaRouteConfig: IARouteConfig[] = [
     buildPromptHeader: () => "Pergunta:",
     promptOptions: [
       "Esta combinação genética é boa?",
-      "A fêmea pode reproduzir neste momento?",
       "Existe risco nessa reprodução?",
       "O macho é adequado para cobertura?",
-      "Previsão de características dos cordeiros",
     ],
   },
 ];

@@ -9,6 +9,7 @@ interface UsuarioCardProps {
   roles: Role[];
   funcionarioNome?: string;
   autenticacao2fa?: boolean | null;
+  onClick?: () => void;
 }
 
 const UsuarioCard: React.FC<UsuarioCardProps> = ({
@@ -17,11 +18,15 @@ const UsuarioCard: React.FC<UsuarioCardProps> = ({
   roles,
   funcionarioNome,
   autenticacao2fa,
+  onClick,
 }) => {
   const emailPrefix = email.split("@")[0];
 
   return (
-    <ul className="usuarioCard-container flex-column">
+    <ul
+      className="usuarioCard-container flex-column"
+      style={{ cursor: onClick ? "pointer" : "default" }}
+    >
       <li className="flex">
         <div className="flex-column">
           <h3>{emailPrefix}</h3>
@@ -53,8 +58,12 @@ const UsuarioCard: React.FC<UsuarioCardProps> = ({
       </li>
 
       <li className="usuarioCard-buttons flex-column">
-        <Button variant="cardPrimary">Ver mais</Button>
-        <Button variant="cardSecondary">Gerenciar acessos</Button>
+        <Button
+          variant="cardPrimary"
+          onClick={onClick}
+        >
+          Ver mais
+        </Button>
       </li>
     </ul>
   );

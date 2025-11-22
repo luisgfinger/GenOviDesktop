@@ -6,6 +6,7 @@ import {
   fromUsuarioResponseDTO,
   toUsuarioRequestDTO,
 } from "../../mappers/usuario/UsuarioMapper";
+import type { UsuarioUpdateDTO } from "../../dtos/usuario/UsuarioUpdateDTO";
 
 export const UsuarioService = {
   async listar(): Promise<Usuario[]> {
@@ -25,9 +26,11 @@ export const UsuarioService = {
     return fromUsuarioResponseDTO(response.data);
   },
 
-  async atualizar(id: number, usuario: Usuario): Promise<Usuario> {
-    const dto: UsuarioRequestDTO = toUsuarioRequestDTO(usuario);
-    const response = await Api.put<UsuarioResponseDTO>(`/auth/usuarios/${id}`, dto);
+  async atualizar(id: number, usuario: UsuarioUpdateDTO): Promise<Usuario> {
+    const response = await Api.put<UsuarioResponseDTO>(
+      `/auth/usuarios/${id}`,
+      usuario
+    );
     return fromUsuarioResponseDTO(response.data);
   },
 

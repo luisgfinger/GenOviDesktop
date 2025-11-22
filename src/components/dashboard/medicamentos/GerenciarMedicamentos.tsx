@@ -131,7 +131,7 @@ const GerenciarMedicamentos: React.FC<GerenciarMedicamentosProps> = ({
             href={`/dashboard/ovinos/${
               isVacina ? "vacinas" : "medicamentos"
             }/criar`}
-            style={{ width: "250px", height: "380px" }}
+            style={{ width: "300px", height: "280px" }}
           />
         )}
       </div>

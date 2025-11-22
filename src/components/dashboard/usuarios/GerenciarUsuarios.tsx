@@ -5,6 +5,7 @@ import PaginationMenu from "../../common/paginationMenu/PaginationMenu";
 import OptionCard from "../../common/cards/optionCard/OptionCard";
 import UsuarioCard from "../../common/cards/usuarioCard/UsuarioCard";
 import UsuarioListSheet from "./usuarioListSheet/UsuarioListSheet";
+import UsuarioDetalhes from "./UsuarioDetalhes";
 import FilterBar from "../../common/filter-bar/FilterBar";
 import Add from "../../../assets/icons/add.png";
 
@@ -18,6 +19,7 @@ const GerenciarUsuarios: React.FC = () => {
   const [q, setQ] = useState("");
   const [role, setRole] = useState<string>("TODOS");
   const [ativo, setAtivo] = useState<string>("TODOS");
+  const [selectedUser, setSelectedUser] = useState<any>(null);
 
   const itemsPerPage = 8;
 
@@ -95,6 +97,7 @@ const GerenciarUsuarios: React.FC = () => {
               roles={usuario.enumRoles}
               funcionarioNome={usuario.funcionario?.nome}
               autenticacao2fa={usuario.autenticacao2fa}
+              onClick={() => setSelectedUser(usuario)}
             />
           ))}
 
@@ -103,7 +106,7 @@ const GerenciarUsuarios: React.FC = () => {
             images={[{ src: Add, alt: "add" }]}
             text="Cadastrar"
             href="/dashboard/usuarios/cadastrar"
-            style={{ width: "250px", height: "310px" }}
+            style={{ width: "250px", height: "280px" }}
           />
         </div>
       )}
@@ -125,6 +128,13 @@ const GerenciarUsuarios: React.FC = () => {
         >
           Ver menos
         </button>
+      )}
+
+      {selectedUser && (
+        <UsuarioDetalhes
+          usuario={selectedUser}
+          onClose={() => setSelectedUser(null)}
+        />
       )}
     </div>
   );
