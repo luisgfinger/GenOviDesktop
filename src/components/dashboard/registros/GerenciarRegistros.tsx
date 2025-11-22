@@ -55,7 +55,7 @@ const GerenciarRegistros: React.FC = () => {
   const [status, setStatus] =
     useState<"TODOS" | "CONFIRMADO" | "NAO_CONFIRMADO">("TODOS");
 
-  const [tipo, setTipo] = useState("TODOS"); // ✔ NOVO FILTRO
+  const [tipo, setTipo] = useState("TODOS");
 
   const [page, setPage] = useState(1);
   const [viewAll, setViewAll] = useState(false);
@@ -124,7 +124,6 @@ const GerenciarRegistros: React.FC = () => {
     );
   };
 
-  // 👇 FILTRO COMPLETO (COM FILTRO DE TIPO)
   const filtered: RegistroResponseDTO[] = useMemo(() => {
     const query = normalize(q.trim());
     const df = dateFrom ? new Date(`${dateFrom}T00:00:00`) : null;
@@ -132,7 +131,6 @@ const GerenciarRegistros: React.FC = () => {
 
     return items
       .filter((r) => {
-        // FILTRO POR DATA
         if (df || dt) {
           const d = new Date(r.dataRegistro ?? "");
           if (Number.isNaN(d.getTime())) return false;
@@ -140,21 +138,16 @@ const GerenciarRegistros: React.FC = () => {
           if (dt && d > dt) return false;
         }
 
-        // FILTRO POR FUNCIONARIO
         if (funcionario !== "TODOS" && r.funcionario?.nome !== funcionario)
           return false;
 
-        // FILTRO POR STATUS
         if (status === "CONFIRMADO" && r.isSugestao) return false;
         if (status === "NAO_CONFIRMADO" && !r.isSugestao) return false;
-
-        // ✔ FILTRO POR TIPO
         if (tipo !== "TODOS") {
           const t = getTipoRegistro(r);
           if (t !== tipo) return false;
         }
 
-        // FILTRO POR TEXTO
         if (!query) return true;
 
         const campos = [
@@ -190,7 +183,7 @@ const GerenciarRegistros: React.FC = () => {
     setDateTo("");
     setFuncionario("TODOS");
     setStatus("TODOS");
-    setTipo("TODOS"); // ✔ reset
+    setTipo("TODOS"); 
     setPage(1);
     setViewAll(false);
   };
@@ -238,7 +231,6 @@ const GerenciarRegistros: React.FC = () => {
         </Button>
       </div>
 
-      {/* ---------------- FILTER BAR ---------------- */}
       <FilterBar
         q={q}
         setQ={setQ}
@@ -279,7 +271,6 @@ const GerenciarRegistros: React.FC = () => {
         <strong>{filtered.length}</strong> resultado(s).
       </div>
 
-      {/* ---------------- LIST OF REGISTROS ---------------- */}
       {pageItems.length === 0 ? (
         <div className="registro-empty">Nenhum registro encontrado.</div>
       ) : (
@@ -422,7 +413,6 @@ const GerenciarRegistros: React.FC = () => {
         </div>
       )}
 
-      {/* ---------------- MODAIS DE DETALHES ---------------- */}
       {selected && selectedTipo && (() => {
         const entidade =
           selected[selectedTipo as keyof RegistroResponseDTO] as any;

@@ -30,7 +30,6 @@ const FuncionarioListSheet: React.FC<FuncionarioListSheetProps> = ({ funcionario
           >
             <FuncionarioCard
               cpfCnpj={selectedFuncionario.cpfCnpj}
-              endereco={selectedFuncionario.endereco}
               nome={selectedFuncionario.nome}
               telefone={selectedFuncionario.telefone}
               dataAdmissao={selectedFuncionario.dataAdmissao}/>

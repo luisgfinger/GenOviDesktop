@@ -13,8 +13,11 @@ import Compra from "../../../assets/icons/buy.png";
 import Pesagem from "../../../assets/icons/balance.png";
 
 import "./DashboardMenu.css";
+import { useIsAdmin } from "../../../api/hooks/useIsAdmin";
 
 const DashboardMenu: React.FC = () => {
+  const isAdmin = useIsAdmin();
+
   const ovinosCardOptions = [
     {
       images: [{ src: Add, alt: "add" }],
@@ -29,44 +32,145 @@ const DashboardMenu: React.FC = () => {
   ];
 
   const ovinosCardOptions2 = [
-    { images: [{ src: Vacina, alt: "vacina" }], text: "Vacinas", href: "/", childrenCount: 4 },
-    { images: [{ src: Medicamento, alt: "medicamento" }], text: "Medicamentos", href: "/", childrenCount: 4 },
-    { images: [{ src: Doenca, alt: "doença" }], text: "Doenças", href: "/", childrenCount: 3 },
-    { images: [{ src: Reproducao, alt: "reproducao" }], text: "Reproduções", href: "/", childrenCount: 2 },
-    { images: [{ src: Gestacao, alt: "gestacao" }], text: "Gestações", href: "/", childrenCount: 2 },
-    { images: [{ src: Amamentacao, alt: "amamentacao" }], text: "Partos", href: "/", childrenCount: 2 },
-    { images: [{ src: Pesagem, alt: "pesagem" }], text: "Pesagens", href: "/dashboard/ovinos/pesagens/gerenciar", childrenCount: 2 },
+    { images: [{ src: Vacina, alt: "vacina" }], text: "Vacinas", href: "/" },
+    {
+      images: [{ src: Medicamento, alt: "medicamento" }],
+      text: "Medicamentos",
+      href: "/",
+    },
+    { images: [{ src: Doenca, alt: "doença" }], text: "Doenças", href: "/" },
+    {
+      images: [{ src: Reproducao, alt: "reproducao" }],
+      text: "Reproduções",
+      href: "/",
+    },
+    {
+      images: [{ src: Gestacao, alt: "gestacao" }],
+      text: "Gestações",
+      href: "/",
+    },
+    {
+      images: [{ src: Amamentacao, alt: "amamentacao" }],
+      text: "Partos",
+      href: "/",
+    },
+    {
+      images: [{ src: Pesagem, alt: "pesagem" }],
+      text: "Pesagens",
+      href: "/dashboard/ovinos/pesagens/gerenciar",
+    },
   ];
 
   const ovinoChildrenOptions = [
-    { text: "Registrar vacinação", href: "/dashboard/ovinos/aplicacoes/cadastrar/vacina" },
-    { text: "Gerenciar vacinanões", href: "/dashboard/ovinos/vacinas/vacinacoes" },
-    { text: "Cadastrar vacina", href: "/dashboard/ovinos/vacinas/criar" },
-    { text: "Gerenciar vacinas", href: "/dashboard/ovinos/vacinas/gerenciar" },
+    {
+      group: 1,
+      text: "Registrar vacinação",
+      href: "/dashboard/ovinos/aplicacoes/cadastrar/vacina",
+    },
+    {
+      group: 1,
+      text: "Gerenciar vacinanões",
+      href: "/dashboard/ovinos/vacinas/vacinacoes",
+    },
+    {
+      group: 1,
+      text: "Cadastrar vacina",
+      href: "/dashboard/ovinos/vacinas/criar",
+      adminOnly: true,
+    },
+    {
+      group: 1,
+      text: "Gerenciar vacinas",
+      href: "/dashboard/ovinos/vacinas/gerenciar",
+    },
 
-    { text: "Registrar aplicação", href: "/dashboard/ovinos/aplicacoes/cadastrar/medicamento" },
-    { text: "Gerenciar aplicações", href: "/dashboard/ovinos/medicamentos/medicacoes" },
-    { text: "Cadastrar medicamento", href: "/dashboard/ovinos/medicamentos/criar" },
-    { text: "Gerenciar medicamentos", href: "/dashboard/ovinos/medicamentos/gerenciar" },
+    {
+      group: 2,
+      text: "Registrar aplicação",
+      href: "/dashboard/ovinos/aplicacoes/cadastrar/medicamento",
+    },
+    {
+      group: 2,
+      text: "Gerenciar aplicações",
+      href: "/dashboard/ovinos/medicamentos/medicacoes",
+    },
+    {
+      group: 2,
+      text: "Cadastrar medicamento",
+      href: "/dashboard/ovinos/medicamentos/criar",
+      adminOnly: true,
+    },
+    {
+      group: 2,
+      text: "Gerenciar medicamentos",
+      href: "/dashboard/ovinos/medicamentos/gerenciar",
+    },
 
-    { text: "Registrar adoecimento", href: "/dashboard/ovinos/doencas/adoecimento" },
-    { text: "Animais doentes", href: "/dashboard/ovinos/doencas/doentes" },
-    { text: "Gerenciar doenças", href: "/dashboard/ovinos/doencas/gerenciar" },
+    {
+      group: 3,
+      text: "Registrar adoecimento",
+      href: "/dashboard/ovinos/doencas/adoecimento",
+    },
+    {
+      group: 3,
+      text: "Animais doentes",
+      href: "/dashboard/ovinos/doencas/doentes",
+    },
+    {
+      group: 3,
+      text: "Gerenciar doenças",
+      href: "/dashboard/ovinos/doencas/gerenciar",
+    },
 
-    { text: "Registrar reprodução", href: "/dashboard/ovinos/reproducoes/criar" },
-    { text: "Gerenciar reproduções", href: "/dashboard/ovinos/reproducoes/gerenciar" },
+    {
+      group: 4,
+      text: "Registrar reprodução",
+      href: "/dashboard/ovinos/reproducoes/criar",
+    },
+    {
+      group: 4,
+      text: "Gerenciar reproduções",
+      href: "/dashboard/ovinos/reproducoes/gerenciar",
+    },
 
-    { text: "Registrar gestação", href: "/dashboard/ovinos/gestacoes/criar" },
-    { text: "Gerenciar gestações", href: "/dashboard/ovinos/gestacoes/gerenciar" },
+    {
+      group: 5,
+      text: "Registrar gestação",
+      href: "/dashboard/ovinos/gestacoes/criar",
+    },
+    {
+      group: 5,
+      text: "Gerenciar gestações",
+      href: "/dashboard/ovinos/gestacoes/gerenciar",
+    },
 
-    { text: "Registrar parto", href: "/dashboard/ovinos/partos/criar" },
-    { text: "Gerenciar partos", href: "/dashboard/ovinos/partos/gerenciar" },
+    {
+      group: 6,
+      text: "Registrar parto",
+      href: "/dashboard/ovinos/partos/criar",
+    },
+    {
+      group: 6,
+      text: "Gerenciar partos",
+      href: "/dashboard/ovinos/partos/gerenciar",
+    },
 
-    { text: "Registrar pesagem", href: "/dashboard/ovinos/pesagens/criar" },
-    { text: "Gerenciar pesagens", href: "/dashboard/ovinos/pesagens/gerenciar" },
+    {
+      group: 7,
+      text: "Registrar pesagem",
+      href: "/dashboard/ovinos/pesagens/criar",
+    },
+    {
+      group: 7,
+      text: "Gerenciar pesagens",
+      href: "/dashboard/ovinos/pesagens/gerenciar",
+    },
   ];
 
-  let start = 0;
+  const filteredChildrenOptions = ovinoChildrenOptions.filter((item) => {
+    if (item.adminOnly && !isAdmin) return false;
+    return true;
+  });
 
   return (
     <ul className="dashboardMenu-content flex-column">
@@ -84,15 +188,16 @@ const DashboardMenu: React.FC = () => {
           />
         ))}
       </li>
+
       <li>
         <h3>Saúde e Reprodução</h3>
       </li>
 
       <li className="dashboardMenu-content-optionsLine flex">
         {ovinosCardOptions2.map((option, index) => {
-          const end = start + option.childrenCount;
-          const childrenForCard = ovinoChildrenOptions.slice(start, end);
-          start = end;
+          const childrenForCard = filteredChildrenOptions.filter(
+            (child) => child.group === index + 1
+          );
 
           return (
             <OptionCard
@@ -105,21 +210,32 @@ const DashboardMenu: React.FC = () => {
           );
         })}
       </li>
-      <li>
-        <h3>Entrada e Saída</h3>
-      </li>
 
-      <li className="dashboardMenu-content-optionsLine flex">
-        <OptionCard
-          images={[{ src: Compra, alt: "compra" }]}
-          text="Compra"
-          href="/dashboard/ovinos/compra/gerenciar"
-          childrenOptions={[
-            { text: "Registrar compra", href: "/dashboard/ovinos/compra/criar" },
-            { text: "Gerenciar compras", href: "/dashboard/ovinos/compra/gerenciar" },
-          ]}
-        />
-      </li>
+      {isAdmin && (
+        <ul>
+          <li>
+            <h3>Entrada e Saída</h3>
+          </li>
+
+          <li className="dashboardMenu-content-optionsLine flex">
+            <OptionCard
+              images={[{ src: Compra, alt: "compra" }]}
+              text="Compra"
+              href="/dashboard/ovinos/compra/gerenciar"
+              childrenOptions={[
+                {
+                  text: "Registrar compra",
+                  href: "/dashboard/ovinos/compra/criar",
+                },
+                {
+                  text: "Gerenciar compras",
+                  href: "/dashboard/ovinos/compra/gerenciar",
+                },
+              ]}
+            />
+          </li>
+        </ul>
+      )}
     </ul>
   );
 };

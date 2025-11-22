@@ -13,6 +13,7 @@ import {
 import type { MedicamentoResponseDTO } from "../../../api/dtos/medicamento/MedicamentoResponseDTO";
 import MedicamentoDetalhes from "./MedicamentoDetalhes";
 import FilterBar from "../../common/filter-bar/FilterBar";
+import { useIsAdmin } from "../../../api/hooks/useIsAdmin";
 
 interface GerenciarMedicamentosProps {
   isVacina: boolean;
@@ -29,6 +30,8 @@ const GerenciarMedicamentos: React.FC<GerenciarMedicamentosProps> = ({
   const [viewAll, setViewAll] = useState(false);
   const [selectedMedicamento, setSelectedMedicamento] =
     useState<MedicamentoResponseDTO | null>(null);
+
+  const isAdmin = useIsAdmin();
 
   const itemsPerPage = 6;
 
@@ -120,15 +123,17 @@ const GerenciarMedicamentos: React.FC<GerenciarMedicamentosProps> = ({
           />
         ))}
 
-        <OptionCard
-          key="add-medicamento"
-          images={[{ src: Add, alt: "add" }]}
-          text={`Cadastrar ${isVacina ? "Vacina" : "Medicamento"}`}
-          href={`/dashboard/ovinos/${
-            isVacina ? "vacinas" : "medicamentos"
-          }/criar`}
-          style={{ width: "250px", height: "380px" }}
-        />
+        {isAdmin && (
+          <OptionCard
+            key="add-medicamento"
+            images={[{ src: Add, alt: "add" }]}
+            text={`Cadastrar ${isVacina ? "Vacina" : "Medicamento"}`}
+            href={`/dashboard/ovinos/${
+              isVacina ? "vacinas" : "medicamentos"
+            }/criar`}
+            style={{ width: "250px", height: "380px" }}
+          />
+        )}
       </div>
 
       {!viewAll && filteredMedicamentos.length > itemsPerPage && (

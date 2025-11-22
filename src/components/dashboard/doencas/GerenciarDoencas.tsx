@@ -13,6 +13,7 @@ import {
 import type { DoencaResponseDTO } from "../../../api/dtos/doenca/DoencaResponseDTO";
 import DoencaDetalhes from "./DoencaDetalhes";
 import FilterBar from "../../common/filter-bar/FilterBar";
+import { useIsAdmin } from "../../../api/hooks/useIsAdmin";
 
 const GerenciarDoencas: React.FC = () => {
   const { doencas, loading: loadingDoencas } = useDoencas();
@@ -23,6 +24,8 @@ const GerenciarDoencas: React.FC = () => {
   const [viewAll, setViewAll] = useState(false);
   const [selectedDoenca, setSelectedDoenca] =
     useState<DoencaResponseDTO | null>(null);
+
+  const isAdmin = useIsAdmin();
 
   const itemsPerPage = 6;
 
@@ -37,11 +40,9 @@ const GerenciarDoencas: React.FC = () => {
     if (!query) return doencas;
 
     return doencas.filter((d) => {
-      const campos = [
-        d.id.toString(),
-        d.nome ?? "",
-        d.descricao ?? "",
-      ].map((x) => normalize(x));
+      const campos = [d.id.toString(), d.nome ?? "", d.descricao ?? ""].map(
+        (x) => normalize(x)
+      );
 
       return campos.some((c) => c.includes(query));
     });
@@ -104,13 +105,15 @@ const GerenciarDoencas: React.FC = () => {
           />
         ))}
 
-        <OptionCard
-          key="add-doenca"
-          images={[{ src: Add, alt: "add" }]}
-          text="Cadastrar Doença"
-          href="/dashboard/ovinos/doencas/criar"
-          style={{ width: "300px", height: "250px" }}
-        />
+        {isAdmin && (
+          <OptionCard
+            key="add-doenca"
+            images={[{ src: Add, alt: "add" }]}
+            text="Cadastrar Doença"
+            href="/dashboard/ovinos/doencas/criar"
+            style={{ width: "300px", height: "250px" }}
+          />
+        )}
       </div>
 
       {!viewAll && filteredDoencas.length > itemsPerPage && (

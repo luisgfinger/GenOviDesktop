@@ -27,7 +27,6 @@ const DoencaCard: React.FC<DoencaCardProps> = ({
 
       <li className="middle-column flex-column">
         <span className="flex-column">
-          <strong>Descrição:</strong>
           <p>{descricao || "—"}</p>
         </span>
       </li>

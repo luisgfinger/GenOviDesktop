@@ -14,7 +14,6 @@ const Navbar: React.FC = () => {
   const items = isLoggedIn
     ? [
         { label: "Dashboard", href: "/dashboard/ovinos" },
-        { label: "Perfil", href: "/profile" },
       ]
     : [
         { label: "Sobre nós", href: "#home" },
@@ -45,7 +44,7 @@ const Navbar: React.FC = () => {
         ))}
 
         {isLoggedIn && (
-          <li>Usuário: {localStorage.getItem("funcionarioNome")} - {isAdmin && "Admin"}</li>
+          <li>Usuário: {localStorage.getItem("funcionarioNome")} {isAdmin && "- Admin"}</li>
         )}
       </ul>
       {isLoggedIn && (
