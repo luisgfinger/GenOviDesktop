@@ -178,7 +178,6 @@ const Gerenciar: React.FC<GerenciarProps> = ({ type }) => {
                 <FuncionarioCard
                   key={funcionario.id}
                   nome={funcionario.nome}
-                  endereco={funcionario.endereco}
                   telefone={funcionario.telefone}
                   cpfCnpj={funcionario.cpfCnpj}
                   dataAdmissao={funcionario.dataAdmissao}
@@ -190,7 +189,7 @@ const Gerenciar: React.FC<GerenciarProps> = ({ type }) => {
                 images={[{ src: Add, alt: "add" }]}
                 text="Cadastrar"
                 href="/dashboard/funcionarios/cadastrar"
-                style={{ width: "250px", height: "310px" }}
+                style={{ width: "270px", height: "270px" }}
               />
             </>
           )}

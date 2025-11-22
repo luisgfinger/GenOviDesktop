@@ -174,17 +174,6 @@ const CadastrarOcorrenciaDoenca: React.FC = () => {
               required
             />
           </li>
-
-          <li className="checkbox-sugestao">
-            <input
-              type="checkbox"
-              id="enviarSugestao"
-              checked={enviarSugestao}
-              onChange={(e) => setEnviarSugestao(e.target.checked)}
-            />
-            <label htmlFor="enviarSugestao">Enviar como solicitação</label>
-          </li>
-
           <div className="cadastrarOcorrenciaDoenca-form-navigation">
             <Button type="submit" variant="cardPrimary" disabled={saving}>
               {saving ? "Salvando..." : "Cadastrar adoecimento"}

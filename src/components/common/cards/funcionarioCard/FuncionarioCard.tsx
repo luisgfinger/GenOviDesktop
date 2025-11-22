@@ -1,11 +1,10 @@
 import React from "react";
 import "./FuncionarioCard.css";
 import Button from "../../buttons/Button";
-import { formatDate } from '../../../../utils/formatDate';
+import { formatDate } from "../../../../utils/formatDate";
 
 interface FuncionarioCardProps {
   nome: string;
-  endereco: string;
   telefone: string;
   dataAdmissao: string;
   cpfCnpj: string;
@@ -13,12 +12,10 @@ interface FuncionarioCardProps {
 
 const FuncionarioCard: React.FC<FuncionarioCardProps> = ({
   nome,
-  endereco,
   telefone,
   dataAdmissao,
   cpfCnpj,
 }) => {
-
   return (
     <ul className="funcionarioCard-container flex-column">
       <li className="flex">
@@ -27,11 +24,7 @@ const FuncionarioCard: React.FC<FuncionarioCardProps> = ({
         </div>
       </li>
       <li className="middle-column flex-column">
-         <span className="flex">
-          <h3>Endereço:</h3>
-          <p>{endereco}</p>
-        </span>
-         <span className="flex">
+        <span className="flex">
           <h3>Telefone:</h3>
           <p>{telefone}</p>
         </span>

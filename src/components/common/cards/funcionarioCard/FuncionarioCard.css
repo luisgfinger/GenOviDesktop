@@ -1,7 +1,7 @@
 .funcionarioCard-container {
   background-color: var(--primary-color);
-  height: 310px;
-  width: 250px;
+  height: 270px;
+  width: 270px;
   border-radius: 10px;
   transition: transform 0.3s ease;
   gap: 20px;

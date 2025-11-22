@@ -4,10 +4,12 @@ import LogoType from "../../common/logo/Logo";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../../context/AuthContext";
 import Button from "../../common/buttons/Button";
+import { useIsAdmin } from "../../../api/hooks/useIsAdmin";
 
 const Navbar: React.FC = () => {
   const navigate = useNavigate();
   const { isLoggedIn, logout } = useAuth();
+  const isAdmin = useIsAdmin();
 
   const items = isLoggedIn
     ? [
@@ -43,7 +45,7 @@ const Navbar: React.FC = () => {
         ))}
 
         {isLoggedIn && (
-          <li>Usuário: {localStorage.getItem("funcionarioNome")}</li>
+          <li>Usuário: {localStorage.getItem("funcionarioNome")} - {isAdmin && "Admin"}</li>
         )}
       </ul>
       {isLoggedIn && (

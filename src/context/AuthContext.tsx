@@ -1,27 +1,36 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { getUsuarioIdByEmail } from "../utils/getUsuarioIdByEmail";
-import { getFuncionarioIdByUsuarioId } from "../utils/getFuncionarioIdByUsuarioId";
 import { UsuarioService } from "../api/services/usuario/UsuarioService";
+import { isAdmin } from "../utils/isAdmin";
 
 interface AuthContextType {
   isLoggedIn: boolean;
   login: (email: string, token: string) => Promise<void>;
   logout: () => void;
   loading: boolean;
+  funcionarioNome: string | null;
+  isAdmin: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
-  children,
-}) => {
+export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [loading, setLoading] = useState(true);
+
+  const [funcionarioNome, setFuncionarioNome] = useState<string | null>(null);
+  const [isAdminState, setIsAdminState] = useState<boolean>(false);
 
   useEffect(() => {
     const email = localStorage.getItem("email");
     const token = localStorage.getItem("token");
     const loginTime = localStorage.getItem("loginTime");
+
+    const savedNome = localStorage.getItem("funcionarioNome");
+    const savedAdmin = localStorage.getItem("isAdmin");
+
+    if (savedNome) setFuncionarioNome(savedNome);
+    if (savedAdmin) setIsAdminState(savedAdmin === "true");
 
     if (email && token && loginTime) {
       const now = Date.now();
@@ -33,6 +42,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         logout();
       }
     }
+
     setLoading(false);
   }, []);
 
@@ -46,21 +56,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       const usuarioId = await getUsuarioIdByEmail();
       if (!usuarioId) return;
 
-      const funcionarioId = await getFuncionarioIdByUsuarioId(usuarioId);
-      if (!funcionarioId) {
-        localStorage.setItem("funcionarioNome", "Admin");
-        return;
-      }
       const usuario = await UsuarioService.buscarPorId(usuarioId);
-      const nomeFuncionario = usuario.funcionario?.nome ?? null;
 
-      if (nomeFuncionario) {
-        console.log(
-          "Salvando nome do funcionário no localStorage:",
-          nomeFuncionario
-        );
-        localStorage.setItem("funcionarioNome", nomeFuncionario);
-      }
+      const admin = isAdmin(usuario);
+      setIsAdminState(admin);
+      localStorage.setItem("isAdmin", String(admin));
+
+      const nomeFuncionario = usuario.funcionario?.nome ?? "Admin";
+      setFuncionarioNome(nomeFuncionario);
+      localStorage.setItem("funcionarioNome", nomeFuncionario);
+
     } catch (error) {
       console.error("Erro ao salvar nome do funcionário:", error);
     }
@@ -73,11 +78,24 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     localStorage.removeItem("usuarioId");
     localStorage.removeItem("funcionarioNome");
     localStorage.removeItem("funcionarioId");
+    localStorage.removeItem("isAdmin");
+
+    setFuncionarioNome(null);
+    setIsAdminState(false);
     setIsLoggedIn(false);
   };
 
   return (
-    <AuthContext.Provider value={{ isLoggedIn, login, logout, loading }}>
+    <AuthContext.Provider
+      value={{
+        isLoggedIn,
+        login,
+        logout,
+        loading,
+        funcionarioNome,
+        isAdmin: isAdminState,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );

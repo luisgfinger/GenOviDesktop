@@ -257,8 +257,6 @@ const CadastrarGestacao: React.FC = () => {
               required
             />
           </li>
-
-          {/* ✅ Checkbox para sugestão */}
           <li className="checkbox-sugestao">
             <input
               type="checkbox"
@@ -266,7 +264,7 @@ const CadastrarGestacao: React.FC = () => {
               checked={enviarSugestao}
               onChange={(e) => setEnviarSugestao(e.target.checked)}
             />
-            <label htmlFor="enviarSugestao">Enviar como sugestão</label>
+            <label htmlFor="enviarSugestao">Solicitar verificação</label>
           </li>
 
           <div className="cadastrarGestacao-form-navigation">
