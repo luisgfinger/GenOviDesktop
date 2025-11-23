@@ -15,7 +15,6 @@ import { usePartos } from "../../../api/hooks/parto/UsePartos";
 
 import type { ReproducaoRequestDTO } from "../../../api/dtos/reproducao/ReproducaoRequestDTO";
 import { formatDate } from "../../../utils/formatDate";
-import { createRegistroAuto } from "../../../utils/criarRegistro";
 import IAButton from "../../common/ia/IAButton";
 
 type Props = {
@@ -35,7 +34,11 @@ function diffMonthsFromNow(iso?: string): number {
 
 const CadastrarReproducao: React.FC<Props> = ({ minAgeMonths = 12 }) => {
   const { ovinos } = useOvinos();
-  const { criarReproducao, loading: saving, error: errorSalvar } = useCriarReproducao();
+  const {
+    criarReproducao,
+    loading: saving,
+    error: errorSalvar,
+  } = useCriarReproducao();
   const { gestacoes } = useGestacoes();
   const { partos } = usePartos();
 
@@ -45,6 +48,10 @@ const CadastrarReproducao: React.FC<Props> = ({ minAgeMonths = 12 }) => {
   const [dataReproducao, setDataReproducao] = useState<string>("");
   const [enviarSugestao, setEnviarSugestao] = useState<boolean>(false);
   const [contextoIA, setContextoIA] = useState<any>(null);
+
+   const idFuncionario = localStorage.getItem("funcionarioId")
+  ? Number(localStorage.getItem("funcionarioId"))
+  : 1;
 
   const isOvelhaGestando = (ovelhaId: number): boolean => {
     return (gestacoes ?? []).some((g) => {
@@ -97,18 +104,11 @@ const CadastrarReproducao: React.FC<Props> = ({ minAgeMonths = 12 }) => {
       ovelhaId: Number(femeaId),
       enumReproducao: typeReproducao as TypeReproducao,
       dataReproducao: `${dataReproducao}:00`,
+      idFuncionario: idFuncionario,
     };
 
     try {
-      const novaReproducao = await criarReproducao(dto);
-
-      const reproducaoFormatada = {
-        ...novaReproducao,
-        enumReproducao: novaReproducao.enumReproducao as TypeReproducao,
-      };
-
-      await createRegistroAuto("reproducao", reproducaoFormatada, enviarSugestao);
-
+      criarReproducao(dto);
       toast.success("Reprodução criada com sucesso!");
 
       setFemeaId("");
@@ -131,7 +131,10 @@ const CadastrarReproducao: React.FC<Props> = ({ minAgeMonths = 12 }) => {
 
   return (
     <div className="cadastrar-reproducao-bg flex-column">
-      <form className="cadastrarReproducao-container flex-column" onSubmit={handleSubmit}>
+      <form
+        className="cadastrarReproducao-container flex-column"
+        onSubmit={handleSubmit}
+      >
         <ul className="flex-column">
           <li className="flex-column">
             <label htmlFor="carneiroId">Macho</label>
@@ -143,7 +146,8 @@ const CadastrarReproducao: React.FC<Props> = ({ minAgeMonths = 12 }) => {
               <option value="">Selecione o macho adulto...</option>
               {machosAdultos.map((o) => (
                 <option key={o.id} value={o.id}>
-                  {o.nome} • {formatEnum(o.raca)} • {formatDate(o.dataNascimento ?? "-")}
+                  {o.nome} • {formatEnum(o.raca)} •{" "}
+                  {formatDate(o.dataNascimento ?? "-")}
                 </option>
               ))}
             </select>
@@ -158,7 +162,8 @@ const CadastrarReproducao: React.FC<Props> = ({ minAgeMonths = 12 }) => {
               <option value="">Selecione a fêmea...</option>
               {femeasAdultas.map((o) => (
                 <option key={o.id} value={String(o.id)}>
-                  {o.nome} • {formatEnum(o.raca)} • {formatDate(o.dataNascimento ?? "-")}
+                  {o.nome} • {formatEnum(o.raca)} •{" "}
+                  {formatDate(o.dataNascimento ?? "-")}
                 </option>
               ))}
             </select>
@@ -168,7 +173,9 @@ const CadastrarReproducao: React.FC<Props> = ({ minAgeMonths = 12 }) => {
             <select
               id="typeReproducao"
               value={typeReproducao}
-              onChange={(e) => setTypeReproducao(e.target.value as TypeReproducao)}
+              onChange={(e) =>
+                setTypeReproducao(e.target.value as TypeReproducao)
+              }
             >
               <option value="">Selecione...</option>
               {Object.values(TypeReproducao).map((t) => (

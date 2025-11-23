@@ -6,6 +6,7 @@ export const pesagemMapper = {
     idOvino: dto.ovinoId,
     dataPesagem: dto.dataPesagem,
     pesagem: dto.peso,
+    idFuncionario: dto.idFuncionario,
   }),
 
   fromResponse: (data: any): PesagemResponseDTO => ({

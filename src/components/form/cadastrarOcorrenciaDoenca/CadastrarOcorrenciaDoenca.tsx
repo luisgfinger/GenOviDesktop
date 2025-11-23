@@ -11,7 +11,6 @@ import type { OcorrenciaDoencaRequestDTO } from "../../../api/dtos/ocorrendiaDoe
 import type { DoencaResponseDTO } from "../../../api/dtos/doenca/DoencaResponseDTO";
 import { useDoencas } from "../../../api/hooks/doenca/UseDoencas";
 import { formatDate } from "../../../utils/formatDate";
-import { createRegistroAuto } from "../../../utils/criarRegistro";
 import { useNavigate } from "react-router-dom";
 
 import { DateToIsoString } from "../../../utils/dateToIsoString";
@@ -30,9 +29,12 @@ const CadastrarOcorrenciaDoenca: React.FC = () => {
   const [, setOvinoNome] = useState<string>("");
   const [dataInicio, setDataInicio] = useState<string>("");
 
-    const navigate = useNavigate();
+  const navigate = useNavigate();
 
-  const [enviarSugestao, setEnviarSugestao] = useState<boolean>(false);
+  const idFuncionario = localStorage.getItem("funcionarioId")
+  ? Number(localStorage.getItem("funcionarioId"))
+  : 1;
+
 
   const doencasById = useMemo(() => {
     const m = new Map<string, DoencaResponseDTO>();
@@ -67,6 +69,7 @@ const CadastrarOcorrenciaDoenca: React.FC = () => {
       doencaId: Number(doencaId),
       dataInicio: DateToIsoString((dataInicio)),
       curado: false,
+      idFuncionario: idFuncionario,
     };
 
     console.log("OcorrenciaDoenca DTO:", dto);
@@ -75,8 +78,6 @@ const CadastrarOcorrenciaDoenca: React.FC = () => {
       const novaOcorrencia = await criarOcorrencia(dto);
 
       console.log("Nova Ocorrencia Doenca criada:", novaOcorrencia);
-
-      await createRegistroAuto("ocorrenciaDoenca", novaOcorrencia, enviarSugestao);
 
       toast.success(
         <div
@@ -110,7 +111,6 @@ const CadastrarOcorrenciaDoenca: React.FC = () => {
       setOvinoId("");
       setDoencaId("");
       setDataInicio("");
-      setEnviarSugestao(false);
     } catch (err) {
       console.error(err);
       toast.error("Erro ao cadastrar adoecimento.");

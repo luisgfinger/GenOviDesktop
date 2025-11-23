@@ -12,7 +12,6 @@ import { DateToIsoString } from "../../../utils/dateToIsoString";
 
 import type { PesagemRequestDTO } from "../../../api/dtos/pesagem/PesagemRequestDTO";
 import { useNavigate } from "react-router-dom";
-import { createRegistroAuto } from "../../../utils/criarRegistro";
 
 const CadastrarPesagem: React.FC = () => {
   const { ovinos, loading: loadingOvinos, error: errorOvinos } = useOvinos();
@@ -24,6 +23,10 @@ const CadastrarPesagem: React.FC = () => {
   const [enviarSugestao, setEnviarSugestao] = useState<boolean>(false);
 
   const navigate = useNavigate();
+
+   const idFuncionario = localStorage.getItem("funcionarioId")
+  ? Number(localStorage.getItem("funcionarioId"))
+  : 1;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -37,12 +40,12 @@ const CadastrarPesagem: React.FC = () => {
       ovinoId: Number(ovinoId),
       dataPesagem: DateToIsoString(dataPesagem),
       peso: Number(peso),
+      idFuncionario: idFuncionario,
     };
 
     try {
       const novaPesagem = await criarPesagem(dto);
 
-      await createRegistroAuto("pesagem", novaPesagem, enviarSugestao);
       toast.success(
         <div
           style={{

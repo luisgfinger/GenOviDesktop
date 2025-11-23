@@ -3,22 +3,22 @@ import type { ReproducaoRequestDTO } from "../../dtos/reproducao/ReproducaoReque
 import type { ReproducaoResponseDTO } from "../../dtos/reproducao/ReproducaoResponseDTO";
 
 export class ReproducaoService {
-
   static async listar(): Promise<ReproducaoResponseDTO[]> {
-    const { data } = await Api.get<ReproducaoResponseDTO[]>("/user/reproducoes");
-    return data.map((r: any): ReproducaoResponseDTO => ({
-      id: r.id,
-      carneiro: r.carneiro ?? null,
-      ovelha: r.ovelha ?? null,
-      enumReproducao: r.enumReproducao,
-      dataReproducao: r.dataReproducao,
-    }));
+    const { data } =
+      await Api.get<ReproducaoResponseDTO[]>("/user/reproducoes");
+    return data.map(
+      (r: any): ReproducaoResponseDTO => ({
+        id: r.id,
+        carneiro: r.carneiro ?? null,
+        ovelha: r.ovelha ?? null,
+        enumReproducao: r.enumReproducao,
+        dataReproducao: r.dataReproducao,
+      })
+    );
   }
-
 
   static async buscarPorId(id: number): Promise<ReproducaoResponseDTO> {
     const { data } = await Api.get<any>(`/user/reproducoes/${id}`);
-    console.log("Reprodução encontrada:", data);
 
     return {
       id: data.id,
@@ -29,22 +29,34 @@ export class ReproducaoService {
     };
   }
 
- 
-  static async criar(dto: ReproducaoRequestDTO): Promise<ReproducaoResponseDTO> {
-    const { data } = await Api.post<any>("/user/reproducoes", dto);
-    console.log("Reprodução criada:", data);
+  static async criar(
+  dto: ReproducaoRequestDTO
+): Promise<ReproducaoResponseDTO> {
+  const idFuncionario = Number(localStorage.getItem("funcionarioId")) || 1;
 
-    return {
-      id: data.id,
-      carneiro: data.carneiro ?? null,
-      ovelha: data.ovelha ?? null,
-      enumReproducao: data.enumReproducao,
-      dataReproducao: data.dataReproducao,
-    };
-  }
+  const payload = {
+    ...dto,
+    idFuncionario,
+  };
+
+  console.log("Payload enviado:", payload);
+
+  const { data } = await Api.post("/user/reproducoes", payload);
+
+  return {
+    id: data.id,
+    carneiro: data.carneiro ?? null,
+    ovelha: data.ovelha ?? null,
+    enumReproducao: data.enumReproducao,
+    dataReproducao: data.dataReproducao,
+  };
+}
 
 
-  static async editar(id: number, dto: ReproducaoRequestDTO): Promise<ReproducaoResponseDTO> {
+  static async editar(
+    id: number,
+    dto: ReproducaoRequestDTO
+  ): Promise<ReproducaoResponseDTO> {
     const { data } = await Api.put<any>(`/user/reproducoes/${id}`, dto);
     console.log("Reprodução atualizada:", data);
 
@@ -57,7 +69,6 @@ export class ReproducaoService {
     };
   }
 
- 
   static async remover(id: number): Promise<void> {
     await Api.delete(`/user/reproducoes/${id}`);
     console.log(`Reprodução ID ${id} removida com sucesso.`);

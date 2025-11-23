@@ -4,4 +4,5 @@ export interface ReproducaoRequestDTO {
   ovelhaId?: number;
   enumReproducao: string;
   dataReproducao: string; 
+  idFuncionario?: number;
 }

@@ -8,6 +8,7 @@ export const ocorrenciaDoencaMapper = {
     dataInicio: dto.dataInicio,
     dataFinal: dto.dataFinal,
     curado: dto.curado,
+    idFuncionario: dto.idFuncionario,
   }),
 
   fromResponse: (data: any): OcorrenciaDoencaResponseDTO => ({

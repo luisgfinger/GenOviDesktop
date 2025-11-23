@@ -1,12 +1,6 @@
-import { useEffect, useState } from "react";
+import { useAuth } from "../../context/AuthContext";
 
 export function useIsAdmin() {
-  const [isAdmin, setIsAdmin] = useState<boolean | null>(null);
-
-  useEffect(() => {
-    const stored = localStorage.getItem("isAdmin");
-    setIsAdmin(stored === "true");
-  }, []);
-
+  const { isAdmin } = useAuth();
   return isAdmin;
 }

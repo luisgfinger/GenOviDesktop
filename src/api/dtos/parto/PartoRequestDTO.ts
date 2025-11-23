@@ -3,4 +3,5 @@ export interface PartoRequestDTO {
   ovelhaPaiId: number;
   gestacaoId?: number;
   dataParto: string;
+  idFuncionario?: number;
 }

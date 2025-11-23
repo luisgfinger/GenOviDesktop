@@ -10,12 +10,16 @@ import { useCriarAplicacao } from "../../../api/hooks/aplicacao/UseAplicacoes";
 import type { AplicacaoRequestDTO } from "../../../api/dtos/aplicacao/AplicacaoRequestDTO";
 import { formatEnum } from "../../../utils/formatEnum";
 import { formatDate } from "../../../utils/formatDate";
-import { createRegistroAuto } from "../../../utils/criarRegistro";
 import { DateToIsoString } from "../../../utils/dateToIsoString";
 
 interface CadastrarAplicacaoProps {
   isVacina: boolean;
 }
+
+const idFuncionario = localStorage.getItem("funcionarioId")
+  ? Number(localStorage.getItem("funcionarioId"))
+  : 1;
+
 
 const CadastrarAplicacao: React.FC<CadastrarAplicacaoProps> = ({
   isVacina,
@@ -54,11 +58,11 @@ const CadastrarAplicacao: React.FC<CadastrarAplicacaoProps> = ({
       ovinoId: Number(ovinoId),
       medicamentoId: Number(medicamentoId),
       dataAplicacao: DateToIsoString(data),
+      idFuncionario: idFuncionario,
     };
 
     try {
       const novaAplicacao = await criarAplicacao(dto);
-      await createRegistroAuto("aplicacao", novaAplicacao, enviarSugestao);
 
       toast.success(
         <div

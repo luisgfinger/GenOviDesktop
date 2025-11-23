@@ -17,7 +17,6 @@ export class AplicacaoService {
  
   static async listarTodos(): Promise<AplicacaoResponseDTO[]> {
     const { data } = await Api.get<any[]>("/user/aplicacoes");
-    console.log("Dados recebidos:", data);
     return data.map(mapAplicacao);
   }
 
@@ -32,6 +31,7 @@ export class AplicacaoService {
     );
 
     const { data } = await Api.post<any>("/user/aplicacoes", payload);
+    console.log("DTO enviado: ", payload);
     return mapAplicacao(data);
   }
 

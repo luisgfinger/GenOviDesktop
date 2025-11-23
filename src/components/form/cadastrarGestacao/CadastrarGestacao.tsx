@@ -5,11 +5,13 @@ import { toast } from "react-toastify";
 
 import { useOvinos } from "../../../api/hooks/ovino/UseOvinos";
 import { useReproducoes } from "../../../api/hooks/reproducao/UseReproducoes";
-import { useCriarGestacao, useGestacoes } from "../../../api/hooks/gestacao/UseGestacoes";
+import {
+  useCriarGestacao,
+  useGestacoes,
+} from "../../../api/hooks/gestacao/UseGestacoes";
 import { usePartos } from "../../../api/hooks/parto/UsePartos";
 import { formatEnum } from "../../../utils/formatEnum";
 import { formatDate } from "../../../utils/formatDate";
-import { createRegistroAuto } from "../../../utils/criarRegistro"; 
 
 import { TypeSexo } from "../../../api/enums/typeSexo/TypeSexo";
 import type { GestacaoRequestDTO } from "../../../api/dtos/gestacao/GestacaoRequestDTO";
@@ -36,8 +38,16 @@ const MIN_FEMALE_MONTHS = 8;
 
 const CadastrarGestacao: React.FC = () => {
   const { ovinos, loading: loadingOvinos, error: errorOvinos } = useOvinos();
-  const { reproducoes, loading: loadingRepros, error: errorRepros } = useReproducoes();
-  const { criarGestacao, loading: saving, error: errorSalvar } = useCriarGestacao();
+  const {
+    reproducoes,
+    loading: loadingRepros,
+    error: errorRepros,
+  } = useReproducoes();
+  const {
+    criarGestacao,
+    loading: saving,
+    error: errorSalvar,
+  } = useCriarGestacao();
   const { gestacoes } = useGestacoes();
   const { partos } = usePartos();
 
@@ -48,6 +58,9 @@ const CadastrarGestacao: React.FC = () => {
   const [enviarSugestao, setEnviarSugestao] = useState<boolean>(false);
 
   const navigate = useNavigate();
+  const idFuncionario = localStorage.getItem("funcionarioId")
+    ? Number(localStorage.getItem("funcionarioId"))
+    : 1;
 
   const reproducoesById = useMemo(() => {
     const map = new Map<string, ReproducaoResponseDTO>();
@@ -117,15 +130,13 @@ const CadastrarGestacao: React.FC = () => {
       ovelhaMaeId: Number(ovelhaMaeId),
       ovelhaPaiId: Number(ovelhaPaiId),
       dataGestacao: dataGestacao ? DateToIsoString(dataGestacao) : "",
+      idFuncionario: idFuncionario,
     };
 
     try {
       const novaGestacao = await criarGestacao(dto);
 
-      await createRegistroAuto("gestacao", novaGestacao as any, enviarSugestao);
-
-
-       toast.success(
+      toast.success(
         <div
           style={{
             display: "flex",
@@ -139,7 +150,7 @@ const CadastrarGestacao: React.FC = () => {
             type="button"
             variant="toast"
             onClick={() => {
-              const destino = `/dashboard/ovinos/gestacoes/gerenciar?searchId=${novaGestacao.id}`
+              const destino = `/dashboard/ovinos/gestacoes/gerenciar?searchId=${novaGestacao.id}`;
               navigate(destino);
               toast.dismiss();
             }}
@@ -167,7 +178,10 @@ const CadastrarGestacao: React.FC = () => {
 
   return (
     <div className="cadastrar-gestacao-bg flex-column">
-      <form className="cadastrarGestacao-container flex-column" onSubmit={handleSubmit}>
+      <form
+        className="cadastrarGestacao-container flex-column"
+        onSubmit={handleSubmit}
+      >
         <ul className="flex-column">
           <li className="flex-column">
             <label htmlFor="reproducaoId">Reprodução (opcional)</label>
@@ -188,8 +202,8 @@ const CadastrarGestacao: React.FC = () => {
 
                   return (
                     <option key={r.id} value={String(r.id)}>
-                      {formatEnum(r.enumReproducao)} • {carneiroNome} × {ovelhaNome} •{" "}
-                      {formatDate(r.dataReproducao)}
+                      {formatEnum(r.enumReproducao)} • {carneiroNome} ×{" "}
+                      {ovelhaNome} • {formatDate(r.dataReproducao)}
                     </option>
                   );
                 })}
@@ -200,7 +214,12 @@ const CadastrarGestacao: React.FC = () => {
           <li className="flex-column">
             <label htmlFor="ovelhaPaiId">Carneiro (pai)</label>
             {reproducaoId ? (
-              <input type="text" value={nomeOvino(ovelhaPaiId)} readOnly disabled />
+              <input
+                type="text"
+                value={nomeOvino(ovelhaPaiId)}
+                readOnly
+                disabled
+              />
             ) : loadingOvinos ? (
               <p>Carregando ovinos...</p>
             ) : errorOvinos ? (
@@ -215,7 +234,8 @@ const CadastrarGestacao: React.FC = () => {
                 <option value="">Selecione o carneiro...</option>
                 {machos.map((o) => (
                   <option key={o.id} value={String(o.id)}>
-                    {o.nome} • {formatEnum(o.raca)} • {formatDate(o.dataNascimento ?? "-")}
+                    {o.nome} • {formatEnum(o.raca)} •{" "}
+                    {formatDate(o.dataNascimento ?? "-")}
                   </option>
                 ))}
               </select>
@@ -225,7 +245,12 @@ const CadastrarGestacao: React.FC = () => {
           <li className="flex-column">
             <label htmlFor="ovelhaMaeId">Ovelha (mãe)</label>
             {reproducaoId ? (
-              <input type="text" value={nomeOvino(ovelhaMaeId)} readOnly disabled />
+              <input
+                type="text"
+                value={nomeOvino(ovelhaMaeId)}
+                readOnly
+                disabled
+              />
             ) : loadingOvinos ? (
               <p>Carregando ovinos...</p>
             ) : errorOvinos ? (
@@ -240,7 +265,8 @@ const CadastrarGestacao: React.FC = () => {
                 <option value="">Selecione a ovelha...</option>
                 {femeas.map((o) => (
                   <option key={o.id} value={String(o.id)}>
-                    {o.nome} • {formatEnum(o.raca)} • {formatDate(o.dataNascimento ?? "-")}
+                    {o.nome} • {formatEnum(o.raca)} •{" "}
+                    {formatDate(o.dataNascimento ?? "-")}
                   </option>
                 ))}
               </select>

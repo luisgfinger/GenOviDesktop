@@ -3,4 +3,5 @@ export interface GestacaoRequestDTO {
   ovelhaMaeId: number;
   ovelhaPaiId: number;
   dataGestacao: string;
+  idFuncionario?: number;
 }

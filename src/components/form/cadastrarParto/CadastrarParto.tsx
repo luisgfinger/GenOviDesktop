@@ -8,7 +8,6 @@ import { useGestacoes } from "../../../api/hooks/gestacao/UseGestacoes";
 import { useCriarParto } from "../../../api/hooks/parto/UsePartos";
 import { formatEnum } from "../../../utils/formatEnum";
 import { formatDate } from "../../../utils/formatDate";
-import { createRegistroAuto } from "../../../utils/criarRegistro";
 
 import { TypeSexo } from "../../../api/enums/typeSexo/TypeSexo";
 import type { PartoRequestDTO } from "../../../api/dtos/parto/PartoRequestDTO";
@@ -56,6 +55,11 @@ const CadastrarParto: React.FC<CadastrarPartoProps> = ({ onSuccess }) => {
 
   const [carneiroPaiNome, setCarneiroPaiNome] = useState<string>("");
   const [ovelhaMaeNome, setOvelhaMaeNome] = useState<string>("");
+
+  const idFuncionario = localStorage.getItem("funcionarioId")
+  ? Number(localStorage.getItem("funcionarioId"))
+  : 1;
+
 
   const gestacoesById = useMemo(() => {
     const m = new Map<string, GestacaoResponseDTO>();
@@ -115,13 +119,13 @@ const CadastrarParto: React.FC<CadastrarPartoProps> = ({ onSuccess }) => {
       ovelhaMaeId: Number(ovelhaMaeId),
       ovelhaPaiId: Number(ovelhaPaiId),
       dataParto: dataParto ? DateToIsoString(dataParto) : "",
+      idFuncionario: idFuncionario,
     };
 
     try {
       console.log("DTO enviado:", dto);
       const partoCriado = await criarParto(dto);
 
-      await createRegistroAuto("parto", partoCriado as any, enviarSugestao);
 
       toast.success("Parto cadastrado com sucesso!");
 
