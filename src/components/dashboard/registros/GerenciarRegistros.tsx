@@ -33,6 +33,8 @@ import PesagemDetalhes from "../pesagens/PesagemDetalhes";
 
 import NovoRegistroMenu from "./NovoRegistroMenu";
 import { updateRegistroSugestao } from "../../../utils/updateRegistroSugestao";
+import { useLocation } from "react-router-dom";
+
 
 function normalize(s?: string) {
   return (s ?? "")
@@ -43,24 +45,29 @@ function normalize(s?: string) {
 
 const PAGE_SIZE = 6;
 
+
 const GerenciarRegistros: React.FC = () => {
   const { registros, setRegistros, loading, error } = useRegistros();
   const { editarOcorrencia } = useEditarOcorrenciaDoenca();
   const { ovinos } = useOvinos();
+  const location = useLocation();
 
-  const [q, setQ] = useState("");
+  const [q, setQ] = useState(() =>
+    location.state?.search ? String(location.state.search) : ""
+  );
+
   const [dateFrom, setDateFrom] = useState("");
   const [dateTo, setDateTo] = useState("");
-  const [funcionario, setFuncionario] = useState("TODOS");
-  const [status, setStatus] =
-    useState<"TODOS" | "CONFIRMADO" | "NAO_CONFIRMADO">("TODOS");
 
+  const [funcionario, setFuncionario] = useState("TODOS");
+
+  const [status, setStatus] = useState<"TODOS" | "CONFIRMADO" | "NAO_CONFIRMADO">("TODOS");
   const [tipo, setTipo] = useState("TODOS");
 
   const [page, setPage] = useState(1);
   const [viewAll, setViewAll] = useState(false);
-  const [selected, setSelected] = useState<RegistroResponseDTO | null>(null);
 
+  const [selected, setSelected] = useState<RegistroResponseDTO | null>(null);
   const [selectedTipo, setSelectedTipo] = useState<
     "aplicacao" | "reproducao" | "gestacao" | "parto" | "ocorrenciaDoenca" | "pesagem" | null
   >(null);
@@ -68,17 +75,24 @@ const GerenciarRegistros: React.FC = () => {
   const [menuAberto, setMenuAberto] = useState(false);
   const [registroStatus, setRegistroStatus] = useState<Record<number, boolean>>({});
 
+  useEffect(() => {
+    if (location.state?.search) {
+      setQ(String(location.state.search));
+      window.history.replaceState({}, "", "");
+    }
+  }, [location.state]);
+
+  useEffect(() => {
+    if (location.state?.funcionario) {
+      setFuncionario(location.state.funcionario);
+      setPage(1);
+      window.history.replaceState({}, "", "");
+    }
+  }, [location.state]);
+
   const items = useMemo(() => registros ?? [], [registros]);
 
-  const getTipoRegistro = (
-    r: RegistroResponseDTO
-  ):
-    | "aplicacao"
-    | "reproducao"
-    | "gestacao"
-    | "parto"
-    | "ocorrenciaDoenca"
-    | "pesagem" => {
+  const getTipoRegistro = (r: RegistroResponseDTO) => {
     if (r.aplicacao) return "aplicacao";
     if (r.reproducao) return "reproducao";
     if (r.gestacao) return "gestacao";
@@ -109,6 +123,7 @@ const GerenciarRegistros: React.FC = () => {
     fetchStatuses();
   }, [items]);
 
+
   const handleConfirm = async (r: RegistroResponseDTO) => {
     const ok = await updateRegistroSugestao(r);
     if (!ok) return;
@@ -124,7 +139,21 @@ const GerenciarRegistros: React.FC = () => {
     );
   };
 
-  const filtered: RegistroResponseDTO[] = useMemo(() => {
+  const funcionarioOptions = useMemo(() => {
+    const nomes = registros
+      ?.map((r) => r.funcionario?.nome)
+      .filter((n) => !!n) as string[];
+
+    const unique = Array.from(new Set(nomes));
+
+    return unique.map((nome) => ({
+      value: nome,
+      label: nome,
+    }));
+  }, [registros]);
+
+
+  const filtered = useMemo(() => {
     const query = normalize(q.trim());
     const df = dateFrom ? new Date(`${dateFrom}T00:00:00`) : null;
     const dt = dateTo ? new Date(`${dateTo}T23:59:59`) : null;
@@ -138,27 +167,37 @@ const GerenciarRegistros: React.FC = () => {
           if (dt && d > dt) return false;
         }
 
-        if (funcionario !== "TODOS" && r.funcionario?.nome !== funcionario)
-          return false;
-
+        if (funcionario !== "TODOS") {
+          const n1 = normalize(r.funcionario?.nome ?? "");
+          const n2 = normalize(funcionario);
+          if (n1 !== n2) return false;
+        }
         if (status === "CONFIRMADO" && r.isSugestao) return false;
         if (status === "NAO_CONFIRMADO" && !r.isSugestao) return false;
-        if (tipo !== "TODOS") {
-          const t = getTipoRegistro(r);
-          if (t !== tipo) return false;
-        }
+
+        const tipoRegistro = getTipoRegistro(r);
+        if (tipo !== "TODOS" && tipoRegistro !== tipo) return false;
 
         if (!query) return true;
+
+        const ovinoAssociado =
+          r.aplicacao?.ovino ??
+          r.reproducao?.ovelha ??
+          r.reproducao?.carneiro ??
+          r.gestacao?.ovelhaMae ??
+          r.gestacao?.ovelhaPai ??
+          r.parto?.mae ??
+          r.parto?.pai ??
+          r.ocorrenciaDoenca?.ovino ??
+          r.pesagem?.ovino ??
+          null;
 
         const campos = [
           r.funcionario?.nome ?? "",
           formatDate(r.dataRegistro, true),
-          r.aplicacao?.id ?? "",
-          r.reproducao?.id ?? "",
-          r.gestacao?.id ?? "",
-          r.parto?.id ?? "",
-          r.ocorrenciaDoenca?.id ?? "",
-          r.pesagem?.id ?? "",
+          ovinoAssociado?.nome ?? "",
+          ovinoAssociado?.raca ?? "",
+          ovinoAssociado?.rfid ?? "",
         ].map((x) => normalize(String(x)));
 
         return campos.some((c) => c.includes(query));
@@ -166,16 +205,21 @@ const GerenciarRegistros: React.FC = () => {
       .sort((a, b) => {
         const da = new Date(a.dataRegistro ?? "").getTime();
         const db = new Date(b.dataRegistro ?? "").getTime();
-        return (db || 0) - (da || 0);
+        return db - da;
       });
   }, [items, q, dateFrom, dateTo, funcionario, status, tipo]);
 
-  const totalPages = viewAll ? 1 : Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
-  const currentPage = viewAll ? 1 : Math.min(page, totalPages);
-  const startIdx = (currentPage - 1) * PAGE_SIZE;
+
+  const totalPages = viewAll
+    ? 1
+    : Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+
+  const currentPage = viewAll ? 1 : page;
+
   const pageItems = viewAll
     ? filtered
-    : filtered.slice(startIdx, startIdx + PAGE_SIZE);
+    : filtered.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
+
 
   const clearFilters = () => {
     setQ("");
@@ -183,7 +227,7 @@ const GerenciarRegistros: React.FC = () => {
     setDateTo("");
     setFuncionario("TODOS");
     setStatus("TODOS");
-    setTipo("TODOS"); 
+    setTipo("TODOS");
     setPage(1);
     setViewAll(false);
   };
@@ -191,36 +235,30 @@ const GerenciarRegistros: React.FC = () => {
   const handleMarkCurado = async (ocorrencia: OcorrenciaDoencaResponseDTO) => {
     if (!ocorrencia?.id) return;
 
-    if (
-      !window.confirm(
-        `Deseja marcar a ocorrência do ovino "${ocorrencia.ovino?.nome}" como curada?`
-      )
-    )
-      return;
+    if (!window.confirm(`Deseja marcar a ocorrência como curada?`)) return;
 
     try {
-      const dataFinalAtual = new Date().toISOString();
-
       await editarOcorrencia(ocorrencia.id, {
         ovinoId: ocorrencia.ovino?.id ?? null,
         doencaId: ocorrencia.doenca?.id ?? null,
         dataInicio: ocorrencia.dataInicio ?? "",
-        dataFinal: dataFinalAtual,
+        dataFinal: new Date().toISOString(),
         curado: true,
       });
 
       toast.success("Ocorrência marcada como curada!");
-    } catch (err) {
-      console.error(err);
-      toast.error("Erro ao marcar ocorrência como curada.");
+    } catch {
+      toast.error("Erro ao atualizar ocorrência.");
     }
   };
+
 
   if (loading) return <p>Carregando registros…</p>;
   if (error) return <p style={{ color: "red" }}>{error}</p>;
 
   return (
     <div className="registro-page">
+
       <div className="registro-header flex">
         <Button
           type="button"
@@ -234,25 +272,18 @@ const GerenciarRegistros: React.FC = () => {
       <FilterBar
         q={q}
         setQ={setQ}
-        dateFrom={dateFrom}
-        setDateFrom={setDateFrom}
-        dateTo={dateTo}
-        setDateTo={setDateTo}
         clearFilters={clearFilters}
         setPage={setPage}
         setViewAll={setViewAll}
-        placeholder="Buscar por funcionário, data ou ID..."
-
+        placeholder="Buscar por RFID, nome, funcionário, data..."
         status={status}
         setStatus={setStatus}
-
         funcionario={funcionario}
         setFuncionario={setFuncionario}
-
+        funcionarioOptions={funcionarioOptions}
         tipo={tipo}
         setTipo={setTipo}
         typeLabel="Tipo de Registro"
-
         typeOptions={[
           { value: "aplicacao", label: "Aplicações" },
           { value: "reproducao", label: "Reproduções" },
@@ -261,7 +292,6 @@ const GerenciarRegistros: React.FC = () => {
           { value: "ocorrenciaDoenca", label: "Ocorrências de Doença" },
           { value: "pesagem", label: "Pesagens" },
         ]}
-
         allOptionLabel="Todos"
         allOptionValue="TODOS"
       />
@@ -276,14 +306,14 @@ const GerenciarRegistros: React.FC = () => {
       ) : (
         <div className="registro-list">
           {pageItems.map((r) => {
-            const tipo = getTipoRegistro(r);
-            let entidade = r[tipo as keyof RegistroResponseDTO] as any;
+            const tipoR = getTipoRegistro(r);
+            let entidade = r[tipoR as keyof RegistroResponseDTO] as any;
+
             if (!entidade) return null;
 
-            if (tipo === "pesagem") {
+            if (tipoR === "pesagem") {
               const ov =
-                ovinos?.find((o) => o.id === entidade.ovino?.id) ??
-                entidade.ovino;
+                ovinos?.find((o) => o.id === entidade.ovino?.id) ?? entidade.ovino;
 
               entidade = {
                 ...entidade,
@@ -292,23 +322,21 @@ const GerenciarRegistros: React.FC = () => {
               };
             }
 
-            const handleView = () => {
+            const view = () => {
               setSelected(r);
-              setSelectedTipo(tipo);
+              setSelectedTipo(tipoR);
             };
 
             const confirm = () => handleConfirm(r);
 
-            switch (tipo) {
+            switch (tipoR) {
               case "aplicacao":
                 return (
                   <AplicacaoCard
                     key={r.idRegistro}
                     aplicacao={entidade}
-                    confirmado={
-                      registroStatus[r.idRegistro] ?? !r.isSugestao
-                    }
-                    onView={handleView}
+                    confirmado={registroStatus[r.idRegistro] ?? !r.isSugestao}
+                    onView={view}
                     onConfirm={confirm}
                   />
                 );
@@ -318,10 +346,8 @@ const GerenciarRegistros: React.FC = () => {
                   <ReproducaoCard
                     key={r.idRegistro}
                     reproducao={entidade}
-                    confirmado={
-                      registroStatus[r.idRegistro] ?? !r.isSugestao
-                    }
-                    onView={handleView}
+                    confirmado={registroStatus[r.idRegistro] ?? !r.isSugestao}
+                    onView={view}
                     onConfirm={confirm}
                   />
                 );
@@ -331,10 +357,8 @@ const GerenciarRegistros: React.FC = () => {
                   <GestacaoCard
                     key={r.idRegistro}
                     gestacao={entidade}
-                    confirmado={
-                      registroStatus[r.idRegistro] ?? !r.isSugestao
-                    }
-                    onView={handleView}
+                    confirmado={registroStatus[r.idRegistro] ?? !r.isSugestao}
+                    onView={view}
                     onConfirm={confirm}
                   />
                 );
@@ -344,10 +368,8 @@ const GerenciarRegistros: React.FC = () => {
                   <PartoCard
                     key={r.idRegistro}
                     parto={entidade}
-                    confirmado={
-                      registroStatus[r.idRegistro] ?? !r.isSugestao
-                    }
-                    onView={handleView}
+                    confirmado={registroStatus[r.idRegistro] ?? !r.isSugestao}
+                    onView={view}
                     onConfirm={confirm}
                   />
                 );
@@ -357,10 +379,8 @@ const GerenciarRegistros: React.FC = () => {
                   <OcorrenciaDoencaCard
                     key={r.idRegistro}
                     ocorrencia={entidade}
-                    confirmado={
-                      registroStatus[r.idRegistro] ?? !r.isSugestao
-                    }
-                    onView={handleView}
+                    confirmado={registroStatus[r.idRegistro] ?? !r.isSugestao}
+                    onView={view}
                     onMarkCurado={() => handleMarkCurado(entidade)}
                     onConfirm={confirm}
                   />
@@ -371,10 +391,8 @@ const GerenciarRegistros: React.FC = () => {
                   <PesagemCard
                     key={r.idRegistro}
                     pesagem={entidade}
-                    confirmado={
-                      registroStatus[r.idRegistro] ?? !r.isSugestao
-                    }
-                    onView={handleView}
+                    confirmado={registroStatus[r.idRegistro] ?? !r.isSugestao}
+                    onView={view}
                     onConfirm={confirm}
                   />
                 );
@@ -414,8 +432,7 @@ const GerenciarRegistros: React.FC = () => {
       )}
 
       {selected && selectedTipo && (() => {
-        const entidade =
-          selected[selectedTipo as keyof RegistroResponseDTO] as any;
+        const entidade = selected[selectedTipo as keyof RegistroResponseDTO] as any;
 
         switch (selectedTipo) {
           case "aplicacao":
@@ -472,9 +489,7 @@ const GerenciarRegistros: React.FC = () => {
         }
       })()}
 
-      {menuAberto && (
-        <NovoRegistroMenu onClose={() => setMenuAberto(false)} />
-      )}
+      {menuAberto && <NovoRegistroMenu onClose={() => setMenuAberto(false)} />}
     </div>
   );
 };

@@ -2,6 +2,7 @@ import React from "react";
 import "./FuncionarioCard.css";
 import Button from "../../buttons/Button";
 import { formatDate } from "../../../../utils/formatDate";
+import { useNavigate } from "react-router-dom";
 
 interface FuncionarioCardProps {
   nome: string;
@@ -16,6 +17,8 @@ const FuncionarioCard: React.FC<FuncionarioCardProps> = ({
   dataAdmissao,
   cpfCnpj,
 }) => {
+  const navigate = useNavigate();
+
   return (
     <ul className="funcionarioCard-container flex-column">
       <li className="flex">
@@ -39,7 +42,16 @@ const FuncionarioCard: React.FC<FuncionarioCardProps> = ({
       </li>
       <li className="funcionarioCard-buttons flex-column">
         <Button variant="cardPrimary">Ver mais</Button>
-        <Button variant="cardSecondary">Abrir registros</Button>
+        <Button
+          variant="cardSecondary"
+          onClick={() =>
+            navigate("/dashboard/registros", {
+              state: { funcionario: nome },
+            })
+          }
+        >
+          Abrir registros
+        </Button>
       </li>
     </ul>
   );

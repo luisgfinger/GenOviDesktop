@@ -5,7 +5,7 @@ import Button from "../../buttons/Button";
 import { formatEnum } from "../../../../utils/formatEnum";
 import type { Ovino } from "../../../../api/models/ovino/OvinoModel";
 import { useNavigate } from "react-router-dom";
-import { abbreviateGrauPureza } from '../../../../utils/abbreviateGrauPureza';
+import { abbreviateGrauPureza } from "../../../../utils/abbreviateGrauPureza";
 
 interface OvinoCardProps {
   ovino: Ovino;
@@ -60,7 +60,16 @@ const OvinoCard: React.FC<OvinoCardProps> = ({
         >
           Ver mais
         </Button>
-        <Button variant="cardSecondary">Abrir registros</Button>
+        <Button
+          variant="cardSecondary"
+          onClick={() =>
+            navigate("/dashboard/registros", {
+              state: { search: ovino.rfid },
+            })
+          }
+        >
+          Abrir registros
+        </Button>
       </li>
     </ul>
   );
