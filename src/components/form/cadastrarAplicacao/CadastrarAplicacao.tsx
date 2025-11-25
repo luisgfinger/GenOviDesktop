@@ -6,11 +6,12 @@ import { useNavigate } from "react-router-dom";
 import { useOvinos } from "../../../api/hooks/ovino/UseOvinos";
 import { useMedicamentos } from "../../../api/hooks/medicamento/UseMedicamentos";
 import { useCriarAplicacao } from "../../../api/hooks/aplicacao/UseAplicacoes";
-
 import type { AplicacaoRequestDTO } from "../../../api/dtos/aplicacao/AplicacaoRequestDTO";
 import { formatEnum } from "../../../utils/formatEnum";
 import { formatDate } from "../../../utils/formatDate";
 import { DateToIsoString } from "../../../utils/dateToIsoString";
+import { useIsAdmin } from "../../../api/hooks/useIsAdmin";
+
 
 interface CadastrarAplicacaoProps {
   isVacina: boolean;
@@ -38,6 +39,8 @@ const CadastrarAplicacao: React.FC<CadastrarAplicacaoProps> = ({
   const navigate = useNavigate();
 
    const idFuncionario = Number(localStorage.getItem("funcionarioId")) || 1;
+
+   const isAdmin = useIsAdmin();
 
   const medicamentosFiltrados = medicamentos.filter(
     (m) => m.isVacina === isVacina
@@ -176,6 +179,7 @@ const CadastrarAplicacao: React.FC<CadastrarAplicacaoProps> = ({
             />
           </li>
 
+          {isAdmin &&
           <li className="checkbox-sugestao">
             <input
               type="checkbox"
@@ -185,6 +189,7 @@ const CadastrarAplicacao: React.FC<CadastrarAplicacaoProps> = ({
             />
             <label htmlFor="enviarSugestao">Enviar como solicitação</label>
           </li>
+}
 
           <div className="cadastrarAplicacao-form-navigation">
             <Button type="submit" variant="cardPrimary" disabled={saving}>

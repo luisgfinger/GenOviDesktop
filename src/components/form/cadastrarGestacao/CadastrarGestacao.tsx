@@ -18,6 +18,7 @@ import type { GestacaoRequestDTO } from "../../../api/dtos/gestacao/GestacaoRequ
 import type { ReproducaoResponseDTO } from "../../../api/dtos/reproducao/ReproducaoResponseDTO";
 import { useNavigate } from "react-router-dom";
 import { DateToIsoString } from "../../../utils/dateToIsoString";
+import { useIsAdmin } from "../../../api/hooks/useIsAdmin";
 
 function monthsBetween(iso?: string): number {
   if (!iso) return 0;
@@ -58,7 +59,9 @@ const CadastrarGestacao: React.FC = () => {
   const [enviarSugestao, setEnviarSugestao] = useState<boolean>(false);
 
   const navigate = useNavigate();
- const idFuncionario = Number(localStorage.getItem("funcionarioId")) || 1;
+
+  const isAdmin = useIsAdmin();
+  const idFuncionario = Number(localStorage.getItem("funcionarioId")) || 1;
   const reproducoesById = useMemo(() => {
     const map = new Map<string, ReproducaoResponseDTO>();
     (reproducoes ?? []).forEach((r) => map.set(String(r.id), r));
@@ -281,16 +284,18 @@ const CadastrarGestacao: React.FC = () => {
               required
             />
           </li>
-          <li className="checkbox-sugestao">
-            <input
-              type="checkbox"
-              id="enviarSugestao"
-              checked={enviarSugestao}
-              onChange={(e) => setEnviarSugestao(e.target.checked)}
-            />
-            <label htmlFor="enviarSugestao">Solicitar verificação</label>
-          </li>
 
+          {isAdmin && (
+            <li className="checkbox-sugestao">
+              <input
+                type="checkbox"
+                id="enviarSugestao"
+                checked={enviarSugestao}
+                onChange={(e) => setEnviarSugestao(e.target.checked)}
+              />
+              <label htmlFor="enviarSugestao">Solicitar verificação</label>
+            </li>
+          )}
           <div className="cadastrarGestacao-form-navigation">
             <Button type="submit" variant="cardPrimary" disabled={saving}>
               {saving ? "Salvando..." : "Cadastrar gestação"}

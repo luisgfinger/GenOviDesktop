@@ -13,6 +13,7 @@ import { TypeSexo } from "../../../api/enums/typeSexo/TypeSexo";
 import type { PartoRequestDTO } from "../../../api/dtos/parto/PartoRequestDTO";
 import type { GestacaoResponseDTO } from "../../../api/dtos/gestacao/GestacaoResponseDTO";
 import { DateToIsoString } from "../../../utils/dateToIsoString";
+import { useIsAdmin } from "../../../api/hooks/useIsAdmin";
 
 function monthsBetween(iso?: string): number {
   if (!iso) return 0;
@@ -49,6 +50,8 @@ const CadastrarParto: React.FC<CadastrarPartoProps> = ({ onSuccess }) => {
     error: errorGestacoes,
   } = useGestacoes();
   const { criarParto, loading: saving, error: errorSalvar } = useCriarParto();
+
+  const isAdmin = useIsAdmin();
 
   const [gestacaoId, setGestacaoId] = useState<string>("");
   const [ovelhaMaeId, setOvelhaMaeId] = useState<string>("");
@@ -254,16 +257,18 @@ const CadastrarParto: React.FC<CadastrarPartoProps> = ({ onSuccess }) => {
               onChange={(e) => setQtdFilhotes(Number(e.target.value))}
             />
           </li>
-          <li className="checkbox-sugestao">
-            <input
-              type="checkbox"
-              id="enviarSugestao"
-              checked={enviarSugestao}
-              onChange={(e) => setEnviarSugestao(e.target.checked)}
-            />
-            <label htmlFor="enviarSugestao">Enviar como solicitação</label>
-          </li>
 
+          {isAdmin && (
+            <li className="checkbox-sugestao">
+              <input
+                type="checkbox"
+                id="enviarSugestao"
+                checked={enviarSugestao}
+                onChange={(e) => setEnviarSugestao(e.target.checked)}
+              />
+              <label htmlFor="enviarSugestao">Enviar como solicitação</label>
+            </li>
+          )}
           <div className="cadastrarParto-form-navigation">
             <Button type="submit" variant="cardPrimary" disabled={saving}>
               {saving ? "Salvando..." : "Cadastrar parto"}

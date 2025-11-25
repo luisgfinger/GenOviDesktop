@@ -16,6 +16,7 @@ import { usePartos } from "../../../api/hooks/parto/UsePartos";
 import type { ReproducaoRequestDTO } from "../../../api/dtos/reproducao/ReproducaoRequestDTO";
 import { formatDate } from "../../../utils/formatDate";
 import IAButton from "../../common/ia/IAButton";
+import { useIsAdmin } from "../../../api/hooks/useIsAdmin";
 
 type Props = {
   minAgeMonths?: number;
@@ -49,6 +50,8 @@ const CadastrarReproducao: React.FC<Props> = ({ minAgeMonths = 12 }) => {
   const [enviarSugestao, setEnviarSugestao] = useState<boolean>(false);
   const [contextoIA, setContextoIA] = useState<any>(null);
  const idFuncionario = Number(localStorage.getItem("funcionarioId")) || 1;
+
+ const isAdmin = useIsAdmin();
 
   const isOvelhaGestando = (ovelhaId: number): boolean => {
     return (gestacoes ?? []).some((g) => {
@@ -192,6 +195,8 @@ const CadastrarReproducao: React.FC<Props> = ({ minAgeMonths = 12 }) => {
               onChange={(e) => setDataReproducao(e.target.value)}
             />
           </li>
+
+          {isAdmin &&
           <li className="checkbox-sugestao">
             <input
               type="checkbox"
@@ -201,6 +206,7 @@ const CadastrarReproducao: React.FC<Props> = ({ minAgeMonths = 12 }) => {
             />
             <label htmlFor="enviarSugestao">Enviar como solicitação</label>
           </li>
+          }
 
           <div className="cadastrarReproducao-form-navigation">
             <Button type="submit" variant="cardPrimary" disabled={saving}>

@@ -12,10 +12,15 @@ import { DateToIsoString } from "../../../utils/dateToIsoString";
 
 import type { PesagemRequestDTO } from "../../../api/dtos/pesagem/PesagemRequestDTO";
 import { useNavigate } from "react-router-dom";
+import { useIsAdmin } from "../../../api/hooks/useIsAdmin";
 
 const CadastrarPesagem: React.FC = () => {
   const { ovinos, loading: loadingOvinos, error: errorOvinos } = useOvinos();
-  const { criarPesagem, loading: saving, error: errorSalvar } = useCriarPesagem();
+  const {
+    criarPesagem,
+    loading: saving,
+    error: errorSalvar,
+  } = useCriarPesagem();
 
   const [ovinoId, setOvinoId] = useState<string>("");
   const [peso, setPeso] = useState<string>("");
@@ -24,7 +29,9 @@ const CadastrarPesagem: React.FC = () => {
 
   const navigate = useNavigate();
 
- const idFuncionario = Number(localStorage.getItem("funcionarioId")) || 1;
+  const isAdmin = useIsAdmin();
+
+  const idFuncionario = Number(localStorage.getItem("funcionarioId")) || 1;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -88,7 +95,10 @@ const CadastrarPesagem: React.FC = () => {
 
   return (
     <div className="cadastrar-pesagem-bg flex-column">
-      <form className="cadastrarPesagem-container flex-column" onSubmit={handleSubmit}>
+      <form
+        className="cadastrarPesagem-container flex-column"
+        onSubmit={handleSubmit}
+      >
         <ul className="flex-column">
           <li className="flex-column">
             <label htmlFor="ovinoId">Ovino</label>
@@ -106,7 +116,8 @@ const CadastrarPesagem: React.FC = () => {
                 <option value="">Selecione o ovino...</option>
                 {(ovinos ?? []).map((o) => (
                   <option key={o.id} value={String(o.id)}>
-                    {o.nome} • {formatEnum(o.raca)} • {formatDate(o.dataNascimento ?? "-")}
+                    {o.nome} • {formatEnum(o.raca)} •{" "}
+                    {formatDate(o.dataNascimento ?? "-")}
                   </option>
                 ))}
               </select>
@@ -138,15 +149,17 @@ const CadastrarPesagem: React.FC = () => {
             />
           </li>
 
-          <li className="checkbox-sugestao">
-            <input
-              type="checkbox"
-              id="enviarSugestao"
-              checked={enviarSugestao}
-              onChange={(e) => setEnviarSugestao(e.target.checked)}
-            />
-            <label htmlFor="enviarSugestao">Enviar como solicitação</label>
-          </li>
+          {isAdmin && (
+            <li className="checkbox-sugestao">
+              <input
+                type="checkbox"
+                id="enviarSugestao"
+                checked={enviarSugestao}
+                onChange={(e) => setEnviarSugestao(e.target.checked)}
+              />
+              <label htmlFor="enviarSugestao">Enviar como solicitação</label>
+            </li>
+          )}
 
           <div className="cadastrarPesagem-form-navigation">
             <Button type="submit" variant="cardPrimary" disabled={saving}>

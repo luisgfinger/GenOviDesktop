@@ -14,6 +14,7 @@ import { formatDate } from "../../../utils/formatDate";
 import { useNavigate } from "react-router-dom";
 
 import { DateToIsoString } from "../../../utils/dateToIsoString";
+import { useIsAdmin } from "../../../api/hooks/useIsAdmin";
 
 const CadastrarOcorrenciaDoenca: React.FC = () => {
   const { ovinos } = useOvinos();
@@ -34,6 +35,7 @@ const CadastrarOcorrenciaDoenca: React.FC = () => {
   const navigate = useNavigate();
 
   const idFuncionario = Number(localStorage.getItem("funcionarioId")) || 1;
+  const isAdmin = useIsAdmin();
   const doencasById = useMemo(() => {
     const m = new Map<string, DoencaResponseDTO>();
     (doencas ?? []).forEach((r) => m.set(String(r.id), r));
@@ -171,15 +173,18 @@ const CadastrarOcorrenciaDoenca: React.FC = () => {
               required
             />
           </li>
-          <li className="checkbox-sugestao">
-            <input
-              type="checkbox"
-              id="enviarSugestao"
-              checked={enviarSugestao}
-              onChange={(e) => setEnviarSugestao(e.target.checked)}
-            />
-            <label htmlFor="enviarSugestao">Solicitar verificação</label>
-          </li>
+
+          {isAdmin && (
+            <li className="checkbox-sugestao">
+              <input
+                type="checkbox"
+                id="enviarSugestao"
+                checked={enviarSugestao}
+                onChange={(e) => setEnviarSugestao(e.target.checked)}
+              />
+              <label htmlFor="enviarSugestao">Solicitar verificação</label>
+            </li>
+          )}
 
           <div className="cadastrarOcorrenciaDoenca-form-navigation">
             <Button type="submit" variant="cardPrimary" disabled={saving}>
