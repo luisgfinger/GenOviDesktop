@@ -3,4 +3,5 @@ export interface AplicacaoRequestDTO {
   dataAplicacao: string;
   medicamentoId: number;
   idFuncionario?: number;
+  isSugestao?: boolean;
 }

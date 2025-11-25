@@ -9,6 +9,7 @@ export const ocorrenciaDoencaMapper = {
     dataFinal: dto.dataFinal,
     curado: dto.curado,
     idFuncionario: dto.idFuncionario,
+    isSugestao: dto.isSugestao,
   }),
 
   fromResponse: (data: any): OcorrenciaDoencaResponseDTO => ({

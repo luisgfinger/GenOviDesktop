@@ -10,6 +10,7 @@ interface ReproducaoCardProps {
   onEdit?: () => void;
   confirmado: boolean;
   onConfirm: () => void;
+  responsavel?: string;
 }
 
 const ReproducaoCard: React.FC<ReproducaoCardProps> = ({
@@ -18,6 +19,7 @@ const ReproducaoCard: React.FC<ReproducaoCardProps> = ({
   onEdit,
   confirmado = false,
   onConfirm,
+  responsavel,
 }) => {
   return (
     <div className="card">
@@ -27,7 +29,7 @@ const ReproducaoCard: React.FC<ReproducaoCardProps> = ({
 
           <span>
             <strong>Responsável:</strong>{" "}
-            {localStorage.getItem("funcionarioNome") ?? "—"}
+            {responsavel ?? "—"}
           </span>
 
           <span>

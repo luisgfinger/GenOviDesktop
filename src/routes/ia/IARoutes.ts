@@ -35,7 +35,7 @@ export const iaRouteConfig: IARouteConfig[] = [
     permitirInputUsuario: true,
     buildPromptHeader: () => "Pergunta:",
     promptOptions: [
-      "Esta combinação genética é boa?",
+      "Esta combinação é boa para reprrodução?",
       "Existe risco nessa reprodução?",
       "O macho é adequado para cobertura?",
     ],

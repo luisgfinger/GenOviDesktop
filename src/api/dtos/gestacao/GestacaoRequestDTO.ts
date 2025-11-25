@@ -4,4 +4,5 @@ export interface GestacaoRequestDTO {
   ovelhaPaiId: number;
   dataGestacao: string;
   idFuncionario?: number;
+  isSugestao?: boolean;
 }

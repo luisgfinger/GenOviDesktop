@@ -8,6 +8,7 @@ export const gestacaoMapper = {
     ovelhaPaiId: dto.ovelhaPaiId,
     dataGestacao: dto.dataGestacao,
     idFuncionario: dto.idFuncionario,
+    isSugestao: dto.isSugestao,
   }),
 
   fromResponse: (data: any): GestacaoResponseDTO => ({

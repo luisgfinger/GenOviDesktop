@@ -44,7 +44,7 @@ const Navbar: React.FC = () => {
         ))}
 
         {isLoggedIn && (
-          <li>Usuário: {localStorage.getItem("funcionarioNome")} {isAdmin && "- Admin"}</li>
+          <li>Usuário: {localStorage.getItem("funcionarioNome")}{isAdmin && " - Admin"}</li>
         )}
       </ul>
       {isLoggedIn && (

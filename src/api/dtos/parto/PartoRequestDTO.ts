@@ -4,4 +4,5 @@ export interface PartoRequestDTO {
   gestacaoId?: number;
   dataParto: string;
   idFuncionario?: number;
+  isSugestao?: boolean;
 }

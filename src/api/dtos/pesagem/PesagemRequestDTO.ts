@@ -3,4 +3,5 @@ export interface PesagemRequestDTO {
   dataPesagem: string;
   peso: number;
   idFuncionario?: number;
+  isSugestao?: boolean;
 }

@@ -7,6 +7,7 @@ export const aplicacaoMapper = {
     dataAplicacao: dto.dataAplicacao,
     medicamentoId: dto.medicamentoId,
     idFuncionario: dto.idFuncionario,
+    isSugestao: dto.isSugestao,
   }),
 
   fromResponse: (data: any): AplicacaoResponseDTO => ({

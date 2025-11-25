@@ -16,11 +16,6 @@ interface CadastrarAplicacaoProps {
   isVacina: boolean;
 }
 
-const idFuncionario = localStorage.getItem("funcionarioId")
-  ? Number(localStorage.getItem("funcionarioId"))
-  : 1;
-
-
 const CadastrarAplicacao: React.FC<CadastrarAplicacaoProps> = ({
   isVacina,
 }) => {
@@ -42,6 +37,8 @@ const CadastrarAplicacao: React.FC<CadastrarAplicacaoProps> = ({
   const [enviarSugestao, setEnviarSugestao] = useState<boolean>(false);
   const navigate = useNavigate();
 
+   const idFuncionario = Number(localStorage.getItem("funcionarioId")) || 1;
+
   const medicamentosFiltrados = medicamentos.filter(
     (m) => m.isVacina === isVacina
   );
@@ -59,7 +56,10 @@ const CadastrarAplicacao: React.FC<CadastrarAplicacaoProps> = ({
       medicamentoId: Number(medicamentoId),
       dataAplicacao: DateToIsoString(data),
       idFuncionario: idFuncionario,
+      isSugestao: enviarSugestao,
     };
+
+    console.log("DTO ENVIADO DO FORM: ", dto);
 
     try {
       const novaAplicacao = await criarAplicacao(dto);

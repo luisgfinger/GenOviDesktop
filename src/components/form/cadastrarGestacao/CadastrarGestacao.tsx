@@ -58,10 +58,7 @@ const CadastrarGestacao: React.FC = () => {
   const [enviarSugestao, setEnviarSugestao] = useState<boolean>(false);
 
   const navigate = useNavigate();
-  const idFuncionario = localStorage.getItem("funcionarioId")
-    ? Number(localStorage.getItem("funcionarioId"))
-    : 1;
-
+ const idFuncionario = Number(localStorage.getItem("funcionarioId")) || 1;
   const reproducoesById = useMemo(() => {
     const map = new Map<string, ReproducaoResponseDTO>();
     (reproducoes ?? []).forEach((r) => map.set(String(r.id), r));
@@ -131,6 +128,7 @@ const CadastrarGestacao: React.FC = () => {
       ovelhaPaiId: Number(ovelhaPaiId),
       dataGestacao: dataGestacao ? DateToIsoString(dataGestacao) : "",
       idFuncionario: idFuncionario,
+      isSugestao: enviarSugestao,
     };
 
     try {

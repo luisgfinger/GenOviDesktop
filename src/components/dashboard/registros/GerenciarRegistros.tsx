@@ -338,6 +338,7 @@ const GerenciarRegistros: React.FC = () => {
                     confirmado={registroStatus[r.idRegistro] ?? !r.isSugestao}
                     onView={view}
                     onConfirm={confirm}
+                    responsavel={r.funcionario.nome}
                   />
                 );
 
@@ -349,6 +350,7 @@ const GerenciarRegistros: React.FC = () => {
                     confirmado={registroStatus[r.idRegistro] ?? !r.isSugestao}
                     onView={view}
                     onConfirm={confirm}
+                    responsavel={r.funcionario.nome}
                   />
                 );
 
@@ -360,6 +362,7 @@ const GerenciarRegistros: React.FC = () => {
                     confirmado={registroStatus[r.idRegistro] ?? !r.isSugestao}
                     onView={view}
                     onConfirm={confirm}
+                    responsavel={r.funcionario.nome}
                   />
                 );
 
@@ -371,6 +374,7 @@ const GerenciarRegistros: React.FC = () => {
                     confirmado={registroStatus[r.idRegistro] ?? !r.isSugestao}
                     onView={view}
                     onConfirm={confirm}
+                    responsavel={r.funcionario.nome}
                   />
                 );
 
@@ -383,6 +387,7 @@ const GerenciarRegistros: React.FC = () => {
                     onView={view}
                     onMarkCurado={() => handleMarkCurado(entidade)}
                     onConfirm={confirm}
+                    responsavel={r.funcionario.nome}
                   />
                 );
 
@@ -394,6 +399,7 @@ const GerenciarRegistros: React.FC = () => {
                     confirmado={registroStatus[r.idRegistro] ?? !r.isSugestao}
                     onView={view}
                     onConfirm={confirm}
+                    responsavel={r.funcionario.nome}
                   />
                 );
 

@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { getUsuarioIdByEmail } from "../utils/getUsuarioIdByEmail";
 import { UsuarioService } from "../api/services/usuario/UsuarioService";
-import { isAdmin } from "../utils/isAdmin";
+import { isAdmin as isAdminFn } from "../utils/isAdmin";
 
 interface AuthContextType {
   isLoggedIn: boolean;
@@ -50,31 +50,43 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     localStorage.setItem("email", email);
     localStorage.setItem("token", token);
     localStorage.setItem("loginTime", Date.now().toString());
+
     setIsLoggedIn(true);
 
     try {
+      
       const usuarioId = await getUsuarioIdByEmail();
       if (!usuarioId) return;
 
       const usuario = await UsuarioService.buscarPorId(usuarioId);
 
-      const admin = isAdmin(usuario);
+
+      const admin = isAdminFn(usuario);
       setIsAdminState(admin);
       localStorage.setItem("isAdmin", String(admin));
-
       const nomeFuncionario = usuario.funcionario?.nome ?? "Admin";
+      const funcionarioId = usuario.funcionario?.id ?? null;
+
       setFuncionarioNome(nomeFuncionario);
       localStorage.setItem("funcionarioNome", nomeFuncionario);
 
+      if (funcionarioId !== null) {
+        localStorage.setItem("funcionarioId", String(funcionarioId));
+      }else{
+        console.log("Funcionario id é null");
+      }
+
     } catch (error) {
-      console.error("Erro ao salvar nome do funcionário:", error);
+      console.error("Erro ao salvar informações do funcionário:", error);
     }
   };
+
 
   const logout = () => {
     localStorage.removeItem("email");
     localStorage.removeItem("token");
     localStorage.removeItem("loginTime");
+
     localStorage.removeItem("usuarioId");
     localStorage.removeItem("funcionarioNome");
     localStorage.removeItem("funcionarioId");

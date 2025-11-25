@@ -43,7 +43,11 @@ interface CadastrarPartoProps {
 
 const CadastrarParto: React.FC<CadastrarPartoProps> = ({ onSuccess }) => {
   const { ovinos, loading: loadingOvinos, error: errorOvinos } = useOvinos();
-  const { gestacoes, loading: loadingGestacoes, error: errorGestacoes } = useGestacoes();
+  const {
+    gestacoes,
+    loading: loadingGestacoes,
+    error: errorGestacoes,
+  } = useGestacoes();
   const { criarParto, loading: saving, error: errorSalvar } = useCriarParto();
 
   const [gestacaoId, setGestacaoId] = useState<string>("");
@@ -55,12 +59,7 @@ const CadastrarParto: React.FC<CadastrarPartoProps> = ({ onSuccess }) => {
 
   const [carneiroPaiNome, setCarneiroPaiNome] = useState<string>("");
   const [ovelhaMaeNome, setOvelhaMaeNome] = useState<string>("");
-
-  const idFuncionario = localStorage.getItem("funcionarioId")
-  ? Number(localStorage.getItem("funcionarioId"))
-  : 1;
-
-
+  const idFuncionario = Number(localStorage.getItem("funcionarioId")) || 1;
   const gestacoesById = useMemo(() => {
     const m = new Map<string, GestacaoResponseDTO>();
     (gestacoes ?? []).forEach((r) => m.set(String(r.id), r));
@@ -120,12 +119,12 @@ const CadastrarParto: React.FC<CadastrarPartoProps> = ({ onSuccess }) => {
       ovelhaPaiId: Number(ovelhaPaiId),
       dataParto: dataParto ? DateToIsoString(dataParto) : "",
       idFuncionario: idFuncionario,
+      isSugestao: enviarSugestao,
     };
 
     try {
       console.log("DTO enviado:", dto);
       const partoCriado = await criarParto(dto);
-
 
       toast.success("Parto cadastrado com sucesso!");
 
@@ -153,7 +152,10 @@ const CadastrarParto: React.FC<CadastrarPartoProps> = ({ onSuccess }) => {
 
   return (
     <div className="cadastrar-parto-bg flex-column">
-      <form className="cadastrarParto-container flex-column" onSubmit={handleSubmit}>
+      <form
+        className="cadastrarParto-container flex-column"
+        onSubmit={handleSubmit}
+      >
         <ul className="flex-column">
           <li className="flex-column">
             <label htmlFor="gestacaoId">Gestação (opcional)</label>
@@ -197,7 +199,8 @@ const CadastrarParto: React.FC<CadastrarPartoProps> = ({ onSuccess }) => {
                 <option value="">Selecione o carneiro...</option>
                 {machos.map((o) => (
                   <option key={o.id} value={String(o.id)}>
-                    {o.nome} • {formatEnum(o.raca)} • {formatDate(o.dataNascimento ?? "-")}
+                    {o.nome} • {formatEnum(o.raca)} •{" "}
+                    {formatDate(o.dataNascimento ?? "-")}
                   </option>
                 ))}
               </select>
@@ -222,7 +225,8 @@ const CadastrarParto: React.FC<CadastrarPartoProps> = ({ onSuccess }) => {
                 <option value="">Selecione a ovelha...</option>
                 {femeas.map((o) => (
                   <option key={o.id} value={String(o.id)}>
-                    {o.nome} • {formatEnum(o.raca)} • {formatDate(o.dataNascimento ?? "-")}
+                    {o.nome} • {formatEnum(o.raca)} •{" "}
+                    {formatDate(o.dataNascimento ?? "-")}
                   </option>
                 ))}
               </select>

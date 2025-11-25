@@ -13,6 +13,7 @@ interface PesagemCardProps {
   confirmado: boolean;
   onView: () => void;
   onConfirm: () => void;
+  responsavel?: string;
 }
 
 const PesagemCard: React.FC<PesagemCardProps> = ({
@@ -20,6 +21,7 @@ const PesagemCard: React.FC<PesagemCardProps> = ({
   confirmado,
   onView,
   onConfirm,
+  responsavel,
 }) => {
   return (
     <div className="card">
@@ -29,7 +31,7 @@ const PesagemCard: React.FC<PesagemCardProps> = ({
 
           <span>
             <strong>Responsável:</strong>{" "}
-            {localStorage.getItem("funcionarioNome") ?? "—"}
+            {responsavel ?? "—"}
           </span>
 
           <span>

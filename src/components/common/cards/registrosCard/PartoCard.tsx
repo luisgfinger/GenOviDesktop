@@ -9,6 +9,7 @@ interface PartoCardProps {
   onView: () => void;
   confirmado: boolean;
   onConfirm: () => void;
+  responsavel?: string;
 }
 
 const PartoCard: React.FC<PartoCardProps> = ({
@@ -16,6 +17,7 @@ const PartoCard: React.FC<PartoCardProps> = ({
   onView,
   confirmado,
   onConfirm,
+  responsavel,
 }) => {
   return (
     <div className="card">
@@ -25,7 +27,7 @@ const PartoCard: React.FC<PartoCardProps> = ({
 
           <span>
             <strong>Responsável:</strong>{" "}
-            {localStorage.getItem("funcionarioNome") ?? "—"}
+            {responsavel?? "—"}
           </span>
 
           <span>

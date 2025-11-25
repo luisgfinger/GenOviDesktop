@@ -16,7 +16,7 @@ import { useNavigate } from "react-router-dom";
 import { DateToIsoString } from "../../../utils/dateToIsoString";
 
 const CadastrarOcorrenciaDoenca: React.FC = () => {
-  const { ovinos} = useOvinos();
+  const { ovinos } = useOvinos();
   const { doencas, loading: loadingDoenc, error: errorDoenc } = useDoencas();
   const {
     criarOcorrencia,
@@ -29,13 +29,11 @@ const CadastrarOcorrenciaDoenca: React.FC = () => {
   const [, setOvinoNome] = useState<string>("");
   const [dataInicio, setDataInicio] = useState<string>("");
 
+  const [enviarSugestao, setEnviarSugestao] = useState<boolean>(false);
+
   const navigate = useNavigate();
 
-  const idFuncionario = localStorage.getItem("funcionarioId")
-  ? Number(localStorage.getItem("funcionarioId"))
-  : 1;
-
-
+  const idFuncionario = Number(localStorage.getItem("funcionarioId")) || 1;
   const doencasById = useMemo(() => {
     const m = new Map<string, DoencaResponseDTO>();
     (doencas ?? []).forEach((r) => m.set(String(r.id), r));
@@ -67,17 +65,16 @@ const CadastrarOcorrenciaDoenca: React.FC = () => {
     const dto: OcorrenciaDoencaRequestDTO = {
       ovinoId: Number(ovinoId),
       doencaId: Number(doencaId),
-      dataInicio: DateToIsoString((dataInicio)),
+      dataInicio: DateToIsoString(dataInicio),
       curado: false,
       idFuncionario: idFuncionario,
+      isSugestao: enviarSugestao,
     };
 
     console.log("OcorrenciaDoenca DTO:", dto);
 
     try {
       const novaOcorrencia = await criarOcorrencia(dto);
-
-      console.log("Nova Ocorrencia Doenca criada:", novaOcorrencia);
 
       toast.success(
         <div
@@ -93,7 +90,7 @@ const CadastrarOcorrenciaDoenca: React.FC = () => {
             type="button"
             variant="toast"
             onClick={() => {
-              const destino = `/dashboard/ovinos/doencas/doentes?searchId=${novaOcorrencia.id}`
+              const destino = `/dashboard/ovinos/doencas/doentes?searchId=${novaOcorrencia.id}`;
               navigate(destino);
               toast.dismiss();
             }}
@@ -108,9 +105,11 @@ const CadastrarOcorrenciaDoenca: React.FC = () => {
           },
         }
       );
+
       setOvinoId("");
       setDoencaId("");
       setDataInicio("");
+      setEnviarSugestao(false);
     } catch (err) {
       console.error(err);
       toast.error("Erro ao cadastrar adoecimento.");
@@ -127,7 +126,7 @@ const CadastrarOcorrenciaDoenca: React.FC = () => {
           <li className="flex-column">
             <label htmlFor="doencaId">Doença</label>
             {loadingDoenc ? (
-              <p>Carregando reproduções...</p>
+              <p>Carregando doenças...</p>
             ) : errorDoenc ? (
               <p style={{ color: "red" }}>{errorDoenc}</p>
             ) : (
@@ -145,7 +144,6 @@ const CadastrarOcorrenciaDoenca: React.FC = () => {
               </select>
             )}
           </li>
-
           <li className="flex-column">
             <label htmlFor="ovinoId">Ovino</label>
             <select
@@ -163,7 +161,6 @@ const CadastrarOcorrenciaDoenca: React.FC = () => {
               ))}
             </select>
           </li>
-
           <li className="flex-column">
             <label htmlFor="dataInicio">Data de início</label>
             <input
@@ -174,6 +171,16 @@ const CadastrarOcorrenciaDoenca: React.FC = () => {
               required
             />
           </li>
+          <li className="checkbox-sugestao">
+            <input
+              type="checkbox"
+              id="enviarSugestao"
+              checked={enviarSugestao}
+              onChange={(e) => setEnviarSugestao(e.target.checked)}
+            />
+            <label htmlFor="enviarSugestao">Solicitar verificação</label>
+          </li>
+
           <div className="cadastrarOcorrenciaDoenca-form-navigation">
             <Button type="submit" variant="cardPrimary" disabled={saving}>
               {saving ? "Salvando..." : "Cadastrar adoecimento"}

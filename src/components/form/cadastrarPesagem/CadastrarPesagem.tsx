@@ -24,9 +24,7 @@ const CadastrarPesagem: React.FC = () => {
 
   const navigate = useNavigate();
 
-   const idFuncionario = localStorage.getItem("funcionarioId")
-  ? Number(localStorage.getItem("funcionarioId"))
-  : 1;
+ const idFuncionario = Number(localStorage.getItem("funcionarioId")) || 1;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -41,7 +39,10 @@ const CadastrarPesagem: React.FC = () => {
       dataPesagem: DateToIsoString(dataPesagem),
       peso: Number(peso),
       idFuncionario: idFuncionario,
+      isSugestao: enviarSugestao,
     };
+
+    console.log("Dto enviado: ", dto);
 
     try {
       const novaPesagem = await criarPesagem(dto);

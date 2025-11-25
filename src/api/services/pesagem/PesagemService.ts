@@ -17,6 +17,7 @@ export class PesagemService {
   static async criar(dto: PesagemRequestDTO): Promise<PesagemResponseDTO> {
     const payload = pesagemMapper.toRequest(dto);
     const { data } = await Api.post<any>("/user/pesagens", payload);
+    console.log("dto efetivo enviado: ", payload);
     return pesagemMapper.fromResponse(data);
   }
 

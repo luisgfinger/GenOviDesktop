@@ -10,6 +10,7 @@ interface OcorrenciaDoencaCardProps {
   onMarkCurado?: () => void;
   confirmado: boolean;
   onConfirm: () => void;
+  responsavel?: string;
 }
 
 const OcorrenciaDoencaCard: React.FC<OcorrenciaDoencaCardProps> = ({
@@ -17,7 +18,8 @@ const OcorrenciaDoencaCard: React.FC<OcorrenciaDoencaCardProps> = ({
   onView,
   onMarkCurado,
   confirmado,
-  onConfirm
+  onConfirm,
+  responsavel,
 }) => {
   return (
     <div className="card">
@@ -27,7 +29,7 @@ const OcorrenciaDoencaCard: React.FC<OcorrenciaDoencaCardProps> = ({
           
           <span>
             <strong>Responsável:</strong>{" "}
-            {localStorage.getItem("funcionarioNome") ?? "—"}
+            {responsavel ?? "—"}
           </span>
 
           <span>

@@ -5,4 +5,5 @@ export interface OcorrenciaDoencaRequestDTO {
   dataFinal?: string;
   curado: boolean;
   idFuncionario?: number;
+  isSugestao?: boolean;
 }

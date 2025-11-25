@@ -48,10 +48,7 @@ const CadastrarReproducao: React.FC<Props> = ({ minAgeMonths = 12 }) => {
   const [dataReproducao, setDataReproducao] = useState<string>("");
   const [enviarSugestao, setEnviarSugestao] = useState<boolean>(false);
   const [contextoIA, setContextoIA] = useState<any>(null);
-
-   const idFuncionario = localStorage.getItem("funcionarioId")
-  ? Number(localStorage.getItem("funcionarioId"))
-  : 1;
+ const idFuncionario = Number(localStorage.getItem("funcionarioId")) || 1;
 
   const isOvelhaGestando = (ovelhaId: number): boolean => {
     return (gestacoes ?? []).some((g) => {
@@ -105,6 +102,7 @@ const CadastrarReproducao: React.FC<Props> = ({ minAgeMonths = 12 }) => {
       enumReproducao: typeReproducao as TypeReproducao,
       dataReproducao: `${dataReproducao}:00`,
       idFuncionario: idFuncionario,
+      isSugestao: enviarSugestao,
     };
 
     try {
@@ -218,7 +216,7 @@ const CadastrarReproducao: React.FC<Props> = ({ minAgeMonths = 12 }) => {
         promptPreDefinido="Avaliação da reprodução:"
         permitirInputUsuario={true}
         promptOptions={[
-          "Esta combinação genética é boa?",
+          "Esta combinação é boa para reprodução?",
           "A fêmea pode reproduzir neste momento?",
           "Existe risco nessa reprodução?",
           "O macho é adequado para cobertura?",

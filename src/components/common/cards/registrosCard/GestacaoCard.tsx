@@ -10,13 +10,15 @@ interface GestacaoCardProps {
   onView: () => void;
   confirmado: boolean;
   onConfirm: () => void; 
+  responsavel?: string;
 }
 
 const GestacaoCard: React.FC<GestacaoCardProps> = ({
   gestacao,
   onView,
   confirmado,
-  onConfirm
+  onConfirm,
+  responsavel,
 }) => {
   return (
     <div className="card">
@@ -26,7 +28,7 @@ const GestacaoCard: React.FC<GestacaoCardProps> = ({
 
           <span>
             <strong>Responsável:</strong>{" "}
-            {localStorage.getItem("funcionarioNome") ?? "—"}
+            {responsavel ?? "—"}
           </span>
 
           <span>

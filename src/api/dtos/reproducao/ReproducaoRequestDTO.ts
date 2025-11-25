@@ -5,4 +5,5 @@ export interface ReproducaoRequestDTO {
   enumReproducao: string;
   dataReproducao: string; 
   idFuncionario?: number;
+  isSugestao?: boolean;
 }

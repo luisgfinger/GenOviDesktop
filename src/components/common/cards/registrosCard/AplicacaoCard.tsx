@@ -10,6 +10,7 @@ interface AplicacaoCardProps {
   onView: () => void;
   confirmado: boolean;
   onConfirm: () => void;
+  responsavel?: string;
 }
 
 const AplicacaoCard: React.FC<AplicacaoCardProps> = ({
@@ -17,6 +18,7 @@ const AplicacaoCard: React.FC<AplicacaoCardProps> = ({
   onView,
   confirmado,
   onConfirm,
+  responsavel,
 }) => {
   const isVacina = aplicacao.medicamento?.isVacina === true;
   const titulo = isVacina ? "Vacinação" : "Medicação";
@@ -31,7 +33,7 @@ const AplicacaoCard: React.FC<AplicacaoCardProps> = ({
 
           <span>
             <strong>Responsável:</strong>{" "}
-            {localStorage.getItem("funcionarioNome") ?? "—"}
+            {responsavel ?? "—"}
           </span>
 
           <span>
