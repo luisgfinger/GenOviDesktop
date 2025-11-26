@@ -9,24 +9,18 @@ import SideMenu from "../components/layout/side-menu/SideMenu";
 import "../styles/AppLayout.css";
 import { ToastContainer } from "react-toastify";
 import IAButton from "../components/common/ia/IAButton";
-import { getIaConfig } from "../routes/ia/GetIAConfig";
-import type { Ovino } from "../api/models/ovino/OvinoModel";
 
 const AppRoutes: React.FC = () => {
   const { isLoggedIn } = useAuth();
   const location = useLocation();
   const pathname = location.pathname;
 
-  const state = location.state as any;
+const rotasComIAProprio = [
+  "/dashboard/ovinos/gerenciar",
+  "/dashboard/ovinos/fullinfo/",
+  "/dashboard/ovinos/reproducoes/criar",
+];
 
-  const ovino = state?.ovino as Ovino | undefined;
-  const contextoDaRota = state?.contextoIA;
-
-  const contextoIA = contextoDaRota ?? ovino ?? null;
-
-  const iaConfig = getIaConfig(pathname, contextoIA);
-
-  const rotasComIAProprio = ["/dashboard/ovinos/reproducoes/criar"];
 
   const esconderIAButtonGlobal = rotasComIAProprio.some((rota) =>
     pathname.startsWith(rota)
@@ -62,10 +56,6 @@ const AppRoutes: React.FC = () => {
 
         {!esconderIAButtonGlobal && isLoggedIn &&(
           <IAButton
-            promptPreDefinido={iaConfig.promptPreDefinido}
-            permitirInputUsuario={iaConfig.permitirInputUsuario}
-            promptOptions={iaConfig.promptOptions}
-            contextoIA={contextoIA}
           />
         )}
 

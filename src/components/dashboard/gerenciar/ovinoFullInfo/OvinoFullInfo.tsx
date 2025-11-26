@@ -13,6 +13,8 @@ import { TypeGrauPureza } from "../../../../api/enums/typeGrauPureza/TypeGrauPur
 
 import { PartoService } from "../../../../api/services/parto/PartoService";
 import { CompraService } from "../../../../api/services/compra/CompraService";
+import IAButton from "../../../common/ia/IAButton";
+import { gerarContextoOvino } from "../../../../utils/ia/gerarContextoOvino";
 
 const OvinoFullInfo: React.FC = () => {
   const { state } = useLocation();
@@ -51,8 +53,8 @@ const OvinoFullInfo: React.FC = () => {
   if (!ovino) {
     return (
       <p style={{ padding: "20px" }}>
-        Nenhum ovino carregado.  
-        Volte para a lista de ovinos e selecione novamente.
+        Nenhum ovino carregado. Volte para a lista de ovinos e selecione
+        novamente.
       </p>
     );
   }
@@ -127,7 +129,10 @@ const OvinoFullInfo: React.FC = () => {
 
     if (editField === "sexo") {
       return (
-        <select value={tempValue} onChange={(e) => setTempValue(e.target.value)}>
+        <select
+          value={tempValue}
+          onChange={(e) => setTempValue(e.target.value)}
+        >
           <option value="">Selecione</option>
           <option value="MACHO">Macho</option>
           <option value="FEMEA">Fêmea</option>
@@ -137,10 +142,15 @@ const OvinoFullInfo: React.FC = () => {
 
     if (editField === "raca") {
       return (
-        <select value={tempValue} onChange={(e) => setTempValue(e.target.value)}>
+        <select
+          value={tempValue}
+          onChange={(e) => setTempValue(e.target.value)}
+        >
           <option value="">Selecione</option>
           {Object.values(TypeRaca).map((r) => (
-            <option key={r} value={r}>{r}</option>
+            <option key={r} value={r}>
+              {r}
+            </option>
           ))}
         </select>
       );
@@ -148,9 +158,14 @@ const OvinoFullInfo: React.FC = () => {
 
     if (editField === "status") {
       return (
-        <select value={tempValue} onChange={(e) => setTempValue(e.target.value)}>
+        <select
+          value={tempValue}
+          onChange={(e) => setTempValue(e.target.value)}
+        >
           {Object.values(TypeStatus).map((s) => (
-            <option key={s} value={s}>{s}</option>
+            <option key={s} value={s}>
+              {s}
+            </option>
           ))}
         </select>
       );
@@ -158,9 +173,14 @@ const OvinoFullInfo: React.FC = () => {
 
     if (editField === "grauPureza") {
       return (
-        <select value={tempValue} onChange={(e) => setTempValue(e.target.value)}>
+        <select
+          value={tempValue}
+          onChange={(e) => setTempValue(e.target.value)}
+        >
           {Object.values(TypeGrauPureza).map((g) => (
-            <option key={g} value={g}>{g}</option>
+            <option key={g} value={g}>
+              {g}
+            </option>
           ))}
         </select>
       );
@@ -168,11 +188,16 @@ const OvinoFullInfo: React.FC = () => {
 
     if (editField === "ovinoMae" || editField === "ovinoPai") {
       const options = ovinos.filter((o) => {
-        return editField === "ovinoMae" ? o.sexo === "Fêmea" : o.sexo === "Macho";
+        return editField === "ovinoMae"
+          ? o.sexo === "Fêmea"
+          : o.sexo === "Macho";
       });
 
       return (
-        <select value={tempValue} onChange={(e) => setTempValue(e.target.value)}>
+        <select
+          value={tempValue}
+          onChange={(e) => setTempValue(e.target.value)}
+        >
           <option value="">Selecione</option>
           {options.map((o) => (
             <option key={o.id} value={o.id}>
@@ -185,7 +210,10 @@ const OvinoFullInfo: React.FC = () => {
 
     if (editField === "parto") {
       return (
-        <select value={tempValue} onChange={(e) => setTempValue(e.target.value)}>
+        <select
+          value={tempValue}
+          onChange={(e) => setTempValue(e.target.value)}
+        >
           <option value="">Selecione</option>
           {partos.map((p) => (
             <option key={p.id} value={p.id}>
@@ -198,7 +226,10 @@ const OvinoFullInfo: React.FC = () => {
 
     if (editField === "compra") {
       return (
-        <select value={tempValue} onChange={(e) => setTempValue(e.target.value)}>
+        <select
+          value={tempValue}
+          onChange={(e) => setTempValue(e.target.value)}
+        >
           <option value="">Selecione</option>
           {compras.map((c) => (
             <option key={c.id} value={c.id}>
@@ -221,7 +252,11 @@ const OvinoFullInfo: React.FC = () => {
 
   return (
     <div className="ovinoFullInfo flex-column">
-      <OvinoCardFull ovino={ovino} onEdit={handleEdit} onRemove={handleDisable} />
+      <OvinoCardFull
+        ovino={ovino}
+        onEdit={handleEdit}
+        onRemove={handleDisable}
+      />
 
       {editField && (
         <div className="edit-overlay">
@@ -229,16 +264,35 @@ const OvinoFullInfo: React.FC = () => {
             <h3>Editando: {editField}</h3>
             {renderInput()}
             <div className="edit-buttons">
-              <Button variant="cardPrimary" onClick={handleSave} disabled={loading}>
+              <Button
+                variant="cardPrimary"
+                onClick={handleSave}
+                disabled={loading}
+              >
                 {loading ? "Salvando..." : "Salvar"}
               </Button>
-              <Button variant="cardSecondary" onClick={handleCancel} disabled={loading}>
+              <Button
+                variant="cardSecondary"
+                onClick={handleCancel}
+                disabled={loading}
+              >
                 Cancelar
               </Button>
             </div>
           </div>
         </div>
       )}
+
+      <IAButton
+        promptPreDefinido={gerarContextoOvino(ovino)}
+        contextoIA={{ ovinoId: ovino.id }}
+        promptOptions={[
+          "Com base na raça, quais cuidados especiais devo ter?",
+          "Este ovino está em idade reprodutiva?",
+          "Qual histórico de saúde?",
+          "Qual alimentação adequada?",
+        ]}
+      />
     </div>
   );
 };

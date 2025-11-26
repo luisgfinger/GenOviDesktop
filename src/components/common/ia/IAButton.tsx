@@ -11,7 +11,6 @@ interface IAButtonProps {
 }
 
 export default function IAButton(props: IAButtonProps) {
-  const { contextoIA } = props;
   const [open, setOpen] = useState(false);
 
   return (
@@ -25,7 +24,6 @@ export default function IAButton(props: IAButtonProps) {
           promptPreDefinido={props.promptPreDefinido}
           permitirInputUsuario={props.permitirInputUsuario}
           promptOptions={props.promptOptions}
-          contextoIA={contextoIA}
           onClose={() => setOpen(false)}
         />
       )}

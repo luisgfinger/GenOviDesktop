@@ -4,29 +4,30 @@ import "./ChatIA.css";
 
 export default function ChatIA() {
   const [input, setInput] = useState("");
-  const [messages, setMessages] = useState<any[]>([]);
+  const [messages, setMessages] = useState<{ role: string; text: string; timestamp: Date }[]>([]);
   const { sendToIA, loading } = useGenoviIA();
 
   async function handleSend() {
     if (!input.trim()) return;
 
     const userMsg = {
+      role: "user",
       text: input,
-      sender: "user",
-      timestamp: new Date(),
+      timestamp: new Date()
     };
 
-    setMessages(prev => [...prev, userMsg]);
+    const updatedHistory = [...messages, userMsg];
+    setMessages(updatedHistory);
+
     setInput("");
 
-    const iaResponse = await sendToIA(userMsg.text);
+    const iaResponse = await sendToIA(updatedHistory);
 
     const iaMsg = {
+      role: "model",
       text: iaResponse.text,
-      sender: iaResponse.success ? "bot" : "error",
-      timestamp: iaResponse.timestamp,
+      timestamp: new Date()
     };
-
     setMessages(prev => [...prev, iaMsg]);
   }
 
@@ -38,7 +39,7 @@ export default function ChatIA() {
         {messages.map((m, i) => (
           <div
             key={i}
-            className={`chat-bubble ${m.sender === "user" ? "me" : m.sender}`}
+            className={`chat-bubble ${m.role === "user" ? "me" : "bot"}`}
           >
             <p>{m.text}</p>
             <span className="timestamp">

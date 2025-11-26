@@ -1,13 +1,12 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useGenoviIA } from "../../../api/hooks/ia/UseGenoviIA";
 import "./IA.css";
-import { gerarContextoIA } from "../../../utils/ia/gerarContextoIA";
 
 interface IAChatWidgetProps {
   promptPreDefinido?: string;
   permitirInputUsuario?: boolean;
   promptOptions?: string[];
-  contextoIA?: any;
+
   onClose: () => void;
 }
 
@@ -15,51 +14,57 @@ export default function IAChatWidget({
   promptPreDefinido,
   permitirInputUsuario = true,
   promptOptions = [],
-  contextoIA,
   onClose,
 }: IAChatWidgetProps) {
+
   const { sendToIA, loading } = useGenoviIA();
-  const [messages, setMessages] = useState<any[]>([]);
+
+  const [messages, setMessages] = useState<
+    { role: string; text: string; hidden?: boolean }[]
+  >([]);
+
   const [input, setInput] = useState("");
 
-  function construirPrompt(finalPergunta: string) {
-    let header = "";
-
-    if (contextoIA) {
-      header += gerarContextoIA(contextoIA) + "\n\n";
-    }
-
+  useEffect(() => {
     if (promptPreDefinido) {
-      header += promptPreDefinido + "\n";
+      setMessages([
+        {
+          role: "model",
+          text: promptPreDefinido,
+          hidden: true
+        }
+      ]);
     }
-
-    return header ? `${header}${finalPergunta}` : finalPergunta;
-  }
+  }, [promptPreDefinido]);
 
   async function enviarPrompt(text: string) {
-    const userMsg = { text, sender: "user", timestamp: new Date() };
-    setMessages((prev) => [...prev, userMsg]);
+    const newHistory = [...messages, { role: "user", text }];
+    setMessages(newHistory);
 
-    const finalPrompt = construirPrompt(text);
-    const result = await sendToIA(finalPrompt);
+    const result = await sendToIA(newHistory);
 
-    console.log("PROMPT FINAL ENVIADO PARA IA:");
-    console.log(finalPrompt);
-
-    const iaMsg = {
-      text: result.text,
-      sender: result.success ? "bot" : "error",
-      timestamp: result.timestamp,
+    const iaReply = {
+      role: "model",
+      text: result.text
     };
 
-    setMessages((prev) => [...prev, iaMsg]);
+    setMessages(prev => [...prev, iaReply]);
   }
 
   return (
     <div className="ia-widget">
+
       <div className="ia-header">
         <span>Assistente Genovi 🐑</span>
-        <button className="ia-close-btn" onClick={onClose}>×</button>
+        <button
+          className="ia-close-btn"
+          onClick={() => {
+            setMessages([]);
+            onClose();
+          }}
+        >
+          ×
+        </button>
       </div>
 
       {promptOptions.length > 0 && (
@@ -73,11 +78,14 @@ export default function IAChatWidget({
       )}
 
       <div className="ia-messages">
-        {messages.map((m, i) => (
-          <div key={i} className={`msg ${m.sender}`}>
-            {m.text}
-          </div>
-        ))}
+        {messages
+          .filter(m => !m.hidden) 
+          .map((m, i) => (
+            <div key={i} className={`msg ${m.role === "user" ? "user" : "bot"}`}>
+              {m.text}
+            </div>
+          ))
+        }
 
         {loading && <div className="msg bot">Digitando...</div>}
       </div>

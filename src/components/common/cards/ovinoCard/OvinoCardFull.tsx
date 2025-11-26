@@ -88,7 +88,6 @@ const OvinoCardFull: React.FC<OvinoCardFullProps> = ({
           "grauPureza"
         )}
 
-       
 
         {renderField("Parto", ovino.parto?.id, "parto")}
         {renderField("Mãe", ovino.ovinoMae?.nome, "ovinoMae")}

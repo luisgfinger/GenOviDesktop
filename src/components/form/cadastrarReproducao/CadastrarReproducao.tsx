@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, {useMemo, useState } from "react";
 import "./CadastrarReproducao.css";
 import Button from "../../common/buttons/Button";
 import { toast } from "react-toastify";
@@ -17,6 +17,7 @@ import type { ReproducaoRequestDTO } from "../../../api/dtos/reproducao/Reproduc
 import { formatDate } from "../../../utils/formatDate";
 import IAButton from "../../common/ia/IAButton";
 import { useIsAdmin } from "../../../api/hooks/useIsAdmin";
+import { gerarContextoReproducao } from "../../../utils/ia/gerenciarContextoReproducao";
 
 type Props = {
   minAgeMonths?: number;
@@ -48,10 +49,9 @@ const CadastrarReproducao: React.FC<Props> = ({ minAgeMonths = 12 }) => {
   const [typeReproducao, setTypeReproducao] = useState<TypeReproducao | "">("");
   const [dataReproducao, setDataReproducao] = useState<string>("");
   const [enviarSugestao, setEnviarSugestao] = useState<boolean>(false);
-  const [contextoIA, setContextoIA] = useState<any>(null);
- const idFuncionario = Number(localStorage.getItem("funcionarioId")) || 1;
+  const idFuncionario = Number(localStorage.getItem("funcionarioId")) || 1;
 
- const isAdmin = useIsAdmin();
+  const isAdmin = useIsAdmin();
 
   const isOvelhaGestando = (ovelhaId: number): boolean => {
     return (gestacoes ?? []).some((g) => {
@@ -91,6 +91,11 @@ const CadastrarReproducao: React.FC<Props> = ({ minAgeMonths = 12 }) => {
     [adultosAtivos, carneiroId, gestacoes, partos]
   );
 
+  const machoSelecionado =
+    machosAdultos.find((o) => String(o.id) === carneiroId) ?? null;
+  const femeaSelecionada =
+    femeasAdultas.find((o) => String(o.id) === femeaId) ?? null;
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -122,13 +127,6 @@ const CadastrarReproducao: React.FC<Props> = ({ minAgeMonths = 12 }) => {
       toast.error("Erro ao cadastrar reprodução.");
     }
   };
-
-  useEffect(() => {
-    const macho = machosAdultos.find((m) => String(m.id) === carneiroId);
-    const femea = femeasAdultas.find((f) => String(f.id) === femeaId);
-
-    setContextoIA(macho && femea ? { macho, femea } : null);
-  }, [carneiroId, femeaId, machosAdultos, femeasAdultas]);
 
   return (
     <div className="cadastrar-reproducao-bg flex-column">
@@ -196,17 +194,17 @@ const CadastrarReproducao: React.FC<Props> = ({ minAgeMonths = 12 }) => {
             />
           </li>
 
-          {isAdmin &&
-          <li className="checkbox-sugestao">
-            <input
-              type="checkbox"
-              id="enviarSugestao"
-              checked={enviarSugestao}
-              onChange={(e) => setEnviarSugestao(e.target.checked)}
-            />
-            <label htmlFor="enviarSugestao">Enviar como solicitação</label>
-          </li>
-          }
+          {isAdmin && (
+            <li className="checkbox-sugestao">
+              <input
+                type="checkbox"
+                id="enviarSugestao"
+                checked={enviarSugestao}
+                onChange={(e) => setEnviarSugestao(e.target.checked)}
+              />
+              <label htmlFor="enviarSugestao">Enviar como solicitação</label>
+            </li>
+          )}
 
           <div className="cadastrarReproducao-form-navigation">
             <Button type="submit" variant="cardPrimary" disabled={saving}>
@@ -219,16 +217,14 @@ const CadastrarReproducao: React.FC<Props> = ({ minAgeMonths = 12 }) => {
       </form>
 
       <IAButton
-        promptPreDefinido="Avaliação da reprodução:"
-        permitirInputUsuario={true}
+        promptPreDefinido={
+          machoSelecionado && femeaSelecionada
+            ? gerarContextoReproducao(machoSelecionado, femeaSelecionada)
+            : undefined
+        }
         promptOptions={[
-          "Esta combinação é boa para reprodução?",
-          "A fêmea pode reproduzir neste momento?",
-          "Existe risco nessa reprodução?",
-          "O macho é adequado para cobertura?",
-          "Previsão de características dos cordeiros",
+          "Essa é uma boa combinação reprodutiva?",
         ]}
-        contextoIA={contextoIA}
       />
     </div>
   );

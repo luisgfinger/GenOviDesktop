@@ -2,15 +2,20 @@ import { useState } from "react";
 import { mapChatResponse } from "../../mappers/ia/ChatMapper";
 import { GenoviIAService } from "../../services/ia/GenoviIAService";
 
+interface IAHistoryItem {
+  role: string;
+  text: string;
+}
+
 export function useGenoviIA() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  async function sendToIA(prompt: string) {
+  async function sendToIA(history: IAHistoryItem[]) {
     setLoading(true);
     setError(null);
 
-    const result = await GenoviIAService.enviarMensagem(prompt);
+    const result = await GenoviIAService.enviarMensagem(history);
 
     const mapped = mapChatResponse(result);
 

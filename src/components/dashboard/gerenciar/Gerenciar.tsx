@@ -16,6 +16,7 @@ import { TypeStatus } from "../../../api/enums/typeStatus/TypeStatus";
 
 import type { Ovino } from "../../../api/models/ovino/OvinoModel";
 import type { Funcionario } from "../../../api/models/funcionario/FuncinarioModel";
+import IAButton from "../../common/ia/IAButton";
 
 interface GerenciarProps {
   type: "ovino" | "funcionario";
@@ -213,6 +214,17 @@ const Gerenciar: React.FC<GerenciarProps> = ({ type }) => {
           Ver menos
         </button>
       )}
+      <IAButton
+        permitirInputUsuario={true}
+        promptOptions={
+          [
+            type === "ovino" && "Quais raças são melhores para carne?",
+            type === "ovino" && "Principais sinais de doenças?",
+            type === "ovino" && "Como melhorar a produtividade?",
+            type === "ovino" && "Cuidados essenciais com cordeiros",
+          ].filter(Boolean) as string[]
+        }
+      />
     </div>
   );
 };
