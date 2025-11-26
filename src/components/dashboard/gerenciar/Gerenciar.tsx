@@ -47,43 +47,45 @@ const Gerenciar: React.FC<GerenciarProps> = ({ type }) => {
   };
 
   const filteredOvinos = useMemo(() => {
-    let result = ovinos;
+  let result = ovinos;
 
-    if (q) {
-      result = result.filter((o) =>
-        [o.id.toString(), o.fbb, o.nome, o.raca, o.sexo]
-          .filter(Boolean)
-          .some((field) => field!.toLowerCase().includes(q.toLowerCase()))
-      );
-    }
+  if (q) {
+    result = result.filter((o) =>
+      [o.id.toString(), o.fbb, o.nome, o.raca, o.sexo]
+        .filter(Boolean)
+        .some((field) => field!.toLowerCase().includes(q.toLowerCase()))
+    );
+  }
 
-    if (tipo && tipo !== "TODOS") {
-      result = result.filter(
-        (o) => o.sexo?.toLowerCase() === tipo.toLowerCase()
-      );
-    }
+  if (tipo && tipo !== "TODOS") {
+    result = result.filter(
+      (o) => o.sexo?.toLowerCase() === tipo.toLowerCase()
+    );
+  }
 
-    if (status && status !== "TODOS") {
-      result = result.filter(
-        (o) => o.status?.toLowerCase() === status.toLowerCase()
-      );
-    }
+  if (status && status !== "TODOS") {
+    result = result.filter(
+      (o) => o.status?.toLowerCase() === status.toLowerCase()
+    );
+  }
 
-    if (dateFrom) {
-      result = result.filter(
-        (o) =>
-          o.dataNascimento && new Date(o.dataNascimento) >= new Date(dateFrom)
-      );
-    }
-    if (dateTo) {
-      result = result.filter(
-        (o) =>
-          o.dataNascimento && new Date(o.dataNascimento) <= new Date(dateTo)
-      );
-    }
+  if (dateFrom) {
+    result = result.filter(
+      (o) =>
+        o.dataNascimento && new Date(o.dataNascimento) >= new Date(dateFrom)
+    );
+  }
+  if (dateTo) {
+    result = result.filter(
+      (o) =>
+        o.dataNascimento && new Date(o.dataNascimento) <= new Date(dateTo)
+    );
+  }
 
-    return result;
-  }, [ovinos, q, tipo, status, dateFrom, dateTo]);
+  result = [...result].sort((a, b) => b.id - a.id);
+
+  return result;
+}, [ovinos, q, tipo, status, dateFrom, dateTo]);
 
   const filteredFuncionarios = useMemo(() => {
     let result = funcionarios;

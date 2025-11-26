@@ -13,6 +13,7 @@ import { TypeGrauPureza } from "../../../../api/enums/typeGrauPureza/TypeGrauPur
 
 import { PartoService } from "../../../../api/services/parto/PartoService";
 import { CompraService } from "../../../../api/services/compra/CompraService";
+
 import IAButton from "../../../common/ia/IAButton";
 import { gerarContextoOvino } from "../../../../utils/ia/gerarContextoOvino";
 
@@ -23,7 +24,6 @@ const OvinoFullInfo: React.FC = () => {
   const ovinoInicial = state?.ovino as Ovino | undefined;
 
   const [ovino, setOvino] = useState<Ovino | null>(ovinoInicial ?? null);
-
   const [editField, setEditField] = useState<keyof Ovino | null>(null);
   const [tempValue, setTempValue] = useState<any>("");
   const [loading, setLoading] = useState(false);
@@ -31,6 +31,21 @@ const OvinoFullInfo: React.FC = () => {
   const [ovinos, setOvinos] = useState<Ovino[]>([]);
   const [partos, setPartos] = useState<any[]>([]);
   const [compras, setCompras] = useState<any[]>([]);
+
+  useEffect(() => {
+    async function sincronizarOvino() {
+      if (!ovinoInicial?.id) return;
+
+      try {
+        const atualizado = await OvinoService.findById(ovinoInicial.id);
+        setOvino(atualizado);
+      } catch (err) {
+        console.error("Erro ao sincronizar ovino:", err);
+      }
+    }
+
+    sincronizarOvino();
+  }, [ovinoInicial?.id]);
 
   useEffect(() => {
     (async () => {
@@ -53,8 +68,7 @@ const OvinoFullInfo: React.FC = () => {
   if (!ovino) {
     return (
       <p style={{ padding: "20px" }}>
-        Nenhum ovino carregado. Volte para a lista de ovinos e selecione
-        novamente.
+        Nenhum ovino carregado. Volte para a lista de ovinos.
       </p>
     );
   }
@@ -84,40 +98,56 @@ const OvinoFullInfo: React.FC = () => {
     );
   };
 
-  const handleSave = async () => {
-    if (!ovino || !editField) return;
+ const handleSave = async () => {
+  if (!ovino || !editField) return;
 
-    try {
-      setLoading(true);
+  try {
+    setLoading(true);
 
-      let newValue: any = tempValue;
+    let newValue: any = tempValue;
 
-      if (["ovinoMae", "ovinoPai"].includes(editField)) {
-        newValue = ovinos.find((o) => o.id === Number(tempValue)) ?? null;
-      } else if (editField === "parto") {
-        newValue = partos.find((p) => p.id === Number(tempValue)) ?? null;
-      } else if (editField === "compra") {
-        newValue = compras.find((c) => c.id === Number(tempValue)) ?? null;
-      }
-
-      if (String(editField).toLowerCase().includes("data") && newValue) {
-        newValue = newValue.includes("T") ? newValue : `${newValue}T00:00:00`;
-      }
-
-      const updated = { ...ovino, [editField]: newValue };
-
-      await OvinoService.editar(ovino.id, updated as any);
-
-      toast.success("Campo atualizado com sucesso!");
-      setOvino(updated);
-      setEditField(null);
-    } catch (err) {
-      console.error(err);
-      toast.error("Erro ao atualizar o campo.");
-    } finally {
-      setLoading(false);
+    if (["ovinoMae", "ovinoPai"].includes(editField)) {
+      newValue = tempValue ? Number(tempValue) : null;
+    } else if (editField === "parto") {
+      newValue = tempValue ? Number(tempValue) : null;
+    } else if (editField === "compra") {
+      newValue = tempValue ? Number(tempValue) : null;
     }
-  };
+
+    if (String(editField).toLowerCase().includes("data") && newValue) {
+      newValue = newValue.includes("T") ? newValue : `${newValue}T00:00:00`;
+    }
+
+    const dto: any = {
+      ...ovino,
+      [editField]: newValue,
+
+      ovinoMae: ovino.ovinoMae?.id ?? null,
+      ovinoPai: ovino.ovinoPai?.id ?? null,
+      parto: ovino.parto?.id ?? null,
+      compra: ovino.compra?.id ?? null,
+    };
+
+    if (["ovinoMae", "ovinoPai", "parto", "compra"].includes(editField)) {
+      dto[editField] = newValue;
+    }
+
+    await OvinoService.editar(ovino.id, dto);
+
+    toast.success("Campo atualizado com sucesso!");
+
+    const atualizado = await OvinoService.findById(ovino.id);
+    setOvino(atualizado);
+
+    setEditField(null);
+  } catch (err) {
+    console.error(err);
+    toast.error("Erro ao atualizar o campo.");
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   const handleCancel = () => {
     setEditField(null);
@@ -129,10 +159,7 @@ const OvinoFullInfo: React.FC = () => {
 
     if (editField === "sexo") {
       return (
-        <select
-          value={tempValue}
-          onChange={(e) => setTempValue(e.target.value)}
-        >
+        <select value={tempValue} onChange={(e) => setTempValue(e.target.value)}>
           <option value="">Selecione</option>
           <option value="MACHO">Macho</option>
           <option value="FEMEA">Fêmea</option>
@@ -142,10 +169,7 @@ const OvinoFullInfo: React.FC = () => {
 
     if (editField === "raca") {
       return (
-        <select
-          value={tempValue}
-          onChange={(e) => setTempValue(e.target.value)}
-        >
+        <select value={tempValue} onChange={(e) => setTempValue(e.target.value)}>
           <option value="">Selecione</option>
           {Object.values(TypeRaca).map((r) => (
             <option key={r} value={r}>
@@ -158,10 +182,7 @@ const OvinoFullInfo: React.FC = () => {
 
     if (editField === "status") {
       return (
-        <select
-          value={tempValue}
-          onChange={(e) => setTempValue(e.target.value)}
-        >
+        <select value={tempValue} onChange={(e) => setTempValue(e.target.value)}>
           {Object.values(TypeStatus).map((s) => (
             <option key={s} value={s}>
               {s}
@@ -173,10 +194,7 @@ const OvinoFullInfo: React.FC = () => {
 
     if (editField === "grauPureza") {
       return (
-        <select
-          value={tempValue}
-          onChange={(e) => setTempValue(e.target.value)}
-        >
+        <select value={tempValue} onChange={(e) => setTempValue(e.target.value)}>
           {Object.values(TypeGrauPureza).map((g) => (
             <option key={g} value={g}>
               {g}
@@ -187,17 +205,12 @@ const OvinoFullInfo: React.FC = () => {
     }
 
     if (editField === "ovinoMae" || editField === "ovinoPai") {
-      const options = ovinos.filter((o) => {
-        return editField === "ovinoMae"
-          ? o.sexo === "Fêmea"
-          : o.sexo === "Macho";
-      });
+      const options = ovinos.filter((o) =>
+        editField === "ovinoMae" ? o.sexo === "Fêmea" : o.sexo === "Macho"
+      );
 
       return (
-        <select
-          value={tempValue}
-          onChange={(e) => setTempValue(e.target.value)}
-        >
+        <select value={tempValue} onChange={(e) => setTempValue(e.target.value)}>
           <option value="">Selecione</option>
           {options.map((o) => (
             <option key={o.id} value={o.id}>
@@ -210,10 +223,7 @@ const OvinoFullInfo: React.FC = () => {
 
     if (editField === "parto") {
       return (
-        <select
-          value={tempValue}
-          onChange={(e) => setTempValue(e.target.value)}
-        >
+        <select value={tempValue} onChange={(e) => setTempValue(e.target.value)}>
           <option value="">Selecione</option>
           {partos.map((p) => (
             <option key={p.id} value={p.id}>
@@ -226,10 +236,7 @@ const OvinoFullInfo: React.FC = () => {
 
     if (editField === "compra") {
       return (
-        <select
-          value={tempValue}
-          onChange={(e) => setTempValue(e.target.value)}
-        >
+        <select value={tempValue} onChange={(e) => setTempValue(e.target.value)}>
           <option value="">Selecione</option>
           {compras.map((c) => (
             <option key={c.id} value={c.id}>
@@ -241,6 +248,7 @@ const OvinoFullInfo: React.FC = () => {
     }
 
     const isDate = String(editField).toLowerCase().includes("data");
+
     return (
       <input
         type={isDate ? "datetime-local" : "text"}
@@ -252,11 +260,7 @@ const OvinoFullInfo: React.FC = () => {
 
   return (
     <div className="ovinoFullInfo flex-column">
-      <OvinoCardFull
-        ovino={ovino}
-        onEdit={handleEdit}
-        onRemove={handleDisable}
-      />
+      <OvinoCardFull ovino={ovino} onEdit={handleEdit} onRemove={handleDisable} />
 
       {editField && (
         <div className="edit-overlay">
@@ -264,18 +268,10 @@ const OvinoFullInfo: React.FC = () => {
             <h3>Editando: {editField}</h3>
             {renderInput()}
             <div className="edit-buttons">
-              <Button
-                variant="cardPrimary"
-                onClick={handleSave}
-                disabled={loading}
-              >
+              <Button variant="cardPrimary" onClick={handleSave} disabled={loading}>
                 {loading ? "Salvando..." : "Salvar"}
               </Button>
-              <Button
-                variant="cardSecondary"
-                onClick={handleCancel}
-                disabled={loading}
-              >
+              <Button variant="cardSecondary" onClick={handleCancel} disabled={loading}>
                 Cancelar
               </Button>
             </div>
