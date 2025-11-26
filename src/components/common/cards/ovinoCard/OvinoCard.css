@@ -6,6 +6,13 @@
   transition: transform 0.3s ease;
 }
 
+.ovinoCard-container img{
+width: 88px;
+height: 88px;
+border-radius: 50%;
+overflow: hidden;
+}
+
 .ovinoCard-container:hover{
   transform: scale(1.08);
 }

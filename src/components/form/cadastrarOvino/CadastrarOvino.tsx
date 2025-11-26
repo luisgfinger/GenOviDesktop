@@ -66,7 +66,7 @@ const CadastrarOvino: React.FC<CadastrarOvinoProps> = ({
     paiId ? String(paiId) : ""
   );
   const [status, setStatus] = useState<TypeStatus>(TypeStatus.ATIVO);
-  const [imagem, setImagem] = useState<File | null>(null);
+  const [, setImagem] = useState<File | null>(null);
   const [idParto, setIdParto] = useState(partoId ? String(partoId) : "");
   const [idCompra, setIdCompra] = useState(compraId ? String(compraId) : "");
 
@@ -74,6 +74,7 @@ const CadastrarOvino: React.FC<CadastrarOvinoProps> = ({
   const { ovinos } = useOvinos();
   const { salvar, loading: saving, error: errorSalvar } = useSalvarOvino();
   const { partos, loading: loadingPartos, error: errorPartos } = usePartos();
+  const [imagemBase64, setImagemBase64] = useState<string | null>(null);
 
   const machos = useMemo(
     () =>
@@ -173,6 +174,13 @@ const CadastrarOvino: React.FC<CadastrarOvinoProps> = ({
       return;
     }
 
+    let fotoKey: string | undefined = undefined;
+
+    if (imagemBase64) {
+      fotoKey = `ovino_foto_${rfid}`;
+      localStorage.setItem(fotoKey, imagemBase64);
+    }
+
     try {
       const novoOvino: OvinoRequestDTO = {
         rfid: Number(rfid),
@@ -188,27 +196,21 @@ const CadastrarOvino: React.FC<CadastrarOvinoProps> = ({
         paiId: idCarneiroPai ? Number(idCarneiroPai) : undefined,
         compra: compraId ? compraId : idCompra ? Number(idCompra) : undefined,
         parto: partoId ? partoId : idParto ? Number(idParto) : undefined,
-        fotoOvino: imagem?.name,
+
+        fotoOvino: fotoKey,
       };
 
       await salvar(novoOvino);
       toast.success("Ovino cadastrado com sucesso!");
       onSuccess?.();
 
-      setRfid("");
-      setNome("");
-      setRaca("");
-      setFbb("");
-      setDataNasc(toLocalInput(dataNascimento));
-      setGrauPureza("");
-      setSexo("");
-      setStatus(TypeStatus.ATIVO);
       setImagem(null);
-      if (!compraId) setIdCompra("");
+      setImagemBase64(null);
+      setRfid("");
       setStep(1);
     } catch (err) {
       console.error(err);
-      toast.error("Erro ao salvar ovino. Tente novamente.");
+      toast.error("Erro ao salvar ovino.");
     }
   };
 
@@ -244,8 +246,7 @@ const CadastrarOvino: React.FC<CadastrarOvinoProps> = ({
                   {partos.map((parto) => (
                     <option key={parto.id} value={parto.id}>
                       {parto.dataParto?.split("T")[0]} - Mãe:{" "}
-                      {parto.mae?.nome ?? "?"} | Pai:{" "}
-                      {parto.pai?.nome ?? "?"}
+                      {parto.mae?.nome ?? "?"} | Pai: {parto.pai?.nome ?? "?"}
                     </option>
                   ))}
                 </select>
@@ -472,13 +473,35 @@ const CadastrarOvino: React.FC<CadastrarOvinoProps> = ({
                   type="file"
                   id="imagem"
                   accept="image/*"
-                  onChange={(e) => {
+                  onChange={async (e) => {
                     if (e.target.files && e.target.files[0]) {
-                      setImagem(e.target.files[0]);
+                      const file = e.target.files[0];
+                      setImagem(file);
+
+                      // Converter para Base64
+                      const reader = new FileReader();
+                      reader.onload = () =>
+                        setImagemBase64(reader.result as string);
+                      reader.readAsDataURL(file);
                     }
                   }}
                 />
               </div>
+
+              {imagemBase64 && (
+                <img
+                  src={imagemBase64}
+                  alt="Preview"
+                  style={{
+                    width: "150px",
+                    height: "150px",
+                    objectFit: "cover",
+                    marginTop: "10px",
+                    borderRadius: "6px",
+                    border: "1px solid #ccc",
+                  }}
+                />
+              )}
             </li>
 
             <div className="cadastrarOvino-form-navigation flex">

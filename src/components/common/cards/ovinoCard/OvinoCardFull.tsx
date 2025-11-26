@@ -19,6 +19,12 @@ const OvinoCardFull: React.FC<OvinoCardFullProps> = ({
   onEdit,
   onRemove,
 }) => {
+
+    const fotoLocal =
+    ovino.fotoOvino ? localStorage.getItem(ovino.fotoOvino) : null;
+
+  const fotoFinal = fotoLocal || imagem;
+
   const renderField = (
     label: string,
     value: string | number | undefined,
@@ -47,7 +53,7 @@ const OvinoCardFull: React.FC<OvinoCardFullProps> = ({
       />
 
       <div className="ovinoCardFull-header flex">
-        <img src={imagem} alt={ovino.nome} />
+        <img src={fotoFinal} alt={ovino.nome} />
         <div className="flex-column">
           <h2>{ovino.nome}</h2>
           <div className="ovinoCardFull-field flex">
